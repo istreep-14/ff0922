@@ -1,0 +1,17 @@
+{
+  "name": "ff-slim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FantasyPros leagues, current-week and rest-of-season projections, and Draft Sharks — nothing else.",
+  "type": "module",
+  "scripts": {
+    "fetch": "node src/cli.js fetch",
+    "html": "node src/cli.js html",
+    "serve": "node src/cli.js serve",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
