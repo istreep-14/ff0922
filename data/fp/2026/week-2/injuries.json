@@ -1,0 +1,573 @@
+{
+  "fetchedAt": "2026-09-19T18:59:59.189Z",
+  "source": "https://www.fantasypros.com/nfl/injury-news.php",
+  "injuries": [
+    {
+      "player_id": 19278,
+      "name": "Michael Pittman Jr.",
+      "status": "OUT",
+      "injury_type": "foot",
+      "headline": "Michael Pittman Jr. (foot) ruled out Sunday",
+      "comment": "Pittman Jr. will be sidelined after struggling to reach the practice field for head coach Mike McCarthy, with Roman Wilson and Germie Bernard in line for increased roles behind No. 1 wideout DK Metcalf against the Patriots Sunday.",
+      "injury_update_date": "Sat, Sep 19th 1:19pm EDT"
+    },
+    {
+      "player_id": 28127,
+      "name": "Omar Cooper Jr.",
+      "status": "IR",
+      "injury_type": "ankle",
+      "headline": "Omar Cooper Jr. (ankle) placed on injured reserve",
+      "comment": "The Jets are placing their first-round rookie on injured reserve after he suffered an ankle injury in his NFL debut last week. He is going to miss at least four weeks as a result, but he's not expected to be out much beyond that. Adonai Mitchell and Kenyon Sadiq will both see increased opportunities in his absence for the next few weeks at least.",
+      "injury_update_date": "Sat, Sep 19th 12:23pm EDT"
+    },
+    {
+      "player_id": 23249,
+      "name": "Kene Nwangwu",
+      "status": "OUT",
+      "injury_type": "back",
+      "headline": "Kene Nwangwu (back) won't play Sunday",
+      "comment": "Nwangwu missed New York's season opener last week due to injury, and he is now set to miss another game on Sunday due to a back issue that he's dealing with. His absence won't have much of an impact on New York's offense, as he is relegated to more of a special teams role for the Jets.",
+      "injury_update_date": "Sat, Sep 19th 12:21pm EDT"
+    },
+    {
+      "player_id": 25254,
+      "name": "Will McDonald IV",
+      "status": "QUESTIONABLE",
+      "injury_type": "ankle",
+      "headline": "Will McDonald IV (ankle) officially questionable for Sunday",
+      "comment": "McDonald will officially carry a questionable tag for Sunday's game after suffering a minor ankle injury during the week. It looks like he will be cleared to play in time, however, as HC Aaron Glenn told reporters that the veteran edge rusher should be available to play against the Packers.",
+      "injury_update_date": "Sat, Sep 19th 12:19pm EDT"
+    },
+    {
+      "player_id": 23092,
+      "name": "Troy Franklin",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Troy Franklin (knee) good to go for Sunday",
+      "comment": "Franklin found himself on the injury report earlier in the week due to a knee issue, but he was able to practice in full all week and will be good to go for Sunday's game against the Jaguars. He isn't expected to be fantasy relevant for the foreseeable future, however.",
+      "injury_update_date": "Sat, Sep 19th 12:15pm EDT"
+    },
+    {
+      "player_id": 27142,
+      "name": "RJ Harvey",
+      "status": "QUESTIONABLE",
+      "injury_type": "hamstring",
+      "headline": "RJ Harvey (hamstring) officially questionable for Sunday",
+      "comment": "Harvey will go into the weekend with a questionable tag after missing practice earlier in the week due to a hamstring injury. It looks like he's trending towards playing on Sunday, but if he's ruled out ahead of game time, fantasy managers should expect rookie Jonah Coleman to see increased opportunities against Jacksonville in his absence.",
+      "injury_update_date": "Sat, Sep 19th 12:12pm EDT"
+    },
+    {
+      "player_id": 23000,
+      "name": "Brian Thomas Jr.",
+      "status": "ACTIVE",
+      "injury_type": "shoulder",
+      "headline": "Brian Thomas Jr. (shoulder) cleared to play Sunday",
+      "comment": "Thomas suffered a shoulder injury during the team's season opener last week, but he was able to practice all week and won't miss any time because of it. He has been cleared to play on Sunday and should continue to contribute in his usual capacity for the Jaguars for the foreseeable future.",
+      "injury_update_date": "Sat, Sep 19th 12:09pm EDT"
+    },
+    {
+      "player_id": 22878,
+      "name": "Cole Van Lanen",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Cole Van Lanen (knee) off injury report for Sunday",
+      "comment": "Van Lanen's knee injury is nothing more than a minor issue at this point and won't stop him from playing on Sunday. Jacksonville's offensive line should be at full strength in Week 2, which is good news ahead of a tough matchup against Denver's stout defensive front.",
+      "injury_update_date": "Sat, Sep 19th 12:08pm EDT"
+    },
+    {
+      "player_id": 17607,
+      "name": "Foyesade Oluokun",
+      "status": "ACTIVE",
+      "injury_type": "wrist",
+      "headline": "Foyesade Oluokun (wrist) will play Sunday",
+      "comment": "Jacksonville has cleared Oluokun to play in their matchup against Denver on Sunday. That's good news for the team, as he is one of their key defenders and will be needed in what projects to be a close matchup in Week 2.",
+      "injury_update_date": "Sat, Sep 19th 12:06pm EDT"
+    },
+    {
+      "player_id": 18598,
+      "name": "Jakobi Meyers",
+      "status": "ACTIVE",
+      "injury_type": "wrist",
+      "headline": "Jakobi Meyers (wrist) good to go for Sunday",
+      "comment": "Meyers was on the injury report all week due to a lingering wrist issue, but he is going to be good to go and will play in Sunday's game against the Broncos. Fantasy managers shouldn't trust in his week-to-week consistency at this point in the season, however, especially in what projects to be a tough matchup.",
+      "injury_update_date": "Sat, Sep 19th 12:02pm EDT"
+    },
+    {
+      "player_id": 24330,
+      "name": "Aidan O'Connell",
+      "status": "QUESTIONABLE",
+      "injury_type": "personal",
+      "headline": "Aidan O'Connell (personal) listed questionable for Sunday",
+      "comment": "O'Connell may not be able to play on Sunday due to a personal issue of some kind that he's managing right now. He is currently Las Vegas' QB3, however, so his absence wouldn't have a notable impact on their lineup.",
+      "injury_update_date": "Sat, Sep 19th 12:00pm EDT"
+    },
+    {
+      "player_id": 25291,
+      "name": "Lukas Van Ness",
+      "status": "QUESTIONABLE",
+      "injury_type": "concussion",
+      "headline": "Lukas Van Ness (concussion) questionable for Sunday",
+      "comment": "The Packers are uncertain whether or not Van Ness will play on Sunday, as he has yet receive full clearance from the NFL's concussion protocols. His absence would mean a weaker defensive front this week in a matchup against Breece Hall and the Jets.",
+      "injury_update_date": "Sat, Sep 19th 12:32am EDT"
+    },
+    {
+      "player_id": 24244,
+      "name": "Zach Bako-Bewele",
+      "status": "QUESTIONABLE",
+      "injury_type": "knee",
+      "headline": "Zach Bako-Bewele (knee) listed questionable for Sunday",
+      "comment": "A knee injury may leave Bako-Bewele sidelined on Sunday, as he is officially considered questionable heading into the weekend. Aaron Banks (knee) is also uncertain to play, so Green Bay's offensive line may be much weaker than usual if both of those guys are ruled out ahead of game time.",
+      "injury_update_date": "Sat, Sep 19th 12:30am EDT"
+    },
+    {
+      "player_id": 22804,
+      "name": "Aaron Banks",
+      "status": "QUESTIONABLE",
+      "injury_type": "knee",
+      "headline": "Aaron Banks (knee) officially questionable for Sunday",
+      "comment": "Banks has yet to make his season debut due to a knee injury, and it's threatening to leave him sidelined for another game on Sunday. Green Bay is dealing with multiple offensive line injuries right now, so they could be weaker than usual against the Jets this week.",
+      "injury_update_date": "Sat, Sep 19th 12:27am EDT"
+    },
+    {
+      "player_id": 25366,
+      "name": "Max Melton",
+      "status": "QUESTIONABLE",
+      "injury_type": "ankle",
+      "headline": "Max Melton (ankle) considered questionable for Sunday",
+      "comment": "The Cardinals may be without a key defender on Sunday, as Melton is considered questionable to play due to his ankle injury. His absence would make life easier for Drew Lock, Jaxon Smith-Njigba, and Seattle's offense as a whole this week.",
+      "injury_update_date": "Sat, Sep 19th 12:25am EDT"
+    },
+    {
+      "player_id": 16433,
+      "name": "Cooper Kupp",
+      "status": "ACTIVE",
+      "injury_type": "back",
+      "headline": "Cooper Kupp (back) off injury report for Sunday",
+      "comment": "The veteran wideout was limited at practice earlier in the week due to a back injury, but he is over it now and carries no injury designation heading into the weekend. He doesn't project to be a good fantasy option in this matchup, however, especially with Drew Lock set to start at quarterback for the Seahawks this week.",
+      "injury_update_date": "Sat, Sep 19th 12:21am EDT"
+    },
+    {
+      "player_id": 27053,
+      "name": "Nick Emmanwori",
+      "status": "QUESTIONABLE",
+      "injury_type": null,
+      "headline": "Nick Emmanwori (ankle/hip) officially questionable for Sunday",
+      "comment": "Emmanwori was not able to play in Seattle's season opener last week, but he may make his season debut on Sunday, as he is officially considered questionable to play at this point. His return would provide a nice boost to this already-elite defense in a divisional matchup against the Cardinals.",
+      "injury_update_date": "Sat, Sep 19th 12:19am EDT"
+    },
+    {
+      "player_id": 28401,
+      "name": "Kaelon Black",
+      "status": "QUESTIONABLE",
+      "injury_type": "groin",
+      "headline": "Kaelon Black (groin) questionable to play Sunday",
+      "comment": "The rookie was added to the injury report due to a groin issue on Thursday and will officially be questionable to play in Sunday's game against the Dolphins. He was quite involved in San Francisco's season opener last week, so his absence would likely lead to Christian McCaffrey seeing a supermajority of touches for the team in Week 2.",
+      "injury_update_date": "Sat, Sep 19th 12:10am EDT"
+    },
+    {
+      "player_id": 16499,
+      "name": "George Kittle",
+      "status": "ACTIVE",
+      "injury_type": "achilles",
+      "headline": "George Kittle (Achilles) good to go for Sunday",
+      "comment": "As expected, Kittle carries no injury designation heading into the weekend and will be available to play against the Dolphins. It seems likely that he will continue to be limited in some capacity, though it looks like the 49ers are planning on ramping his workload up more and more each week moving forward.",
+      "injury_update_date": "Sat, Sep 19th 12:07am EDT"
+    },
+    {
+      "player_id": 23791,
+      "name": "Alec Pierce",
+      "status": "ACTIVE",
+      "injury_type": "heel",
+      "headline": "Alec Pierce (heel) good to go for Sunday",
+      "comment": "Pierce missed Indianapolis' practice on Thursday, but it looks like that was just for injury maintenance, as he was back and a full participant for them at practice on Friday. He carries no injury designation heading into the weekend and will play on Sunday night, although it remains quite possible that he will continue to have minor limitations while the team ramps his workload back up.",
+      "injury_update_date": "Fri, Sep 18th 4:43pm EDT"
+    },
+    {
+      "player_id": 19276,
+      "name": "Jonathan Greenard",
+      "status": "OUT",
+      "injury_type": "pec",
+      "headline": "Jonathan Greenard (pec) won't play Sunday",
+      "comment": "The veteran edge rusher is going to be out this week, despite taking part at practice all week. He should return to the lineup and provide a nice boost to Philly's pass rush sometime in the near future.",
+      "injury_update_date": "Fri, Sep 18th 4:38pm EDT"
+    },
+    {
+      "player_id": 17281,
+      "name": "Daron Payne",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Daron Payne (knee) cleared to play Sunday",
+      "comment": "Payne now has full clearance to play in Sunday's game against the Cowboys, which was to be expected after he was upgraded to a full participant at practice on Thursday. Look for his presence to make a positive impact on Washington's defensive front in this matchup and beyond.",
+      "injury_update_date": "Fri, Sep 18th 4:33pm EDT"
+    },
+    {
+      "player_id": 26122,
+      "name": "Ladd McConkey",
+      "status": "QUESTIONABLE",
+      "injury_type": "ribs",
+      "headline": "Ladd McConkey (ribs) questionable for Sunday",
+      "comment": "McConkey was a DNP Wednesday and Thursday but got back on the practice field Friday. His chances to play are more on the slim side, but if he plays, you need to start him against this Raiders defense. If he sits, Quentin Johnston and Tre Harris are next in line for targets.",
+      "injury_update_date": "Fri, Sep 18th 4:32pm EDT"
+    },
+    {
+      "player_id": 19206,
+      "name": "Javon Kinlaw",
+      "status": "QUESTIONABLE",
+      "injury_type": "back",
+      "headline": "Javon Kinlaw (back) officially questionable for Sunday",
+      "comment": "Kinlaw returned to practice on Friday and will officially be questionable to play in Washington's matchup against Dallas on Sunday. Their defensive front will be a little short on depth if he is ruled out ahead of kickoff for this game.",
+      "injury_update_date": "Fri, Sep 18th 4:32pm EDT"
+    },
+    {
+      "player_id": 27454,
+      "name": "Jaylin Lane",
+      "status": "ACTIVE",
+      "injury_type": "groin",
+      "headline": "Jaylin Lane (groin) good to go for Sunday",
+      "comment": "A groin injury left Lane limited at practice all week, but it's not a serious issue and won't affect his availability for Sunday's game against Dallas. He doesn't project to be fantasy relevant for the foreseeable future, however.",
+      "injury_update_date": "Fri, Sep 18th 4:29pm EDT"
+    },
+    {
+      "player_id": 19228,
+      "name": "K'Lavon Chaisson",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "K'Lavon Chaisson (knee) off injury report for Sunday",
+      "comment": "Chaisson will be available to play on Sunday after managing a knee issue at practice throughout the week. He will continue to play an important role for the Commanders in their divisional matchup against Dallas' talented offense.",
+      "injury_update_date": "Fri, Sep 18th 4:28pm EDT"
+    },
+    {
+      "player_id": 23238,
+      "name": "Greg Newsome II",
+      "status": "LIMITED",
+      "injury_type": "rib",
+      "headline": "Greg Newsome II (rib) again limited on Friday",
+      "comment": "Newsome was limited for a second-straight practice on Friday as he continues to battle a rib injury of some kind. Deonte Banks (calf) and Paulson Adebo (Knee/IR) are both injured members of New York's secondary as well, so they may be much thinner than usual in Monday night's tough matchup against the Rams.",
+      "injury_update_date": "Fri, Sep 18th 4:24pm EDT"
+    },
+    {
+      "player_id": 19199,
+      "name": "Andrew Thomas",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Andrew Thomas (ankle) limited again Friday",
+      "comment": "The star offensive lineman has been limited at two-straight practices to start the week. It looks like he's trending towards playing on Monday night, assuming he suffers no setbacks between now and then.",
+      "injury_update_date": "Fri, Sep 18th 4:21pm EDT"
+    },
+    {
+      "player_id": 17402,
+      "name": "B.J. Hill",
+      "status": "QUESTIONABLE",
+      "injury_type": "achilles",
+      "headline": "B.J. Hill (Achilles) questionable for Sunday",
+      "comment": "Hill was not in uniform during the teams practice, so it’s unlikely he plays this weekend. He’ll have to wait another week to see the field.",
+      "injury_update_date": "Fri, Sep 18th 4:19pm EDT"
+    },
+    {
+      "player_id": 26168,
+      "name": "Cedric Gray",
+      "status": "QUESTIONABLE",
+      "injury_type": "concussion",
+      "headline": "Cedric Gray (concussion) officially questionable for Sunday",
+      "comment": "Gray has been a full participant at practice all week but still has yet to officially the NFL's concussion protocols, so he will be questionable to play in Week 2. His absence would be bad news for Tennessee's defense in a matchup against the Eagles this week.",
+      "injury_update_date": "Fri, Sep 18th 4:19pm EDT"
+    },
+    {
+      "player_id": 19196,
+      "name": "Joe Burrow",
+      "status": "QUESTIONABLE",
+      "injury_type": "back",
+      "headline": "Joe Burrow (back) questionable for Sunday",
+      "comment": "The questionable tag is likely a formality given Burrows limited practice status throughout the week. He should be fine and good to go against a Texans defense that just got bulldozed by the Bills.",
+      "injury_update_date": "Fri, Sep 18th 4:16pm EDT"
+    },
+    {
+      "player_id": 23179,
+      "name": "Jalen McMillan",
+      "status": "QUESTIONABLE",
+      "injury_type": "knee",
+      "headline": "Jalen McMillan (knee) questionable for Sunday",
+      "comment": "McMillan was able to practice in a full capacity all week, but he still hasn't received full clearance to play and is officially questionable heading into the weekend. If he's unable to suit up this week, look for rookie Ted Hurst III to see more work as a result of his absence.",
+      "injury_update_date": "Fri, Sep 18th 4:11pm EDT"
+    },
+    {
+      "player_id": 19201,
+      "name": "Jerry Jeudy",
+      "status": "ACTIVE",
+      "injury_type": "wrist",
+      "headline": "Jerry Jeudy (wrist) good to go for Sunday",
+      "comment": "Jeudy is going to be good to go on Sunday, which was expected after he was able to practice without limitations this week. He isn't expected to be a relevant fantasy option for however long Deshaun Watson is starting for the Browns, however.",
+      "injury_update_date": "Fri, Sep 18th 4:09pm EDT"
+    },
+    {
+      "player_id": 18242,
+      "name": "Elgton Jenkins",
+      "status": "ACTIVE",
+      "injury_type": "back",
+      "headline": "Elgton Jenkins (back) cleared to play for Sunday",
+      "comment": "Jenkins will be available to play on Sunday despite being on the injury report recently due to a back injury. Tevin Jenkins (back) has been ruled out for Cleveland, however, so their offensive line will still be at less than full power against the Buccaneers.",
+      "injury_update_date": "Fri, Sep 18th 4:08pm EDT"
+    },
+    {
+      "player_id": 20130,
+      "name": "Nico Collins",
+      "status": "OUT",
+      "injury_type": "hamstring",
+      "headline": "Nico Collins (hamstring) ruled out for Sunday",
+      "comment": "Collins recently suffered a hamstring injury and will not be able to play in Sunday's game as a result. It may cause him to miss more time beyond this game as well, but we likely won't know more about his official recovery timeline until later this week or next. Look for Dalton Schultz, Kayshon Boutte, and Jaylin Noel to see more work as a result of his absence against the Bengals in Week 2.",
+      "injury_update_date": "Fri, Sep 18th 4:02pm EDT"
+    },
+    {
+      "player_id": 26116,
+      "name": "Troy Fautanu",
+      "status": "QUESTIONABLE",
+      "injury_type": "ankle",
+      "headline": "Troy Fautanu (ankle) listed questionable for Sunday",
+      "comment": "The Steelers are at risk of playing without their starting left tackle on Sunday, as Fautanu is currently questionable to play due to an ankle injury. His absence would be a big hit to Pittsburgh's offense in an already-tough road matchup in Week 2.",
+      "injury_update_date": "Fri, Sep 18th 3:50pm EDT"
+    },
+    {
+      "player_id": 24705,
+      "name": "Joey Porter Jr.",
+      "status": "OUT",
+      "injury_type": null,
+      "headline": "Joey Porter Jr. (conditioning/back) won't play Sunday",
+      "comment": "Porter will be out for another game on Sunday. He's still ramping up his conditioning, and the team doesn't feel confident that he is ready to retake the field at this point. His absence will make life easier for Drake Maye and New England's offense on the other side of the ball.",
+      "injury_update_date": "Fri, Sep 18th 3:47pm EDT"
+    },
+    {
+      "player_id": 17318,
+      "name": "Carlton Davis III",
+      "status": "QUESTIONABLE",
+      "injury_type": "neck",
+      "headline": "Carlton Davis III (neck) officially questionable for Sunday",
+      "comment": "As expected, Davis is officially listed with a questionable tag heading into the weekend. He seems to have an uphill battle at playing on Sunday, however, as he wasn't able to take part in any of the team's practices this week, even in a limited fashion.",
+      "injury_update_date": "Fri, Sep 18th 3:42pm EDT"
+    },
+    {
+      "player_id": 18212,
+      "name": "Dre'Mont Jones",
+      "status": "QUESTIONABLE",
+      "injury_type": "foot",
+      "headline": "Dre'Mont Jones (foot) questionable for Sunday",
+      "comment": "The veteran edge rusher is at risk of missing Sunday's game due to a foot injury that left him limited at practice all week. It looks like he's trending towards playing through it, however, which will be much needed for a New England defense that already lacks talent at edge rusher.",
+      "injury_update_date": "Fri, Sep 18th 3:40pm EDT"
+    },
+    {
+      "player_id": 23065,
+      "name": "TreVeyon Henderson",
+      "status": "ACTIVE",
+      "injury_type": "ankle",
+      "headline": "TreVeyon Henderson (ankle) officially good to go for Sunday",
+      "comment": "New England's offense is set to get a much-needed boost this week with their young running back off of the injury report and set to make his season debut on Sunday. Henderson projects to be something of a 'boom-or-bust' fantasy option on a week-to-week basis while he continues to split work with Rhamondre Stevenson in the Patriots' backfield.",
+      "injury_update_date": "Fri, Sep 18th 3:38pm EDT"
+    },
+    {
+      "player_id": 19237,
+      "name": "Paulson Adebo",
+      "status": "IR",
+      "injury_type": "knee",
+      "headline": "Paulson Adebo (knee) placed on injured reserve",
+      "comment": "The veteran cornerback lands on injured reserve after suffering a knee injury, which means that he will be sidelined for at least four weeks while he recovers. New York is dealing with multiple injuries to key players in their secondary right now, so their defense could take a big hit if those continue to stack up over the next couple of weeks.",
+      "injury_update_date": "Fri, Sep 18th 3:35pm EDT"
+    },
+    {
+      "player_id": 19244,
+      "name": "John Simpson",
+      "status": "QUESTIONABLE",
+      "injury_type": "groin",
+      "headline": "John Simpson (groin) questionable for Sunday",
+      "comment": "Simpson's groin injury will leave him with a questionable tag ahead of Sunday's game against the Saints. Ronnie Stanley (toe) is also questionable to play in that matchup, so Baltimore's offensive line may look weaker than usual if one or both of those guys are unable to suit up.",
+      "injury_update_date": "Fri, Sep 18th 3:32pm EDT"
+    },
+    {
+      "player_id": 26011,
+      "name": "Devontez Walker",
+      "status": "ACTIVE",
+      "injury_type": "groin",
+      "headline": "Devontez Walker (groin) good to go for Sunday",
+      "comment": "To no surprise, Walker has received full clearance to play on Sunday after practicing without limitations all week. He is primed to see more work than usual with Zay Flowers (hamstring) doubtful to play for the Ravens in Week 2.",
+      "injury_update_date": "Fri, Sep 18th 3:30pm EDT"
+    },
+    {
+      "player_id": 27146,
+      "name": "Teddye Buchanan",
+      "status": "OUT",
+      "injury_type": "knee",
+      "headline": "Teddye Buchanan (knee) won't play Sunday",
+      "comment": "The Ravens will be without Buchanan on Sunday. They are dealing with several key injuries on the defensive side of the ball and will be thinner than usual in what projects to be a tough matchup against New Orleans' effective offense.",
+      "injury_update_date": "Fri, Sep 18th 3:28pm EDT"
+    },
+    {
+      "player_id": 16719,
+      "name": "Trey Hendrickson",
+      "status": "QUESTIONABLE",
+      "injury_type": "finger",
+      "headline": "Trey Hendrickson (finger) listed questionable for Sunday",
+      "comment": "The Ravens may be without their star edge rusher on Sunday, as he's currently considered questionable to play due to a finger injury. Nnamdi Madubuike (neck) has already been ruled out for Baltimore, so their defensive front is already set to be weaker than usual in a matchup against New Orleans' potent offense in Week 2.",
+      "injury_update_date": "Fri, Sep 18th 3:27pm EDT"
+    },
+    {
+      "player_id": 15490,
+      "name": "Ronnie Stanley",
+      "status": "QUESTIONABLE",
+      "injury_type": "toe",
+      "headline": "Ronnie Stanley (toe) officially questionable for Sunday",
+      "comment": "Stanley was able to return to practice on Friday after being absent earlier in the week due to a toe injury. He is questionable and will have a chance to play on Sunday, but we won't know his status with certainty until sometime closer to kickoff.",
+      "injury_update_date": "Fri, Sep 18th 3:23pm EDT"
+    },
+    {
+      "player_id": 22916,
+      "name": "Zay Flowers",
+      "status": "DOUBTFUL",
+      "injury_type": "hamstring",
+      "headline": "Zay Flowers (hamstring) doubtful to play Sunday",
+      "comment": "Flowers is officially going into the weekend with a doubtful tag, meaning that he is almost certainly going to be sidelined against the Saints thanks to the hamstring injury that he suffered in Week 1. It remains to be seen if he will have to miss more time beyond this game, and fantasy managers should look for Rashod Bateman and Devontez Walker to benefit from his absence and see more work on Sunday.",
+      "injury_update_date": "Fri, Sep 18th 3:20pm EDT"
+    },
+    {
+      "player_id": 25363,
+      "name": "Darnell Wright",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Darnell Wright (knee) cleared to play Sunday",
+      "comment": "There was some concern for Wright's health earlier in the week when he missed practice due to a knee issue, but it turned out to be nothing more than a minor issue and he has received full clearance to play through it against the Vikings. That's good news for Chicago's offense as a whole as they look to build off of the great success they found in the season opener last week.",
+      "injury_update_date": "Fri, Sep 18th 3:08pm EDT"
+    },
+    {
+      "player_id": 27131,
+      "name": "Kyle Monangai",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "Kyle Monangai (hamstring) off injury report for Sunday",
+      "comment": "Monangai is going to be good to go for Sunday's game, despite being limited at practice earlier in the week due to a hamstring injury. He shouldn't have any limitations and will likely continue to be an involved backup behind D'Andre Swift in this game and beyond.",
+      "injury_update_date": "Fri, Sep 18th 3:05pm EDT"
+    },
+    {
+      "player_id": 19210,
+      "name": "D'Andre Swift",
+      "status": "ACTIVE",
+      "injury_type": null,
+      "headline": "D'Andre Swift (ankle/knee) good to go for Sunday",
+      "comment": "Swift was limited at practice earlier in the week due to a couple of injuries that he was dealing with, but neither of them are serious and he carries no injury designation heading into the weekend. Kyle Monangai (hamstring) is also good to go, so Chicago's backfield should continue operating as usual in a divisional matchup against the Vikings on Sunday.",
+      "injury_update_date": "Fri, Sep 18th 3:03pm EDT"
+    },
+    {
+      "player_id": 22955,
+      "name": "Brock Bowers",
+      "status": "DOUBTFUL",
+      "injury_type": "knee",
+      "headline": "Brock Bowers (knee) doubtful to play Sunday",
+      "comment": "HC Klint Kubiak told reporters that Bowers is doubtful to play on Sunday, despite making his return to the practice field on Friday. It looks like he's trending the right way for Week 3, but fantasy managers will have to wait at least another week for him and should expect Michael Mayer to see more opportunities in the meantime.",
+      "injury_update_date": "Fri, Sep 18th 2:52pm EDT"
+    },
+    {
+      "player_id": 19590,
+      "name": "Jauan Jennings",
+      "status": "OUT",
+      "injury_type": "personal",
+      "headline": "Jauan Jennings (personal) won't play Sunday",
+      "comment": "The veteran wideout is going to be absent for Sunday's game. He is currently dealing with a personal issue of some kind, though the details of it are unknown at this point. Jordan Addison may see a little bit more work with Jennings out of the lineup.",
+      "injury_update_date": "Fri, Sep 18th 2:44pm EDT"
+    },
+    {
+      "player_id": 17353,
+      "name": "Brian O'Neill",
+      "status": "QUESTIONABLE",
+      "injury_type": "knee",
+      "headline": "Brian O'Neill (knee) questionable for Sunday",
+      "comment": "O'Neill will carry an injury designation heading into the weekend after missing practice earlier in the week due to some kind of a knee issue. If he is ruled out for Sunday's game, Minnesota's offensive line will be weaker than usual in a divisional matchup against the Bears.",
+      "injury_update_date": "Fri, Sep 18th 2:42pm EDT"
+    },
+    {
+      "player_id": 18600,
+      "name": "Kyler Murray",
+      "status": "OUT",
+      "injury_type": "concussion",
+      "headline": "Kyler Murray (concussion) ruled out for Sunday",
+      "comment": "Murray was progressing well through the NFL's concussion protocols this week, but he will ultimately have to end up missing a game due to the big hit that he suffered in Week 1. It looks likely that he will be back in time for Week 3, but Carson Wentz is expected to serve as Minnesota's starter in the meantime, which is good news for the fantasy value of Justin Jefferson in a prime matchup against the Bears this week.",
+      "injury_update_date": "Fri, Sep 18th 2:40pm EDT"
+    },
+    {
+      "player_id": 19562,
+      "name": "Juwan Johnson",
+      "status": "ACTIVE",
+      "injury_type": "illness",
+      "headline": "Juwan Johnson (illness) off injury report Week 2",
+      "comment": "Johnson was a late addition to the injury report this week with an illness. He'll be on the TE1/TE2 radar for fantasy managers this week.",
+      "injury_update_date": "Fri, Sep 18th 2:33pm EDT"
+    },
+    {
+      "player_id": 9886,
+      "name": "Cameron Jordan",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "Cameron Jordan (hamstring) off injury report Week 2",
+      "comment": "Jordan returned to a full practice on Friday. He'll be a full-go on Sunday against Baltimore.",
+      "injury_update_date": "Fri, Sep 18th 2:31pm EDT"
+    },
+    {
+      "player_id": 16421,
+      "name": "Alvin Kamara",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Alvin Kamara (knee) off injury report for Week 2",
+      "comment": "Kamara will be good to go for his season debut. He should be in a third down/passing down role in the Saints backfield behind Travis Etienne.",
+      "injury_update_date": "Fri, Sep 18th 2:06pm EDT"
+    },
+    {
+      "player_id": 19195,
+      "name": "Chase Young",
+      "status": "QUESTIONABLE",
+      "injury_type": "calf",
+      "headline": "Chase Young (calf) listed questionable for Week 2",
+      "comment": "Young was able to practice on Friday after he was a late addition to the injury report on Thursday. He should be on the favorable side of questionable, but he'll still need to be monitored on Sunday ahead of kickoff.",
+      "injury_update_date": "Fri, Sep 18th 2:04pm EDT"
+    },
+    {
+      "player_id": 20111,
+      "name": "Chris Olave",
+      "status": "QUESTIONABLE",
+      "injury_type": "hamstring",
+      "headline": "Chris Olave (hamstring) listed questionable for Week 2",
+      "comment": "Olave was able to practice on Friday after he was a late addition to the injury report on Thursday. He should be on the favorable side of questionable, but he'll still need to be monitored on Sunday ahead of kickoff.",
+      "injury_update_date": "Fri, Sep 18th 2:03pm EDT"
+    },
+    {
+      "player_id": 17319,
+      "name": "Ronnie Harrison Jr.",
+      "status": "OUT",
+      "injury_type": "hamstring",
+      "headline": "Ronnie Harrison Jr. (hamstring) ruled out Week 2",
+      "comment": "Harrison was unable to practice all week due to a hamstring injury. He will be sidelined on Sunday.",
+      "injury_update_date": "Fri, Sep 18th 1:56pm EDT"
+    },
+    {
+      "player_id": 26105,
+      "name": "Chop Robinson",
+      "status": "OUT",
+      "injury_type": "concussion",
+      "headline": "Chop Robinson (concussion) ruled out Week 2",
+      "comment": "Robinson remains in the concussion protocol. He'll miss at least one game on Sunday.",
+      "injury_update_date": "Fri, Sep 18th 1:55pm EDT"
+    },
+    {
+      "player_id": 18656,
+      "name": "Ashton Dulin",
+      "status": "OUT",
+      "injury_type": "ankle",
+      "headline": "Ashton Dulin (ankle) ruled out for Week 2",
+      "comment": "Dulin did not practice this week. He is characterized as week-to-week.",
+      "injury_update_date": "Fri, Sep 18th 1:48pm EDT"
+    },
+    {
+      "player_id": 22755,
+      "name": "Teven Jenkins",
+      "status": "OUT",
+      "injury_type": "back",
+      "headline": "Teven Jenkins (back) ruled out Week 2",
+      "comment": "Jenkins will miss a second straight game to begin the season. He'll hope to be ready to go for his season debut in Week 3.",
+      "injury_update_date": "Fri, Sep 18th 1:31pm EDT"
+    }
+  ]
+}

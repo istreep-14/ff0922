@@ -1,0 +1,144 @@
+{
+  "updatedAt": "2026-09-19T19:32:55.323Z",
+  "leagues": {
+    "nfl~8bd69940-f400-46f3-a9f6-a5975a5b9b87": {
+      "nickname": null,
+      "myTeamIds": [],
+      "primaryTeamId": null,
+      "teams": {
+        "1": {
+          "nickname": "Ian",
+          "abbreviation": "IAN"
+        },
+        "2": {
+          "nickname": "Shern Foote",
+          "abbreviation": "SHERN"
+        },
+        "3": {
+          "nickname": "Klonk & Che",
+          "abbreviation": "KLONK"
+        },
+        "4": {
+          "nickname": "Kobe",
+          "abbreviation": "KOBE"
+        },
+        "5": {
+          "nickname": "Charlie & Kendall",
+          "abbreviation": "CHUCK"
+        },
+        "6": {
+          "nickname": "Jaros",
+          "abbreviation": "JAROS"
+        },
+        "7": {
+          "nickname": "Hunter",
+          "abbreviation": "DON"
+        },
+        "8": {
+          "nickname": "Graham",
+          "abbreviation": "GRAHM"
+        },
+        "9": {
+          "nickname": "Scheib",
+          "abbreviation": "SCHEIB"
+        },
+        "10": {
+          "nickname": "Marchan & Chan",
+          "abbreviation": "JEW"
+        },
+        "11": {
+          "nickname": "Annakin",
+          "abbreviation": "BEN"
+        },
+        "12": {
+          "nickname": "Kevin & Dawson",
+          "abbreviation": "HOCK"
+        }
+      },
+      "divisions": [],
+      "playoffs": {
+        "rule": "points-wildcard",
+        "playoffTeams": 6,
+        "divisionSeeds": null,
+        "wildcards": 1,
+        "tiebreak": "pointsFor",
+        "startWeek": 15,
+        "note": "Seeds 1-5 best records (PF tiebreak); seed 6 is most points scored among the rest"
+      },
+      "scoring": {},
+      "waivers": {
+        "type": "faab",
+        "claimDays": 2,
+        "processDay": 3,
+        "processHour": 3,
+        "note": null
+      },
+      "notes": null
+    },
+    "nfl~7cd9fb32-a82d-434f-9ce7-3fe8edbf9f5f": {
+      "nickname": null,
+      "myTeamIds": [],
+      "primaryTeamId": null,
+      "teams": {
+        "1": {
+          "division": "East"
+        },
+        "2": {
+          "division": "East"
+        },
+        "3": {
+          "division": "East"
+        },
+        "4": {
+          "division": "West"
+        },
+        "5": {
+          "division": "East"
+        },
+        "6": {
+          "division": "West"
+        },
+        "7": {
+          "division": "West"
+        },
+        "8": {
+          "division": "East"
+        },
+        "9": {
+          "division": "West"
+        },
+        "10": {
+          "division": "West"
+        }
+      },
+      "divisions": [
+        {
+          "id": "East",
+          "name": "East"
+        },
+        {
+          "id": "West",
+          "name": "West"
+        }
+      ],
+      "playoffs": {
+        "rule": "division-first",
+        "playoffTeams": 6,
+        "divisionSeeds": 2,
+        "wildcards": null,
+        "tiebreak": "pointsFor",
+        "startWeek": null,
+        "note": null
+      },
+      "scoring": {},
+      "waivers": {
+        "type": null,
+        "claimDays": null,
+        "processDay": null,
+        "processHour": null,
+        "note": null
+      },
+      "notes": null
+    }
+  }
+}
