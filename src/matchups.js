@@ -30,6 +30,8 @@ import { record } from './freshness.js';
  * you never synced is simply missing rather than silently counted as zero —
  * `weeksCounted` is carried alongside every total so the UI can say so. Sleeper
  * publishes real season totals, and those are preferred wherever they exist.
+ * ESPN/Yahoo past weeks that rolled over before a sync are recovered by
+ * `scores:ingest` from a logged-in browser capture, into these same files.
  */
 
 const dir = (season) => join(DATA, 'scores', String(season));
@@ -152,6 +154,25 @@ function dedupe(pairs) {
 export function readWeek(season, week) {
   const p = filePath(season, week);
   return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null;
+}
+
+/**
+ * Fold one league's board into a week file without touching the other leagues.
+ *
+ * `matchups:sync` rewrites the CURRENT week for every league at once. Past-week
+ * backfills (ESPN/Yahoo ingest, a recovered snapshot) have to land in the same
+ * files or `seasonTotals` / the week picker will not see them — but they must
+ * not wipe a sibling league's live capture in that same week file.
+ */
+export function mergeLeagueWeek(season, week, leagueKey, payload, { fetchedAt = null } = {}) {
+  const existing = readWeek(season, week) || { season, week, fetchedAt: null, leagues: {} };
+  existing.leagues = existing.leagues || {};
+  existing.leagues[leagueKey] = payload;
+  if (fetchedAt) existing.fetchedAt = fetchedAt;
+  else if (!existing.fetchedAt) existing.fetchedAt = new Date().toISOString();
+  mkdirSync(dir(season), { recursive: true });
+  writeFileSync(filePath(season, week), JSON.stringify(existing));
+  return existing;
 }
 
 /** Every week on disk for a season, ascending. */
