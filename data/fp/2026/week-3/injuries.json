@@ -1,7 +1,52 @@
 {
-  "fetchedAt": "2026-09-22T13:58:21.661Z",
+  "fetchedAt": "2026-09-22T21:42:28.537Z",
   "source": "https://www.fantasypros.com/nfl/injury-news.php",
   "injuries": [
+    {
+      "player_id": 20094,
+      "name": "Brian Robinson Jr.",
+      "status": "ACTIVE",
+      "injury_type": "ankle",
+      "headline": "Brian Robinson Jr. (ankle) logs full practice Tuesday",
+      "comment": "Robinson is dealing with an ankle injury. He is on track to be good to go in his backup role on Thursday against the Packers.",
+      "injury_update_date": "Tue, Sep 22nd 4:48pm EDT"
+    },
+    {
+      "player_id": 19198,
+      "name": "Tua Tagovailoa",
+      "status": "ACTIVE",
+      "injury_type": "oblique",
+      "headline": "Tua Tagovailoa (oblique) logs full practice Tuesday",
+      "comment": "Tagovailoa has missd the first two weeks of the season due to an oblique injury. Michael Penix Jr. was already named the starter, so Tagovailoa would figure to back him up if he is cleared.",
+      "injury_update_date": "Tue, Sep 22nd 4:47pm EDT"
+    },
+    {
+      "player_id": 24244,
+      "name": "Zach Tom",
+      "status": "OUT",
+      "injury_type": null,
+      "headline": "Zach Bako-Bewele out for season with torn patellar tendon",
+      "comment": "Bako-Bewele suffered the injury in Sunday’s overtime win over the Jets. He was told he has a nine-month recovery timeline from his current injury.",
+      "injury_update_date": "Tue, Sep 22nd 3:28pm EDT"
+    },
+    {
+      "player_id": 25321,
+      "name": "Tyson Bagent",
+      "status": "OUT",
+      "injury_type": "concussion",
+      "headline": "Tyson Bagent (concussion) in concussion protocol, could miss Week 3",
+      "comment": "Bagent came in relief of the injured Caleb Williams and was having decent success in moving the ball on a potential game winning drive before stalling in the red zone. If Bagent can’t go, Case Keenum will start. Keenum has had success in the past and isn’t a bad third stringer to have on a real life roster, but isn’t someone you should look to start this weekend in fantasy if you can help it.",
+      "injury_update_date": "Tue, Sep 22nd 2:26pm EDT"
+    },
+    {
+      "player_id": 19224,
+      "name": "A.J. Terrell Jr.",
+      "status": "IR",
+      "injury_type": "groin",
+      "headline": "A.J. Terrell Jr. (groin) placed on IR",
+      "comment": "Terrell left Sunday's game against the Panthers early due to a groin injury, and he will now miss at least the next four games. The 27-year-old has started at least 15 games for Atlanta in each of the last three seasons, so Terrell will be a big hole to fill in the coming weeks.",
+      "injury_update_date": "Tue, Sep 22nd 1:22pm EDT"
+    },
     {
       "player_id": 25409,
       "name": "Malik Nabers",
@@ -111,15 +156,6 @@
       "injury_update_date": "Sun, Sep 20th 2:09pm EDT"
     },
     {
-      "player_id": 19224,
-      "name": "A.J. Terrell Jr.",
-      "status": "DOUBTFUL",
-      "injury_type": "groin",
-      "headline": "A.J. Terrell Jr. (groin) doubtful to return",
-      "comment": "Terrell was originally evaluated for a concussion and was cleared, but also suffered a groin injury prior to leaving the game. The Falcons appear to be without their best defender in their secondary for the remainder of Week 2.",
-      "injury_update_date": "Sun, Sep 20th 1:29pm EDT"
-    },
-    {
       "player_id": 15628,
       "name": "Javon Hargrave",
       "status": "OUT",
@@ -190,42 +226,6 @@
       "headline": "Cole Van Lanen (knee) off injury report for Sunday",
       "comment": "Van Lanen's knee injury is nothing more than a minor issue at this point and won't stop him from playing on Sunday. Jacksonville's offensive line should be at full strength in Week 2, which is good news ahead of a tough matchup against Denver's stout defensive front.",
       "injury_update_date": "Sat, Sep 19th 12:08pm EDT"
-    },
-    {
-      "player_id": 17607,
-      "name": "Foyesade Oluokun",
-      "status": "ACTIVE",
-      "injury_type": "wrist",
-      "headline": "Foyesade Oluokun (wrist) will play Sunday",
-      "comment": "Jacksonville has cleared Oluokun to play in their matchup against Denver on Sunday. That's good news for the team, as he is one of their key defenders and will be needed in what projects to be a close matchup in Week 2.",
-      "injury_update_date": "Sat, Sep 19th 12:06pm EDT"
-    },
-    {
-      "player_id": 18598,
-      "name": "Jakobi Meyers",
-      "status": "ACTIVE",
-      "injury_type": "wrist",
-      "headline": "Jakobi Meyers (wrist) good to go for Sunday",
-      "comment": "Meyers was on the injury report all week due to a lingering wrist issue, but he is going to be good to go and will play in Sunday's game against the Broncos. Fantasy managers shouldn't trust in his week-to-week consistency at this point in the season, however, especially in what projects to be a tough matchup.",
-      "injury_update_date": "Sat, Sep 19th 12:02pm EDT"
-    },
-    {
-      "player_id": 24330,
-      "name": "Aidan O'Connell",
-      "status": "QUESTIONABLE",
-      "injury_type": "personal",
-      "headline": "Aidan O'Connell (personal) listed questionable for Sunday",
-      "comment": "O'Connell may not be able to play on Sunday due to a personal issue of some kind that he's managing right now. He is currently Las Vegas' QB3, however, so his absence wouldn't have a notable impact on their lineup.",
-      "injury_update_date": "Sat, Sep 19th 12:00pm EDT"
-    },
-    {
-      "player_id": 25366,
-      "name": "Max Melton",
-      "status": "QUESTIONABLE",
-      "injury_type": "ankle",
-      "headline": "Max Melton (ankle) considered questionable for Sunday",
-      "comment": "The Cardinals may be without a key defender on Sunday, as Melton is considered questionable to play due to his ankle injury. His absence would make life easier for Drew Lock, Jaxon Smith-Njigba, and Seattle's offense as a whole this week.",
-      "injury_update_date": "Sat, Sep 19th 12:25am EDT"
     }
   ]
 }

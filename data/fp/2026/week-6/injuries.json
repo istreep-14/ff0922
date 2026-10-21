@@ -1,0 +1,465 @@
+{
+  "fetchedAt": "2026-10-15T08:53:04.375Z",
+  "source": "https://www.fantasypros.com/nfl/injury-news.php",
+  "injuries": [
+    {
+      "player_id": 24372,
+      "name": "KeAndre Lambert-Smith",
+      "status": "LIMITED",
+      "injury_type": "hamstring",
+      "headline": "KeAndre Lambert-Smith (hamstring) limited participant Wednesday",
+      "comment": "The team recently opened up Lambert-Smith's 21-day practice window. He was able to participate in a limited fashion on Wednesday, and there's a chance that he will suit up and play in Week 6, though we won't know if that will be the case or not until later on in the week.",
+      "injury_update_date": "Thu, Oct 15th 12:49am EDT"
+    },
+    {
+      "player_id": 28133,
+      "name": "Brenen Thompson",
+      "status": "LIMITED",
+      "injury_type": "quad",
+      "headline": "Brenen Thompson (quad) listed as limited Wednesday",
+      "comment": "Thompson was able to practice in a limited fashion on Wednesday. If he's active in Week 6, he could see more work than usual with Ladd McConkey (foot), Tre Harris' (hamstring), and Quentin Johnston (chest) all uncertain to play for the Chargers.",
+      "injury_update_date": "Thu, Oct 15th 12:47am EDT"
+    },
+    {
+      "player_id": 17528,
+      "name": "Marquez Valdes-Scantling",
+      "status": "LIMITED",
+      "injury_type": "rib",
+      "headline": "Marquez Valdes-Scantling (rib) limited Wednesday",
+      "comment": "The veteran wasn't able to log a full practice on Wednesday, as he was left limited by a rib issue of some kind. He remains off of the fantasy radar moving forward, regardless of his injury status heading into Week 6.",
+      "injury_update_date": "Thu, Oct 15th 12:45am EDT"
+    },
+    {
+      "player_id": 26122,
+      "name": "Ladd McConkey",
+      "status": "LIMITED",
+      "injury_type": "foot",
+      "headline": "Ladd McConkey (foot) officially limited Wednesday",
+      "comment": "McConkey was unable to see any real action last week due to his foot issue. He was able to practice on Wednesday to start the week this week, but he remained limited due to the same injury. He may play through it in Week 6, but it's hard for fantasy managers to trust starting him at this point in the season, even if his health is improving.",
+      "injury_update_date": "Thu, Oct 15th 12:42am EDT"
+    },
+    {
+      "player_id": 22756,
+      "name": "Charlie Kolar",
+      "status": "ACTIVE",
+      "injury_type": "arm",
+      "headline": "Charlie Kolar (arm) logs full practice Wednesday",
+      "comment": "The veteran tight end made his return to the lineup in Week 4 after missing a couple of weeks with a forearm injury. He looked good and is now a full participant at practice, so fantasy managers can safely speculate that he is back to close health at this point.",
+      "injury_update_date": "Thu, Oct 15th 12:39am EDT"
+    },
+    {
+      "player_id": 23123,
+      "name": "Quentin Johnston",
+      "status": "LIMITED",
+      "injury_type": "chest",
+      "headline": "Quentin Johnston (chest) limited at practice Wednesday",
+      "comment": "Johnston was not able to play last week due to a chest injury that he's dealing with. He was able to practice on Wednesday, however, which is a good sign that he will be back for Week 6. If he's active, he may see more work than usual if Tre' Harris (hamstring) or Ladd McConkey (foot) are ruled out for Sunday's game.",
+      "injury_update_date": "Thu, Oct 15th 12:37am EDT"
+    },
+    {
+      "player_id": 26123,
+      "name": "Tyler Guyton",
+      "status": "ACTIVE",
+      "injury_type": "back",
+      "headline": "Tyler Guyton (back) logs full practice Wednesday",
+      "comment": "The young offensive lineman was able to practice in full on Wednesday, which puts him on track to be 100% healthy for Week 6. That's good news for Dallas' offense ahead of a matchup against the Packers this week.",
+      "injury_update_date": "Thu, Oct 15th 12:31am EDT"
+    },
+    {
+      "player_id": 24705,
+      "name": "Joey Porter Jr.",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Joey Porter Jr. (ankle) listed as limited Wednesday",
+      "comment": "Porter was left limited at practice on Wednesday due to an ankle issue of some kind that he's dealing with. It's unclear if it will affect his availability for Week 6 or not, but we should know more sometime within the next day or two.",
+      "injury_update_date": "Thu, Oct 15th 12:29am EDT"
+    },
+    {
+      "player_id": 27144,
+      "name": "Savion Williams",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Savion Williams (ankle) considered limited Wednesday",
+      "comment": "Williams was able to practice on Wednesday, although he remained limited due to an ankle issue. His status for Week 6 is undetermined at this point, but either way he remains off of the fantasy radar for the time being.",
+      "injury_update_date": "Thu, Oct 15th 12:25am EDT"
+    },
+    {
+      "player_id": 25291,
+      "name": "Lukas Van Ness",
+      "status": "ACTIVE",
+      "injury_type": "shoulder",
+      "headline": "Lukas Van Ness (shoulder) logs full practice Wednesday",
+      "comment": "Van Ness has been dealing with this shoulder injury for a while, but he was upgraded to a full participant at practice on Wednesday, meaning that it should be a non-issue for him moving forward. Green Bay's defense will benefit from him being at full health.",
+      "injury_update_date": "Thu, Oct 15th 12:21am EDT"
+    },
+    {
+      "player_id": 26463,
+      "name": "Jacob Monk",
+      "status": "LIMITED",
+      "injury_type": "quad",
+      "headline": "Jacob Monk (quad) limited Wednesday",
+      "comment": "Monk was a limited participant on Wednesday due to his nagging quad issue. He may play in Week 6, however, which would be great news for an injury-riddled Packers' offensive line.",
+      "injury_update_date": "Thu, Oct 15th 12:19am EDT"
+    },
+    {
+      "player_id": 19372,
+      "name": "Colby Parkinson",
+      "status": "LIMITED",
+      "injury_type": "shoulder",
+      "headline": "Colby Parkinson (shoulder) limited at practice Wednesday",
+      "comment": "The veteran is still dealing with his shoulder issue and was limited on Wednesday as a result. He seems likely to play through it in Week 6, however, and will see more work than usual with Terrance Ferguson (ankle) out and Davis Allen (foot) trending towards being sidelined for the Rams.",
+      "injury_update_date": "Thu, Oct 15th 12:12am EDT"
+    },
+    {
+      "player_id": 28071,
+      "name": "Emmanuel Pregnon",
+      "status": "LIMITED",
+      "injury_type": "toe",
+      "headline": "Emmanuel Pregnon (toe) limited participant Wednesday",
+      "comment": "Jacksonville's starting lineman is uncertain to play in Week 6. He was limited on Wednesday due to a toe issue, and if it leaves him sidelined on Sunday, the Jaguars' offensive line will be weaker than usual ahead of a matchup against the Texans.",
+      "injury_update_date": "Wed, Oct 14th 11:54pm EDT"
+    },
+    {
+      "player_id": 22878,
+      "name": "Cole Van Lanen",
+      "status": "LIMITED",
+      "injury_type": "knee",
+      "headline": "Cole Van Lanen (knee) limited Wednesday",
+      "comment": "To no surprise, Van Lanen was limited at another practice due to his ongoing knee issue. The team has made a habit of limiting his workload in practice, but he has been playing through the injury and should be able to do so again in Week 6, barring setbacks.",
+      "injury_update_date": "Wed, Oct 14th 11:52pm EDT"
+    },
+    {
+      "player_id": 28427,
+      "name": "Nate Boerkircher",
+      "status": "LIMITED",
+      "injury_type": "back",
+      "headline": "Nate Boerkircher (back) listed as limited Wednesday",
+      "comment": "The rookie is managing a back issue of some kind and was left limited at the team's first practice of the week on Wednesday as a result. He's not fantasy relevant at this point, so his potential absence in Week 6 wouldn't have a big impact for fantasy purposes.",
+      "injury_update_date": "Wed, Oct 14th 11:50pm EDT"
+    },
+    {
+      "player_id": 14060,
+      "name": "Za'Darius Smith",
+      "status": "LIMITED",
+      "injury_type": null,
+      "headline": "Za'Darius Smith (concussion/neck) limited Wednesday",
+      "comment": "Smith is still going through the NFL's concussion protocols, but he was able to practice in a limited fashion on Wednesday, which is a good sign for his availability for Week 6. Atlanta's defense will see a nice boost if he's available to play this week.",
+      "injury_update_date": "Wed, Oct 14th 11:45pm EDT"
+    },
+    {
+      "player_id": 22973,
+      "name": "Michael Penix Jr.",
+      "status": "ACTIVE",
+      "injury_type": "ribs",
+      "headline": "Michael Penix Jr. (ribs) logs full practice Wednesday",
+      "comment": "Penix injured his ribs last week, but it doesn't seem to be a serious issue, as he was able to practice in full on Wednesday and told reporters that he will be 'good to play' this week. He should be available to start for the Falcons, which is great news for the fantasy value of Drake London, Bijan Robinson, and all of Atlanta's skill-position players this week.",
+      "injury_update_date": "Wed, Oct 14th 11:32pm EDT"
+    },
+    {
+      "player_id": 23703,
+      "name": "Dee Alford",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Dee Alford (ankle) limited Wednesday",
+      "comment": "Alford was sidelined in Week 5 due to an ankle injury, but he was able to practice in a limited fashion on Wednesday, which puts him on track to make his return in Week 6. Buffalo's defense will see a nice boost to their secondary if he's active against the Raiders.",
+      "injury_update_date": "Wed, Oct 14th 11:18pm EDT"
+    },
+    {
+      "player_id": 22845,
+      "name": "Joshua Palmer",
+      "status": "LIMITED",
+      "injury_type": "shoulder",
+      "headline": "Joshua Palmer (shoulder) limited participant Wednesday",
+      "comment": "A shoulder injury left Palmer limited at practice on Wednesday. It's not considered a serious issue, however, so it isn't likely to leave him sidelined in Week 6. He would see more work in Sunday's game in the off-chance that DJ Moore (shoulder) is unable to suit up for Buffalo.",
+      "injury_update_date": "Wed, Oct 14th 11:15pm EDT"
+    },
+    {
+      "player_id": 18406,
+      "name": "Ty Johnson",
+      "status": "LIMITED",
+      "injury_type": "hamstring",
+      "headline": "Ty Johnson (hamstring) limited Wednesday",
+      "comment": "Johnson was left limited at practice on Wednesday due to a hamstring injury that he's still managing. It shouldn't affect his availability for Week 6, however, unless he suffers a setback at some point in the week.",
+      "injury_update_date": "Wed, Oct 14th 11:11pm EDT"
+    },
+    {
+      "player_id": 25989,
+      "name": "Ashton Jeanty",
+      "status": "ACTIVE",
+      "injury_type": "foot",
+      "headline": "Ashton Jeanty (foot) logs full practice Wednesday",
+      "comment": "There has been some recent speculation that Jeanty is not at full health, but while he is listed on Las Vegas' injury report, he was able to practice in full on Wednesday and should be good to go for Week 6. Fantasy managers should continue to start him, but after a slow start to the season, they should have tempered expectations for his efficiency for the foreseeable future.",
+      "injury_update_date": "Wed, Oct 14th 11:09pm EDT"
+    },
+    {
+      "player_id": 27288,
+      "name": "Dont'e Thornton Jr.",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "Dont'e Thornton Jr. (hamstring) logs full practice Wednesday",
+      "comment": "Thornton is still in his 21-day practice window, but he seems to be very close to a return and was able to practice in full on Wednesday. It looks likely that he will be activated for Week 6, but we won't know for sure until later on in the week.",
+      "injury_update_date": "Wed, Oct 14th 11:03pm EDT"
+    },
+    {
+      "player_id": 22955,
+      "name": "Brock Bowers",
+      "status": "LIMITED",
+      "injury_type": "knee",
+      "headline": "Brock Bowers (knee) limited at practice Wednesday",
+      "comment": "Bowers was limited at Wednesday's practice, which doesn't come as a surprise, as the team has made a habit out of limiting his workload early in the week. He should be available to play in Week 6 and will remain a top-tier fantasy option moving forward.",
+      "injury_update_date": "Wed, Oct 14th 11:01pm EDT"
+    },
+    {
+      "player_id": 22717,
+      "name": "Chazz Surratt",
+      "status": "OUT",
+      "injury_type": "calf",
+      "headline": "Chazz Surratt (calf) ruled out Thursday",
+      "comment": "Surratt is unable to go on a short week for Seattle.",
+      "injury_update_date": "Wed, Oct 14th 7:15pm EDT"
+    },
+    {
+      "player_id": 25905,
+      "name": "Drake Thomas",
+      "status": "OUT",
+      "injury_type": "ankle",
+      "headline": "Drake Thomas (ankle) ruled out Thursday",
+      "comment": "Thomas is unable to go on a short week. Tyrice Knight will start for Thomas.",
+      "injury_update_date": "Wed, Oct 14th 7:14pm EDT"
+    },
+    {
+      "player_id": 23152,
+      "name": "Zach Charbonnet",
+      "status": "OUT",
+      "injury_type": "knee",
+      "headline": "Zach Charbonnet (knee) ruled out for Thursday",
+      "comment": "Charbonnet remains hopeful to make his season debut next week against the Chiefs.",
+      "injury_update_date": "Wed, Oct 14th 7:13pm EDT"
+    },
+    {
+      "player_id": 25459,
+      "name": "Riley Moss",
+      "status": "QUESTIONABLE",
+      "injury_type": "ribs",
+      "headline": "Riley Moss (ribs) listed questionable for Thursday",
+      "comment": "Moss was limited in practice all week. Pat Surtain II and Talanoa Hufanga were both ruled out.",
+      "injury_update_date": "Wed, Oct 14th 7:11pm EDT"
+    },
+    {
+      "player_id": 23084,
+      "name": "Caleb Williams",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "Caleb Williams (hamstring) officially logs full practice Wednesday",
+      "comment": "This confirms what Ben Johnson told reporters earlier in the day on Wednesday. Williams will have a chance to return for Sunday's game against the Falcons.",
+      "injury_update_date": "Wed, Oct 14th 7:09pm EDT"
+    },
+    {
+      "player_id": 23765,
+      "name": "Kyler Gordon",
+      "status": "ACTIVE",
+      "injury_type": "calf",
+      "headline": "Kyler Gordon (calf) logs full practice Wednesday",
+      "comment": "Gordon will have a chance to be activated from the PUP list for Sunday's game against the Falcons.",
+      "injury_update_date": "Wed, Oct 14th 7:08pm EDT"
+    },
+    {
+      "player_id": 25263,
+      "name": "Tyrique Stevenson Sr.",
+      "status": "LIMITED",
+      "injury_type": "hip",
+      "headline": "Tyrique Stevenson Sr. (hip) limited in practice Wednesday",
+      "comment": "Stevenson is on track to be good to go for Sunday's game against the Falcons.",
+      "injury_update_date": "Wed, Oct 14th 7:07pm EDT"
+    },
+    {
+      "player_id": 27081,
+      "name": "Andrew Mukuba",
+      "status": "ACTIVE",
+      "injury_type": "shoulder",
+      "headline": "Andrew Mukuba (shoulder) logs full practice Wednesday",
+      "comment": "Mukuba is on track to be good to go for Sunday's game against the Panthers.",
+      "injury_update_date": "Wed, Oct 14th 6:55pm EDT"
+    },
+    {
+      "player_id": 18360,
+      "name": "Fred Johnson",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Fred Johnson (knee) logs full practice Wednesday",
+      "comment": "Johnson is on track to be good to go for Sunday's game against the Panthers.",
+      "injury_update_date": "Wed, Oct 14th 6:55pm EDT"
+    },
+    {
+      "player_id": 19275,
+      "name": "Jalen Hurts",
+      "status": "ACTIVE",
+      "injury_type": "calf",
+      "headline": "Jalen Hurts (calf) logs full practice Wednesday",
+      "comment": "Hurts fantasy value will largely be dependant on the health of DeVonta Smith and Saquon Barkley. He is a risky start for fantasy managers as of now given his recent struggles.",
+      "injury_update_date": "Wed, Oct 14th 6:53pm EDT"
+    },
+    {
+      "player_id": 24703,
+      "name": "Jalen Carter",
+      "status": "ACTIVE",
+      "injury_type": "wrist",
+      "headline": "Jalen Carter (wrist) logs full practice Wednesday",
+      "comment": "Carter will be a full-go for Sunday's game against the Panthers.",
+      "injury_update_date": "Wed, Oct 14th 6:50pm EDT"
+    },
+    {
+      "player_id": 27051,
+      "name": "Jihaad Campbell",
+      "status": "ACTIVE",
+      "injury_type": null,
+      "headline": "Jihaad Campbell (knee/wrist) logs full practice Wednesday",
+      "comment": "Campbell is on track to be a full-go for Wednesday’s game against the Panthers.",
+      "injury_update_date": "Wed, Oct 14th 6:49pm EDT"
+    },
+    {
+      "player_id": 19238,
+      "name": "Zack Baun",
+      "status": "ACTIVE",
+      "injury_type": "shoulder",
+      "headline": "Zack Baun (shoulder) logs full practice Wednesday",
+      "comment": "Baun is on track to be a full-go for Sunday's game against the Panthers.",
+      "injury_update_date": "Wed, Oct 14th 6:48pm EDT"
+    },
+    {
+      "player_id": 24354,
+      "name": "Dontayvion Wicks",
+      "status": "LIMITED",
+      "injury_type": "hamstring",
+      "headline": "Dontayvion Wicks (hamstring) limited in practice Wednesday",
+      "comment": "Wicks is on the injury report with a hamstring issue. He should be good to go for Sunday's game against the Panthers.",
+      "injury_update_date": "Wed, Oct 14th 6:45pm EDT"
+    },
+    {
+      "player_id": 23144,
+      "name": "Eli Stowers",
+      "status": "LIMITED",
+      "injury_type": "quad",
+      "headline": "Eli Stowers (quad) limited in practice Wednesday",
+      "comment": "Stowers had his practice window opened on Wednesday. His status is up in the air to return this weekend.",
+      "injury_update_date": "Wed, Oct 14th 6:44pm EDT"
+    },
+    {
+      "player_id": 25301,
+      "name": "Tyler Steen",
+      "status": "LIMITED",
+      "injury_type": "shoulder",
+      "headline": "Tyler Steen (shoulder) limited in practice Wednesday",
+      "comment": "Steen will need to be monitored in practice the rest of the week.",
+      "injury_update_date": "Wed, Oct 14th 6:44pm EDT"
+    },
+    {
+      "player_id": 19276,
+      "name": "Jonathan Greenard",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Jonathan Greenard (ankle) limited in practice Wednesday",
+      "comment": "Greenard will need to be monitored in practice the rest of the week.",
+      "injury_update_date": "Wed, Oct 14th 6:43pm EDT"
+    },
+    {
+      "player_id": 18575,
+      "name": "Marcus Epps",
+      "status": "LIMITED",
+      "injury_type": "groin",
+      "headline": "Marcus Epps (groin) limited in practice Wednesday",
+      "comment": "Epps will need to be monitored in practice the rest of the week.",
+      "injury_update_date": "Wed, Oct 14th 6:42pm EDT"
+    },
+    {
+      "player_id": 20149,
+      "name": "Landon Dickerson",
+      "status": "LIMITED",
+      "injury_type": "knee",
+      "headline": "Landon Dickerson (knee) limited in practice Wednesday",
+      "comment": "Dickerson had his practice window opened on Wednesday. His status is up in the air to return this weekend.",
+      "injury_update_date": "Wed, Oct 14th 6:41pm EDT"
+    },
+    {
+      "player_id": 24180,
+      "name": "Grant Calcaterra",
+      "status": "LIMITED",
+      "injury_type": "back",
+      "headline": "Grant Calcaterra (back) limited in practice Wednesday",
+      "comment": "Calcaterra had his practice window opened on Wednesday. His status is up in the air to return this weekend.",
+      "injury_update_date": "Wed, Oct 14th 6:40pm EDT"
+    },
+    {
+      "player_id": 18226,
+      "name": "Hollywood Brown",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Hollywood Brown (ankle) limited in practice Wednesday",
+      "comment": "Brown is continuing to work his way back from an ankle injury. He remains off the fantasy radar when he is healthy.",
+      "injury_update_date": "Wed, Oct 14th 6:40pm EDT"
+    },
+    {
+      "player_id": 25266,
+      "name": "Jakorian Bennett",
+      "status": "LIMITED",
+      "injury_type": "knee",
+      "headline": "Jakorian Bennett (knee) limited in practice Wednesday",
+      "comment": "Bennett had his practice window opened on Wednesday. His status is up in the air to return this weekend.",
+      "injury_update_date": "Wed, Oct 14th 6:39pm EDT"
+    },
+    {
+      "player_id": 23609,
+      "name": "Pat Surtain II",
+      "status": "OUT",
+      "injury_type": "ankle",
+      "headline": "Pat Surtain II (ankle) out for Thursday night against Seattle",
+      "comment": "Surtain will miss yet another game, but with the Bronco’s having a mini bye week, hopefully he can return for Week 7. Denver will have to make it work without him.",
+      "injury_update_date": "Wed, Oct 14th 6:27pm EDT"
+    },
+    {
+      "player_id": 23104,
+      "name": "Theo Johnson",
+      "status": "LIMITED",
+      "injury_type": "neck",
+      "headline": "Theo Johnson (neck) limited in practice Wednesday",
+      "comment": "Johnson remains off the fantasy radar when he is healthy.",
+      "injury_update_date": "Wed, Oct 14th 6:04pm EDT"
+    },
+    {
+      "player_id": 26055,
+      "name": "Kenyon Sadiq",
+      "status": "LIMITED",
+      "injury_type": "concussion",
+      "headline": "Kenyon Sadiq (concussion) listed as limited Wednesday",
+      "comment": "The rookie is currently going through the NFL's concussion protocols and was limited at New York's practice on Wednesday as a result. Fantasy managers should keep close tabs on all updates about his health throughout the week.",
+      "injury_update_date": "Wed, Oct 14th 6:03pm EDT"
+    },
+    {
+      "player_id": 28127,
+      "name": "Omar Cooper Jr.",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "Omar Cooper Jr. (ankle) officially limited Wednesday",
+      "comment": "The rookie has been out for over four weeks due to an ankle injury, but he recently had his practice window opened up and was able to practice in a limited fashion on Wednesday. It looks like he will be back in the lineup in the near future, although it's unclear whether or not his return will come in Week 6.",
+      "injury_update_date": "Wed, Oct 14th 5:58pm EDT"
+    },
+    {
+      "player_id": 19810,
+      "name": "Darnell Mooney",
+      "status": "LIMITED",
+      "injury_type": "neck",
+      "headline": "Darnell Mooney (neck) limited in practice Wednesday",
+      "comment": "Mooney remains off the fantasy radar in his current role.",
+      "injury_update_date": "Wed, Oct 14th 5:57pm EDT"
+    },
+    {
+      "player_id": 16390,
+      "name": "Marlon Humphrey",
+      "status": "LIMITED",
+      "injury_type": null,
+      "headline": "Marlon Humphrey (calf/hamstring) limited in practice Wednesday",
+      "comment": "Humphrey should be good to go for Sunday's game against the Browns.",
+      "injury_update_date": "Wed, Oct 14th 5:55pm EDT"
+    }
+  ]
+}

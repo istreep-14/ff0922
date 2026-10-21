@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { RAW, DATA } from './config.js';
 import { resolveLeagues, fetchLeague, ENDPOINTS } from './fantasypros.js';
-import { applyFilters } from './leaguestate.js';
+import { applyFilters, saveDirectory } from './leaguestate.js';
 import { loadDictionary } from './players.js';
 import { normalize } from './normalize.js';
 import { record } from './freshness.js';
@@ -38,6 +38,7 @@ export async function scrape({ filter = null, limit = null, all = false, endpoin
     throw new Error('MyPlaybook returned no leagues at all. That is a dead session, not an empty account '
       + '— refusing to overwrite data/latest.json. Check FP_EMAIL, then run `leagues`.');
   }
+  saveDirectory(discovered);
   const leagues = applyFilters(discovered, { all, filter, limit });
   const skipped = discovered.length - leagues.length;
   log(`  ${leagues.length} league(s)${skipped > 0 ? ` (${skipped} skipped — inactive or filtered)` : ''}`);

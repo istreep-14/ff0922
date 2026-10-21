@@ -7,29 +7,23 @@ import { resolve as resolveWeek } from './week.js';
 import { record } from './freshness.js';
 
 /**
- * Every matchup in a league, live, for every host.
+ * Every matchup in a league, every week, for every host.
  *
- * MyPlaybook's matchup endpoint takes a `teamId`, and it answers for ANY team
- * in the league — not just yours. That one fact is what makes a league-wide
- * live board possible on ESPN and Yahoo, where no other reachable source
- * returns scores at all: ask once per team and you have the whole week.
+ * MyPlaybook's matchup endpoint takes a `teamId` and answers for ANY team in
+ * the league — not just yours — and a `week`, which reaches every past week
+ * with full starter/bench slots and the league's own scoring. That one
+ * endpoint is the whole scoreboard and the whole season for ESPN, Yahoo and
+ * Sleeper alike: ask once per team, per week.
  *
  * Each pairing comes back twice, once from either side, so teams already seen
- * in a fetched matchup are skipped. A 12-team league costs 6 requests, not 12.
+ * in a fetched matchup are skipped. A 12-team league costs 6 requests a week.
  *
- * WHY THIS IS ALSO THE POINTS-FOR LEDGER
- *
- * MyPlaybook's projected-standings endpoint gives records and playoff odds for
- * every host but no points for or against, and its matchup endpoint has no week
- * parameter — it only ever answers for the current week. So season totals
- * cannot be fetched for ESPN or Yahoo at all; they can only be ACCUMULATED.
- * Each sync writes that week's final scores to data/scores/, and the season
- * total is the sum of the weeks on disk.
- *
- * That means the totals are only as complete as your sync history, and a week
- * you never synced is simply missing rather than silently counted as zero —
- * `weeksCounted` is carried alongside every total so the UI can say so. Sleeper
- * publishes real season totals, and those are preferred wherever they exist.
+ * The endpoint was long believed to answer only the current week, so season
+ * totals used to be ACCUMULATED from whatever weeks a sync happened to catch,
+ * and missed ESPN/Yahoo weeks were patched in from browser dumps that carry
+ * team scores but no lineups. Now every sync re-asks any past week that is
+ * missing, unfinished or lineup-less (`weekNeedsFetch`) and leaves settled
+ * weeks alone, so data/scores/ converges on the full season by itself.
  */
 
 const dir = (season) => join(DATA, 'scores', String(season));
@@ -63,7 +57,7 @@ const sideOf = (t) => t && ({
  * One league's full slate. `teamIds` is every team; the order decides which
  * side of a pairing is fetched, nothing else.
  */
-export async function fetchLeagueMatchups(league, { log = null } = {}) {
+export async function fetchLeagueMatchups(league, { week = null, log = null } = {}) {
   const ids = (league.teams || []).map((t) => t.teamId).filter((x) => x != null);
   if (!ids.length) return { ok: false, error: 'no teams' };
 
@@ -77,7 +71,7 @@ export async function fetchLeagueMatchups(league, { log = null } = {}) {
     if (seen.has(String(id))) continue;
     let r;
     try {
-      r = await getMatchup(league.key, { teamId: id });
+      r = await getMatchup(league.key, { teamId: id, week });
     } catch (err) {
       failed++;
       log?.(`    FAIL team ${id} — ${err.message.split('\n')[0]}`);
@@ -152,6 +146,25 @@ function dedupe(pairs) {
 export function readWeek(season, week) {
   const p = filePath(season, week);
   return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null;
+}
+
+/**
+ * Fold one league's board into a week file without touching the other leagues.
+ *
+ * `matchups:sync` rewrites the CURRENT week for every league at once. Past-week
+ * backfills (ESPN/Yahoo ingest, a recovered snapshot) have to land in the same
+ * files or `seasonTotals` / the week picker will not see them — but they must
+ * not wipe a sibling league's live capture in that same week file.
+ */
+export function mergeLeagueWeek(season, week, leagueKey, payload, { fetchedAt = null } = {}) {
+  const existing = readWeek(season, week) || { season, week, fetchedAt: null, leagues: {} };
+  existing.leagues = existing.leagues || {};
+  existing.leagues[leagueKey] = payload;
+  if (fetchedAt) existing.fetchedAt = fetchedAt;
+  else if (!existing.fetchedAt) existing.fetchedAt = new Date().toISOString();
+  mkdirSync(dir(season), { recursive: true });
+  writeFileSync(filePath(season, week), JSON.stringify(existing));
+  return existing;
 }
 
 /** Every week on disk for a season, ascending. */
@@ -252,34 +265,54 @@ export function completeWeeks(season, { throughWeek = null } = {}) {
 export const isFinal = (m) =>
   /final|finish|complete/i.test(String(m.status || '')) || (!m.isPreGame && m.minutesLeft === 0);
 
+/**
+ * Does this league's stored copy of a week need asking for again?
+ *
+ * The current week always does — scores move. A past week does when it is
+ * missing, failed, not yet final, or has no lineup slots (a browser-dump
+ * backfill: team scores only, so the page fell back to "no lineup was stored").
+ * A settled past week with lineups is never re-asked.
+ */
+export function weekNeedsFetch(entry, week, currentWeek) {
+  if (Number(week) >= Number(currentWeek)) return true;
+  if (!entry?.ok || !(entry.matchups || []).length) return true;
+  if (!entry.matchups.every(isFinal)) return true;
+  return !entry.matchups.every((m) => (m.sides || []).every((s) => (s.starters || []).length > 0));
+}
+
 export async function matchupsSync({ season, week, leagues, log = console.log } = {}) {
   const { season: yr, week: wk } = resolveWeek({ season, week });
-  log(`League matchups — season ${yr}, week ${wk}, ${leagues.length} league(s)`);
-  const out = {};
+  log(`League matchups — season ${yr}, weeks 1–${wk}, ${leagues.length} league(s)`);
   const ok = [], failed = [];
 
   await pool(leagues, async (l) => {
-    const r = await fetchLeagueMatchups(l, { log });
-    out[l.key] = r;
-    if (r.ok) {
-      const live = r.matchups.filter((m) => m.live && !isFinal(m)).length;
-      const done = r.matchups.filter(isFinal).length;
-      log(`  ok   ${(l.host || '').padEnd(8)} ${(l.nickname || '').slice(0, 24).padEnd(25)} ${String(r.matchups.length).padStart(2)} matchups${done ? `, ${done} final` : ''}${live ? `, ${live} live` : ''}`);
-      ok.push(l.nickname || l.key);
-    } else {
-      log(`  ${r.inactive ? 'skip' : 'FAIL'} ${(l.host || '').padEnd(8)} ${(l.nickname || '').slice(0, 24).padEnd(25)} ${r.error}`);
-      if (!r.inactive) failed.push({ label: l.nickname || l.key, error: r.error });
+    const label = `${(l.host || '').padEnd(8)} ${(l.nickname || '').slice(0, 24).padEnd(25)}`;
+    const fetched = [];
+    let kept = 0;
+    for (let w = 1; w <= Math.max(wk, 1); w++) {
+      const stored = readWeek(yr, w)?.leagues?.[l.key];
+      if (!weekNeedsFetch(stored, w, wk)) { kept++; continue; }
+      const r = await fetchLeagueMatchups(l, { week: w, log });
+      if (r.inactive) {
+        log(`  skip ${label} ${r.error}`);
+        return;
+      }
+      // A failed fetch never overwrites a stored copy that has data in it.
+      if (r.ok || !stored?.ok) mergeLeagueWeek(yr, w, l.key, r);
+      if (!r.ok) {
+        log(`  FAIL ${label} week ${w} — ${r.error}`);
+        failed.push({ label: `${l.nickname || l.key} week ${w}`, error: r.error });
+        continue;
+      }
+      fetched.push(w);
     }
+    log(`  ok   ${label} fetched wk ${fetched.join(',') || '—'}${kept ? ` · kept ${kept} settled` : ''}`);
+    ok.push(l.nickname || l.key);
   }, { concurrency: 2 });
-
-  mkdirSync(dir(yr), { recursive: true });
-  // Compact, not pretty: this file now carries every lineup slot for every team
-  // in every league, and indentation was most of the bytes.
-  writeFileSync(filePath(yr, wk), JSON.stringify({ season: yr, week: wk, fetchedAt: new Date().toISOString(), leagues: out }));
 
   const weeks = storedWeeks(yr);
   record('matchups', { ok, failed, sourceAt: null, season: yr, week: wk,
     items: ok.length, note: `weeks on disk: ${weeks.join(', ') || 'none'}` });
-  log(`  -> ${filePath(yr, wk)} (season history: week ${weeks.join(', ')})`);
-  return out;
+  log(`  -> ${dir(yr)} (season history: week ${weeks.join(', ')})`);
+  return readWeek(yr, wk)?.leagues || {};
 }

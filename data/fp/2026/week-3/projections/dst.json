@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-22T21:42:27.684Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 8040,
+      "name": "Carolina Panthers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.384
+      }
+    },
+    {
+      "fpid": 8150,
+      "name": "Kansas City Chiefs",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.342
+      }
+    },
+    {
+      "fpid": 8260,
+      "name": "Seattle Seahawks",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.224
+      }
+    },
+    {
+      "fpid": 8110,
+      "name": "Green Bay Packers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.942
+      }
+    },
+    {
+      "fpid": 8270,
+      "name": "San Francisco 49ers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.822
+      }
+    },
+    {
+      "fpid": 8200,
+      "name": "New York Giants",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.746
+      }
+    },
+    {
+      "fpid": 8100,
+      "name": "Detroit Lions",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.63
+      }
+    },
+    {
+      "fpid": 8190,
+      "name": "New Orleans Saints",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.63
+      }
+    },
+    {
+      "fpid": 8030,
+      "name": "Buffalo Bills",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.49
+      }
+    },
+    {
+      "fpid": 8230,
+      "name": "Philadelphia Eagles",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.483
+      }
+    }
+  ]
+}

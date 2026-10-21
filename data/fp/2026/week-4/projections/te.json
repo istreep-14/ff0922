@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-29T22:46:01.065Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 22936,
+      "name": "Trey McBride",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 17.236
+      }
+    },
+    {
+      "fpid": 22955,
+      "name": "Brock Bowers",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 15.753
+      }
+    },
+    {
+      "fpid": 16499,
+      "name": "George Kittle",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 13.16
+      }
+    },
+    {
+      "fpid": 26434,
+      "name": "Tyler Warren",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 12.983
+      }
+    },
+    {
+      "fpid": 25247,
+      "name": "Dalton Kincaid",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 12.039
+      }
+    },
+    {
+      "fpid": 11594,
+      "name": "Travis Kelce",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 11.932
+      }
+    },
+    {
+      "fpid": 23781,
+      "name": "Isaiah Likely",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 11.347
+      }
+    },
+    {
+      "fpid": 22978,
+      "name": "Sam LaPorta",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 11.214
+      }
+    },
+    {
+      "fpid": 27050,
+      "name": "Harold Fannin Jr.",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 11.163
+      }
+    },
+    {
+      "fpid": 19562,
+      "name": "Juwan Johnson",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 10.932
+      }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-10-15T08:53:03.000Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 23180,
+      "name": "Puka Nacua",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 23.584
+      }
+    },
+    {
+      "fpid": 23070,
+      "name": "Jaxon Smith-Njigba",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 20.644
+      }
+    },
+    {
+      "fpid": 19202,
+      "name": "CeeDee Lamb",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 19.325
+      }
+    },
+    {
+      "fpid": 23886,
+      "name": "Christian Watson",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 18.006
+      }
+    },
+    {
+      "fpid": 23163,
+      "name": "Drake London",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 17.535
+      }
+    },
+    {
+      "fpid": 20111,
+      "name": "Chris Olave",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 17.338
+      }
+    },
+    {
+      "fpid": 20130,
+      "name": "Nico Collins",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 17.11
+      }
+    },
+    {
+      "fpid": 12119,
+      "name": "Mike Evans",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 16.943
+      }
+    },
+    {
+      "fpid": 22916,
+      "name": "Zay Flowers",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 16.42
+      }
+    },
+    {
+      "fpid": 12123,
+      "name": "Davante Adams",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 16.257
+      }
+    }
+  ]
+}

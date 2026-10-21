@@ -13,3 +13,7 @@ data/schedule/
 # needs to be in the history.
 data/mpbadvanced/
 *.log
+# Every line every sync printed. Local history, not project history.
+data/runlog.jsonl
+# Every league on the account, with its key — a credential, like the rest.
+data/leagues-directory.json

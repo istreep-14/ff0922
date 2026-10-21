@@ -33,11 +33,22 @@ function classify(data) {
   return { ok: true };
 }
 
-/** Live/projected matchup with full starter and bench slots. */
-export async function getMatchup(key, { teamId } = {}) {
-  const qs = new URLSearchParams({ matchup: '', key, from: 'web' });
+/**
+ * The matchup endpoint's URL. `week` reaches any past week, with full starter
+ * and bench slots and league-scored points; omitted, it answers the current week.
+ */
+export function matchupUrl(key, { teamId, week } = {}) {
+  const qs = new URLSearchParams({ matchup: '', key });
   if (teamId != null) qs.set('teamId', String(teamId));
-  const data = await get(`${MPB}/json/matchup?${qs.toString()}`);
+  qs.set('includePropBet', 'false');
+  qs.set('from', 'web');
+  if (week != null) qs.set('week', String(week));
+  return `${MPB}/json/matchup?${qs.toString()}`;
+}
+
+/** Live/projected matchup with full starter and bench slots, for any week. */
+export async function getMatchup(key, { teamId, week } = {}) {
+  const data = await get(matchupUrl(key, { teamId, week }));
   const c = classify(data);
   if (!c.ok) return c;
   if (!data.matchup) return { ok: false, inactive: false, error: 'No matchup in response' };

@@ -1,0 +1,246 @@
+{
+  "fetchedAt": "2026-10-21T03:42:58.492Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 26341,
+      "name": "Will Reichard",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 9.5
+      }
+    },
+    {
+      "fpid": 15756,
+      "name": "Ka'imi Fairbairn",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 9.406
+      }
+    },
+    {
+      "fpid": 26075,
+      "name": "Jake Bates",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 8.284
+      }
+    },
+    {
+      "fpid": 13029,
+      "name": "Chris Boswell",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 8.242
+      }
+    },
+    {
+      "fpid": 14003,
+      "name": "Jason Myers",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 8.224
+      }
+    },
+    {
+      "fpid": 27534,
+      "name": "Tyler Loop",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 8.214
+      }
+    },
+    {
+      "fpid": 27261,
+      "name": "Ryan Fitzgerald",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 8.186
+      }
+    },
+    {
+      "fpid": 18545,
+      "name": "Matt Gay",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 8.182
+      }
+    },
+    {
+      "fpid": 17533,
+      "name": "Jason Sanders",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 8.018
+      }
+    },
+    {
+      "fpid": 17575,
+      "name": "Eddy Pineiro",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 7.938
+      }
+    },
+    {
+      "fpid": 23297,
+      "name": "Evan McPherson",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 7.878
+      }
+    },
+    {
+      "fpid": 26763,
+      "name": "Spencer Shrader",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 7.736
+      }
+    },
+    {
+      "fpid": 26068,
+      "name": "Brandon Aubrey",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 7.724
+      }
+    },
+    {
+      "fpid": 13731,
+      "name": "Cairo Santos",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 7.682
+      }
+    },
+    {
+      "fpid": 19058,
+      "name": "Chase McLaughlin",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 7.664
+      }
+    },
+    {
+      "fpid": 28507,
+      "name": "Trey Smack",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 7.6
+      }
+    },
+    {
+      "fpid": 16026,
+      "name": "Wil Lutz",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 7.534
+      }
+    },
+    {
+      "fpid": 16712,
+      "name": "Harrison Butker",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 7.344
+      }
+    },
+    {
+      "fpid": 28176,
+      "name": "Dominic Zvada",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 7.326
+      }
+    },
+    {
+      "fpid": 25354,
+      "name": "Chad Ryland",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 7.298
+      }
+    },
+    {
+      "fpid": 25713,
+      "name": "Andre Szmyt",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 7.248
+      }
+    },
+    {
+      "fpid": 9491,
+      "name": "Nick Folk",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 7.158
+      }
+    },
+    {
+      "fpid": 17420,
+      "name": "Daniel Carlson",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 6.944
+      }
+    },
+    {
+      "fpid": 19028,
+      "name": "Joey Slye",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 6.896
+      }
+    },
+    {
+      "fpid": 27291,
+      "name": "Andy Borregales",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 6.67
+      }
+    },
+    {
+      "fpid": 16540,
+      "name": "Jake Elliott",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 6.27
+      }
+    },
+    {
+      "fpid": 16548,
+      "name": "Zane Gonzalez",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 5.753
+      }
+    },
+    {
+      "fpid": 13274,
+      "name": "Brandon McManus",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 5.01
+      }
+    },
+    {
+      "fpid": 24009,
+      "name": "Jake Moody",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 26444,
+      "name": "Charlie Smyth",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 0
+      }
+    }
+  ]
+}

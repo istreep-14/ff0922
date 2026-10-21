@@ -1,0 +1,542 @@
+{
+  "fetchedAt": "2026-10-21T03:42:58.483Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 23046,
+      "name": "Drake Maye",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 20.587
+      }
+    },
+    {
+      "fpid": 19797,
+      "name": "Brock Purdy",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 20.105
+      }
+    },
+    {
+      "fpid": 17233,
+      "name": "Lamar Jackson",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 19.898
+      }
+    },
+    {
+      "fpid": 19196,
+      "name": "Joe Burrow",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 19.797
+      }
+    },
+    {
+      "fpid": 19246,
+      "name": "Jordan Love",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 19.155
+      }
+    },
+    {
+      "fpid": 15501,
+      "name": "Jared Goff",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 18.904
+      }
+    },
+    {
+      "fpid": 9451,
+      "name": "Matthew Stafford",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 18.809
+      }
+    },
+    {
+      "fpid": 23071,
+      "name": "C.J. Stroud",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 18.757
+      }
+    },
+    {
+      "fpid": 23084,
+      "name": "Caleb Williams",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 18.668
+      }
+    },
+    {
+      "fpid": 22900,
+      "name": "Bryce Young",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 18.611
+      }
+    },
+    {
+      "fpid": 18600,
+      "name": "Kyler Murray",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 17.544
+      }
+    },
+    {
+      "fpid": 9001,
+      "name": "Aaron Rodgers",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 17.309
+      }
+    },
+    {
+      "fpid": 22910,
+      "name": "Bo Nix",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 17.26
+      }
+    },
+    {
+      "fpid": 15600,
+      "name": "Dak Prescott",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 17.177
+      }
+    },
+    {
+      "fpid": 23096,
+      "name": "Tyler Shough",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 16.442
+      }
+    },
+    {
+      "fpid": 11687,
+      "name": "Geno Smith",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 16.292
+      }
+    },
+    {
+      "fpid": 16413,
+      "name": "Patrick Mahomes II",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 16.149
+      }
+    },
+    {
+      "fpid": 22973,
+      "name": "Michael Penix Jr.",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 15.024
+      }
+    },
+    {
+      "fpid": 16398,
+      "name": "Deshaun Watson",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 15
+      }
+    },
+    {
+      "fpid": 23499,
+      "name": "Malik Willis",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 14.878
+      }
+    },
+    {
+      "fpid": 17237,
+      "name": "Baker Mayfield",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 14.713
+      }
+    },
+    {
+      "fpid": 24740,
+      "name": "Tanner McKee",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 14.537
+      }
+    },
+    {
+      "fpid": 17236,
+      "name": "Sam Darnold",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 14.457
+      }
+    },
+    {
+      "fpid": 11177,
+      "name": "Kirk Cousins",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 14.232
+      }
+    },
+    {
+      "fpid": 15642,
+      "name": "Jacoby Brissett",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 14.227
+      }
+    },
+    {
+      "fpid": 24755,
+      "name": "Cam Ward",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 12.746
+      }
+    },
+    {
+      "fpid": 18232,
+      "name": "Daniel Jones",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 11.668
+      }
+    },
+    {
+      "fpid": 23018,
+      "name": "J.J. McCarthy",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 10.203
+      }
+    },
+    {
+      "fpid": 13891,
+      "name": "Jameis Winston",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 6.677
+      }
+    },
+    {
+      "fpid": 26060,
+      "name": "Jalon Daniels",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 5.262
+      }
+    },
+    {
+      "fpid": 28013,
+      "name": "Fernando Mendoza",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 2.203
+      }
+    },
+    {
+      "fpid": 19297,
+      "name": "Tyler Huntley",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 2.183
+      }
+    },
+    {
+      "fpid": 25368,
+      "name": "Ty Simpson",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 1.016
+      }
+    },
+    {
+      "fpid": 22799,
+      "name": "Davis Mills",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 0.475
+      }
+    },
+    {
+      "fpid": 16417,
+      "name": "Joshua Dobbs",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 0.469
+      }
+    },
+    {
+      "fpid": 10007,
+      "name": "Tyrod Taylor",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 0.463
+      }
+    },
+    {
+      "fpid": 22722,
+      "name": "Kenny Pickett",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 0.458
+      }
+    },
+    {
+      "fpid": 23927,
+      "name": "Stetson Bennett IV",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 0.456
+      }
+    },
+    {
+      "fpid": 17234,
+      "name": "Mason Rudolph",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0.445
+      }
+    },
+    {
+      "fpid": 20156,
+      "name": "Mac Jones",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 0.443
+      }
+    },
+    {
+      "fpid": 23081,
+      "name": "Spencer Rattler",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 0.437
+      }
+    },
+    {
+      "fpid": 19781,
+      "name": "Justin Fields",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 0.432
+      }
+    },
+    {
+      "fpid": 19198,
+      "name": "Tua Tagovailoa",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 0.428
+      }
+    },
+    {
+      "fpid": 18225,
+      "name": "Drew Lock",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 0.426
+      }
+    },
+    {
+      "fpid": 15520,
+      "name": "Carson Wentz",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 0.425
+      }
+    },
+    {
+      "fpid": 18604,
+      "name": "Jarrett Stidham",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 0.421
+      }
+    },
+    {
+      "fpid": 25967,
+      "name": "Joe Milton III",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 0.413
+      }
+    },
+    {
+      "fpid": 23045,
+      "name": "Sam Howell",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 0.412
+      }
+    },
+    {
+      "fpid": 25968,
+      "name": "Shedeur Sanders",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 0.409
+      }
+    },
+    {
+      "fpid": 18562,
+      "name": "Gardner Minshew II",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 0.397
+      }
+    },
+    {
+      "fpid": 24361,
+      "name": "Cade Klubnik",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 0.363
+      }
+    },
+    {
+      "fpid": 9300,
+      "name": "Joe Flacco",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 0.344
+      }
+    },
+    {
+      "fpid": 28302,
+      "name": "Cole Payton",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 0.286
+      }
+    },
+    {
+      "fpid": 25746,
+      "name": "Tommy DeVito",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 0.274
+      }
+    },
+    {
+      "fpid": 25321,
+      "name": "Tyson Bagent",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 0.255
+      }
+    },
+    {
+      "fpid": 24347,
+      "name": "Anthony Richardson Sr.",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 0.193
+      }
+    },
+    {
+      "fpid": 16381,
+      "name": "Mitchell Trubisky",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 0.134
+      }
+    },
+    {
+      "fpid": 23066,
+      "name": "Kyle McCord",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 0.121
+      }
+    },
+    {
+      "fpid": 27161,
+      "name": "Brady Cook",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 25972,
+      "name": "Will Howard",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 25373,
+      "name": "Riley Leonard",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 24345,
+      "name": "Drew Allar",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 24330,
+      "name": "Aidan O'Connell",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 22953,
+      "name": "Carson Beck",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 11425,
+      "name": "Case Keenum",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 9907,
+      "name": "Andy Dalton",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 9326,
+      "name": "Josh Johnson",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 0
+      }
+    }
+  ]
+}

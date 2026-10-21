@@ -58,16 +58,32 @@ test('the League group is the one league-specific option, and its pages are all 
 
 test('league-specific pages are under League, not scattered across the other options', () => {
   const under = (id) => pageRows.find((p) => p.id === id)?.group;
-  for (const id of ['myteam', 'matchup', 'standings', 'analysis', 'league', 'waivers', 'moves', 'manage']) {
+  for (const id of ['myteam', 'matchup', 'standings', 'analysis', 'league', 'lplayers', 'waivers', 'moves', 'manage']) {
     assert.equal(under(id), 'league', id);
   }
-  for (const id of ['players', 'trade', 'sources', 'leagues', 'sync']) {
+  for (const id of ['players', 'trade', 'fp', 'draftsharks', 'leagues', 'sync']) {
     assert.notEqual(under(id), 'league', id);
   }
 });
 
-test('pages outside the League option carry no section', () => {
-  assert.deepEqual(pageRows.filter((p) => p.group !== 'league' && p.section).map((p) => p.id), []);
+/**
+ * Sources is the one other sectioned rail: its Overview, then one page per site
+ * grouped by what the site gives us (src/sourcefeeds.js). Those site pages are
+ * generated from FEED_SITES, so they are checked in sourcefeeds.test.js.
+ */
+test('pages outside the League and Sources options carry no section', () => {
+  assert.deepEqual(pageRows.filter((p) => p.group !== 'league' && p.group !== 'sources' && p.section).map((p) => p.id), []);
+});
+
+test('the league has its own players page, and waivers are four sheets', () => {
+  assert.equal(pageRows.find((p) => p.id === 'lplayers')?.section, 'League');
+  assert.match(template, /lplayers:pageLeaguePlayers/);
+  assert.match(template, /function pageLeaguePlayers\(/);
+  assert.match(template, /\['overview','Overview'\],\['projections','Projections'\],\['statistics','Statistics'\],\['schedule','Schedule'\]/);
+  const note = template.match(/function sheetNote\(p\)\{[\s\S]*?\n\}/)?.[0] || '';
+  assert.match(note, /p\.blurb/);
+  assert.match(note, /p\.nw/);
+  assert.doesNotMatch(note, /sig\.nt/);
 });
 
 /* ------------------------------------------------------------ the payload */

@@ -197,4 +197,44 @@ export async function syncLeagueDetail({ season, week, leagues, log = console.lo
   return out;
 }
 
+/**
+ * Fill in every past week's Sleeper detail cache, 1..throughWeek-1.
+ *
+ * Unlike MyPlaybook's matchup endpoint (see `src/matchups.js`), Sleeper's API
+ * takes a week and answers for ANY of them, including ones long finished — so
+ * a week `matchups:sync` never caught before it rolled over is not actually
+ * lost for a Sleeper league the way it is for ESPN/Yahoo. This is what makes
+ * that recoverable: run once and every past week gets its own cache entry,
+ * the same shape and path `syncLeagueDetail` already writes for the current
+ * week, so the dashboard can read it back with no new file format.
+ *
+ * Skips a week that is already cached as `supported: true` unless `force`,
+ * since a finished week's numbers do not change — no reason to re-ask.
+ */
+export async function backfillLeagueDetail({ season, throughWeek, leagues, force = false, log = console.log } = {}) {
+  const targets = leagues.filter((l) => supportsLeagueDetail(l.host));
+  if (!targets.length) { log('  no Sleeper leagues to backfill'); return { weeks: [] }; }
+
+  const weeks = [];
+  for (let wk = 1; wk < throughWeek; wk++) {
+    const cache = readCache(season, wk) || { leagues: {} };
+    let changed = false;
+    await pool(targets, async (l) => {
+      const existing = cache.leagues[l.key];
+      if (existing?.supported && !force) return;
+      try {
+        cache.leagues[l.key] = await sleeperLeague(l.leagueId, wk);
+        changed = true;
+        log(`  ok   week ${wk}  ${(l.nickname || l.key).slice(0, 28).padEnd(28)} ${cache.leagues[l.key].matchups.length} matchups`);
+      } catch (err) {
+        log(`  FAIL week ${wk}  ${(l.nickname || l.key).slice(0, 28).padEnd(28)} ${err.message.split('\n')[0]}`);
+      }
+    }, { concurrency: 2 });
+    if (changed) { writeCache(season, wk, cache.leagues); weeks.push(wk); }
+  }
+  log(weeks.length ? `  backfilled week(s): ${weeks.join(', ')}` : '  nothing new to backfill');
+  record('leaguedetail-backfill', { ok: targets.map((l) => l.nickname || l.key), failed: [], sourceAt: null, season, items: weeks.length, note: weeks.length ? `filled week(s) ${weeks.join(', ')}` : 'already complete' });
+  return { weeks };
+}
+
 export { writeCache as writeDetailCache };

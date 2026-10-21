@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-29T22:46:01.065Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 8240,
+      "name": "Pittsburgh Steelers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 8.37
+      }
+    },
+    {
+      "fpid": 8170,
+      "name": "Minnesota Vikings",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 8.184
+      }
+    },
+    {
+      "fpid": 8260,
+      "name": "Seattle Seahawks",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.683
+      }
+    },
+    {
+      "fpid": 8020,
+      "name": "Baltimore Ravens",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.267
+      }
+    },
+    {
+      "fpid": 8110,
+      "name": "Green Bay Packers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.144
+      }
+    },
+    {
+      "fpid": 8030,
+      "name": "Buffalo Bills",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.614
+      }
+    },
+    {
+      "fpid": 8050,
+      "name": "Chicago Bears",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.49
+      }
+    },
+    {
+      "fpid": 8070,
+      "name": "Cleveland Browns",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.404
+      }
+    },
+    {
+      "fpid": 8010,
+      "name": "Atlanta Falcons",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.038
+      }
+    },
+    {
+      "fpid": 8000,
+      "name": "Arizona Cardinals",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.026
+      }
+    }
+  ]
+}

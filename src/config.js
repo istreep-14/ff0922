@@ -13,7 +13,6 @@ export const RAW = join(DATA, 'raw');
 export const CACHE = join(DATA, 'cache');
 export const EXPORT = join(DATA, 'export');
 export const FPDIR = join(DATA, 'fp');
-export const VEGASDIR = join(DATA, 'vegas');
 export const STATE = join(DATA, 'leagues-state.json');
 
 // Minimal .env reader — no dependency needed for KEY=value lines.
@@ -65,21 +64,12 @@ export const config = {
   apiKey: process.env.FP_API_KEY || '',
   season: process.env.FP_SEASON || null,
   week: process.env.FP_WEEK || null,
-  // VegasEdgeFantasy session cookie (JWT). Separate site, separate login.
-  vegasToken: process.env.VEGAS_TOKEN || '',
-  // Yahoo Fantasy session cookie — the whole `Cookie:` header from a
-  // logged-in football.fantasysports.yahoo.com request, not a single token.
-  yahooCookie: process.env.YAHOO_COOKIE || '',
-  // League used for weekly projections (its own scoring settings apply).
-  yahooLeagueId: process.env.YAHOO_LEAGUE_ID || '529792',
-  // Yahoo's edge bot-mitigation returns HTTP 999 ("Request denied") to a
-  // burst that looks automated — measured: ~55 requests at the shared
-  // FP_CONCURRENCY/FP_DELAY_MS (3 / 250ms) got the session blocked within
-  // minutes, and a single isolated request afterward was still blocked. Kept
-  // separate from FP_CONCURRENCY/FP_DELAY_MS so tuning FantasyPros never
-  // accidentally speeds up the one source that visibly retaliates.
-  yahooConcurrency: Number(process.env.YAHOO_CONCURRENCY || 1),
-  yahooDelayMs: Number(process.env.YAHOO_DELAY_MS || 2000),
+  // FantasyPros website session cookie — the whole `Cookie:` header from a
+  // logged-in fantasypros.com request. The public projections pages (unlike
+  // rankings) only render the top ~10 players/position without one; a
+  // logged-in session sees the full board. Optional — projections scraping
+  // degrades to that top-10-per-position slice when unset.
+  fpCookie: process.env.FP_COOKIE || '',
 };
 
 export function requireEmail() {

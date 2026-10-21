@@ -7,17 +7,36 @@
  * API's throttling signal — a bad key and throttling are indistinguishable at
  * the gateway (see the "Why hybrid" section in readme.md).
  */
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { get } from './http.js';
-import { config } from './config.js';
+import { config, DATA } from './config.js';
 
 export const BASE = 'https://api.fantasypros.com/public/v2/json';
 
-/** Positions worth pulling for a standard fantasy league. */
-export const POSITIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'DST'];
-export const SCORINGS = ['PPR', 'HALF', 'STD'];
-
 /** MyPlaybook reports league scoring with these labels; map them to API values. */
 export const LEAGUE_SCORING_TO_API = { PPR: 'PPR', HALF: 'HALF', STD: 'STD', STANDARD: 'STD' };
+/** A scoring format's stored-data key, e.g. Draft Sharks' per-week cells. */
+export const SCORING_KEY = { PPR: 'ppr', HALF: 'half', STD: 'std' };
+
+/**
+ * Which scoring formats to pull — the ones the account's leagues actually use.
+ *
+ * Every projection/ranking source asks this, so a PPR-only account never
+ * fetches a half-PPR board. Lives here, beside the label map it reads, so the
+ * sources can import it without importing each other.
+ */
+export function scoringsInUse() {
+  const latest = join(DATA, 'latest.json');
+  if (!existsSync(latest)) return ['PPR'];
+  const model = JSON.parse(readFileSync(latest, 'utf8'));
+  const found = new Set();
+  for (const l of model.leagues) {
+    const api = LEAGUE_SCORING_TO_API[String(l.scoring || '').toUpperCase()];
+    if (api) found.add(api);
+  }
+  return found.size ? [...found] : ['PPR'];
+}
 
 export class MissingApiKeyError extends Error {
   constructor() {
@@ -97,45 +116,15 @@ async function call(path, params = {}) {
 
 /* ---------------------------------------------------------------- Players */
 
-/** Universal player database. `external_ids` maps FP ids onto host-site ids. */
+/**
+ * Universal player database. `external_ids` maps FP ids onto host-site ids.
+ *
+ * This and `playerPoints` are the only two endpoints the app calls: rankings,
+ * projections, news and injuries all come from the public pages (scrapefp.js),
+ * which carry more per player and cost nothing against the 500/day quota.
+ */
 export const players = ({ sport = 'nfl', player, update, ecr, external_ids, show } = {}) =>
   call(`/${sport}/players`, { player, update, ecr, external_ids, show });
-
-/* ------------------------------------------------------- News & injuries */
-
-export const news = ({ sport = 'nfl', fpid, limit = 100, category, order_by = 'created' } = {}) =>
-  call(`/${sport}/news`, { fpid, limit, category, order_by });
-
-export const injuries = ({ sport = 'nfl', year, week, include_probabilities = 'true', team_id, player_ids } = {}) =>
-  call(`/${sport}/injuries`, { year, week, include_probabilities, team_id, player_ids });
-
-/* -------------------------------------------------------------- Rankings */
-
-/**
- * Consensus rankings. `week` selects the weekly board (week=0 is preseason/draft);
- * `type: 'ROS'` selects rest-of-season. Position and scoring are both meaningful.
- */
-export const consensusRankings = ({ sport = 'nfl', season, position, scoring, week, type, experts, include_idp, filters } = {}) =>
-  call(`/${sport}/${season}/consensus-rankings`, { position, scoring, week, type, experts, include_idp, filters });
-
-export const rankings = ({ sport = 'nfl', season, week, player, min, range, rankstats, type } = {}) =>
-  call(`/${sport}/${season}/rankings`, { week, player, min, range, rankstats, type });
-
-export const rankingExperts = ({ sport = 'nfl', season, include_overall } = {}) =>
-  call(`/${sport}/${season}/rankings/experts`, { include_overall });
-
-export const comparePlayers = ({ sport = 'nfl', year, week, players: ps, experts, ranking_type, details } = {}) =>
-  call(`/${sport}/compare-players`, { year, week, players: ps, experts, ranking_type, details });
-
-/* ----------------------------------------------------------- Projections */
-
-/**
- * NFL projections. `week` for a single week (0 = preseason), or `ros: true` for
- * rest-of-season. The payload carries points, points_ppr and points_half together,
- * so one call per position covers every scoring format.
- */
-export const projections = ({ season, position, week, ros, players: ps, positions } = {}) =>
-  call(`/nfl/${season}/projections`, { position, week, ros: ros ? 'true' : undefined, players: ps, positions });
 
 /* --------------------------------------------------------- Points scored */
 

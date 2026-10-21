@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-29T22:46:01.064Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 23070,
+      "name": "Jaxon Smith-Njigba",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 22.272
+      }
+    },
+    {
+      "fpid": 19788,
+      "name": "Ja'Marr Chase",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 19.729
+      }
+    },
+    {
+      "fpid": 19799,
+      "name": "Amon-Ra St. Brown",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 19.277
+      }
+    },
+    {
+      "fpid": 20111,
+      "name": "Chris Olave",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 18.67
+      }
+    },
+    {
+      "fpid": 23180,
+      "name": "Puka Nacua",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 17.31
+      }
+    },
+    {
+      "fpid": 19202,
+      "name": "CeeDee Lamb",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 16.971
+      }
+    },
+    {
+      "fpid": 22916,
+      "name": "Zay Flowers",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 16.941
+      }
+    },
+    {
+      "fpid": 23163,
+      "name": "Drake London",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 16.586
+      }
+    },
+    {
+      "fpid": 19236,
+      "name": "Justin Jefferson",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 16.585
+      }
+    },
+    {
+      "fpid": 20130,
+      "name": "Nico Collins",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 16.339
+      }
+    }
+  ]
+}

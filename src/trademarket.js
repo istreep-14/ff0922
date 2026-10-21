@@ -5,7 +5,7 @@ import { FPDIR, config } from './config.js';
 import { resolve as resolveWeek } from './week.js';
 import { record } from './freshness.js';
 import { writeJsonAtomic } from './jsonfile.js';
-import { scoringsInUse } from './fpsync.js';
+import { scoringsInUse } from './fpapi.js';
 
 /**
  * FantasyPros' trade market — `mpbnfl.fantasypros.com/api/tradeMarketValues`.
@@ -25,7 +25,9 @@ import { scoringsInUse } from './fpsync.js';
  *     ~100 fringe players nobody trades for. A null is "not priced", never 0.
  *   - `expertValue`, `ecrRank*`, `valueGap` and `rankGap` (what the experts
  *     would pay against what the market does) were present for 3 of 463
- *     players. They are kept where they exist, but nothing should lean on them.
+ *     players, and still are (2026-10-20: every scoring, every `date`). The
+ *     experts' chart itself is what Dynasty Daddy republishes as its
+ *     FantasyPros market; dashboard.js `tmExpert` fills the gap from there.
  *   - `playerId` is the FantasyPros player id — the same `fpId` the rosters and
  *     league analysis use, so it joins without a crosswalk.
  *   - `timestamp` is when FantasyPros built the payload (seconds). It was

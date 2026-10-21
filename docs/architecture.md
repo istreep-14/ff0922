@@ -26,19 +26,23 @@ data/latest.json  ───────────────►  per-source s
 ```
 
 - **Fetch half** — `scrape` (MyPlaybook leagues) plus one sync step per external
-  source (`fp`, `vegas`, `wwo`, `firstdown`, `fanduel`, `yahoo`, `draftsharks`,
-  `sleeper-proj`, `schedule`, `buzz`, `trend`, `leaguedetail`, `matchups`).
-  Each writes its own `data/<source>/` tree and records the fetch in
-  `data/freshness.json`.
-- **Join half** — `enrich` reads *every* per-source tree plus the scraped
-  rosters and writes one row-per-player universe to `data/enriched.json`.
+  source (`fp`, `draftsharks`, `trade`, `schedule`, `buzz`, `trend`,
+  `leaguedetail`, `leaguedetail-backfill`, `matchups`, `actuals`). Each writes
+  its own `data/<source>/` tree and records the fetch in `data/freshness.json`.
+  Every line a step prints goes to `data/runlog.jsonl` (`src/runlog.js`).
+- **Join half** — `enrich` reads the FantasyPros and Draft Sharks trees plus
+  the scraped rosters and writes one row-per-player universe to
+  `data/enriched.json`. Current week + rest-of-season only — neither source
+  is asked for, or joins, any other week.
 - **Build half** — `dashboard` turns `enriched.json` into the in-browser app.
   The only transforms that still happen at build time are shaping for the page
   (`buildUniverse`, `buildSourceTables`, `slimAnalysis`) and the inlined
-  consensus module.
+  look-ahead-window module.
 
 The `sync` command orchestrates both halves via `src/sync.js`; the joins are
 marked `always` so a `--only <source>` run still lands the fetch on the page.
+The step wiring (`pipelineMods`) exists once, in `sync.js`, and both the CLI
+and the server call it.
 
 ## Layers
 
@@ -46,12 +50,12 @@ marked `always` so a `--only <source>` run still lands the fetch on the page.
 
 | File | Purpose | Reads / Writes | Called by |
 |---|---|---|---|
-| `src/cli.js` | CLI entrypoint (`#!/usr/bin/env node`), the 64-command `commands{}` dispatcher, argv wiring | reads `data/latest.json`, `data/enriched.json`, `.env` | — (the `ff` binary / npm scripts) |
+| `src/cli.js` | CLI entrypoint (`#!/usr/bin/env node`), the `commands{}` dispatcher, argv wiring | reads `data/latest.json`, `data/enriched.json`, `.env` | — (the `ff` binary / npm scripts) |
 | `src/args.js` | `--flag` / `--opt value` / positional parser; `BOOLEAN_FLAGS` disambiguates value-less flags | none | everything via `parseArgs` |
-| `src/config.js` | path constants (`DATA`, `RAW`, `CACHE`, `FPDIR`, `VEGASDIR`, `STATE`), `.env` loader, the `config` object (credentials, pacing, season/week pins) | `.env` | every module |
+| `src/config.js` | path constants (`DATA`, `RAW`, `CACHE`, `FPDIR`, `STATE`), `.env` loader, the `config` object (credentials, pacing, season/week pins) | `.env` | every module |
 | `src/http.js` | the one `fetch` wrapper: retries, exponential backoff, ETag/`NotModified` handling, shared pool, timeouts | network | every network sync |
 | `src/jsonfile.js` | atomic JSON writes (temp file + rename) so a truncated write can never read as data | writes `data/…/*.json` | schedule, draftsharks, mpbadvanced, overrides, leaguestate, freshness |
-| `src/teams.js` | NFL abbreviation normalization across namespaces (ESPN `JAX/WSH` vs Sleeper `JAC/WAS`), `normPos` `DEF/DST→DST`, matchup-string parser | none | `proj`, `enrich`, `dashboard` |
+| `src/teams.js` | NFL abbreviation normalization across namespaces (ESPN `JAX/WSH` vs Sleeper `JAC/WAS`), `normPos` `DEF/DST→DST`, matchup-string parser | none | `enrich`, `dashboard` |
 
 ### Scrape → the normalized league model
 
@@ -60,7 +64,7 @@ marked `always` so a `--only <source>` run still lands the fetch on the page.
 | `src/fantasypros.js` | MyPlaybook per-league API (`getLeagueRostersJSON`, settings, transactions, analysis…), account→leagues bootstrap | none | `leagues`, `scrape`, `endpoints`, sync |
 | `src/scrape.js` | pulls every league into `data/raw/<ts>/` snapshots + normalized `_normalized.json`, writes `data/latest.json`; refuses an empty league list | writes `data/raw/`, `data/latest.json` | `scrape`, sync step |
 | `src/normalize.js` | flattens raw endpoint payloads into the queryable `latest.json` model, derives `scoringSystem` | none | `scrape` |
-| `src/leaguestate.js` | per-league on/off toggles persisting in `data/leagues-state.json` | `data/leagues-state.json` | `leagues:*` commands |
+| `src/leaguestate.js` | per-league on/off toggles (`data/leagues-state.json`) and the account's full league list (`data/leagues-directory.json`, written by every scrape so an off league stays visible) | both files | `leagues:*`, `scrape`, `serve`, dashboard build |
 | `src/overrides.js` | user corrections (renames, badges, divisions, my teams, playoff rules, waivers, scoring) in `data/league-overrides.json` | `data/league-overrides.json` | `league*` commands, dashboard |
 | `src/prune.js` | bounded history: keeps last 20 `raw/` runs, last 48 trend files | deletes old files | seen from `scrape`, `trend:sync` |
 | `src/export.js` | CSV export with CSV-formula injection defusing (`esc`, leading `=` neutralized) | writes `data/export/*.csv` | `export`, sync step |
@@ -70,54 +74,67 @@ marked `always` so a `--only <source>` run still lands the fetch on the page.
 
 ### Per-source syncs (each writes its own `data/<source>/` tree)
 
+Only two projection/ranking sources remain, and each fetches current week +
+rest of season only — never any other week:
+
 | File | Source | Writes | Called by |
 |---|---|---|---|
-| `src/fpsync.js` | FantasyPros universal dataset — API key path plus `apiSupplement` (external ids, points scored) | `data/fp/<season>/` | `fp:sync`, sync step `fp` |
-| `src/scrapefp.js` | FantasyPros **public pages** (no key): ranking boards' `ecrData`, injury-news pages | `data/fp/<season>/` | `fp:scrape`, `scrape:rankings`, `scrape:news`, sync step `fp` |
-| `src/fpapi.js` | FantasyPros public API v2 wrapper (`api.fantasypros.com/public/v2/json`): rankings, projections, injuries, news, ping; serialized per-key queue | none (writes nothing) | `fp:*`, `fp:sync --source api` |
-| `src/vegas.js` | VegasEdgeFantasy sportsbook boards (QB/RB/WR/TE × bookmaker) + `vegas:dist` boom/bust distributions from the site's 10k-sample sim; token lifecycle | `data/vegas/<season>/` | `vegas:sync`, `vegas:dist`, `vegas:rankings`, `vegas:check`, sync steps |
-| `src/winwithodds.js` | WinWithOdds weekly + **static** season-total stat tables (no auth) | `data/wwo/<season>/` | `wwo:sync`, sync step `wwo` |
-| `src/firstdown.js` | First Down Studio Next.js flight payload; rows keyed by **Sleeper id** (the one exact join) | `data/firstdown/<season>/` | `fd:sync`, sync step `firstdown` |
-| `src/fanduel.js` | FanDuel Research / numberFire GraphQL projections (standard + PPR + ROS) | `data/fanduel/<season>/` | `fanduel:sync`, sync step `fanduel` |
-| `src/yahooproj.js` | Yahoo weekly projections scraped from the logged-in players page (`YAHOO_COOKIE`), paced against HTTP-999 blocks; DevTools-console fallback + ingest | `data/yahoo/<season>/projections.json` | `yahoo:sync`, `yahoo:ages`, `yahoo:script`, `yahoo:ingest`, sync step `yahoo` |
-| `src/draftsharks.js` | Draft Sharks weekly rankings: SSR top-25 + HTMX `load-table` for the rest | `data/draftsharks/<season>/` | `ds:sync`, `proj` (reads), sync step `draftsharks` |
-| `src/sleeperproj.js` | Sleeper week-by-week projections for all 18 weeks; `slimWeek` keeps only rows with real projections; per-week ETag revalidation | `data/sleeper/<season>/projections.json` | `sleeper:proj`, `proj:ages`, `proj`, sync step, `serve` |
+| `src/fpsync.js` | **the one way FantasyPros is fetched**: `fpSync` = the public pages (`scrapefp.js`), then `apiSupplement` (external ids, points scored) when `FP_API_KEY` is set. `sync` and `fp:sync` run the same call | `data/fp/<season>/` | `fp:sync`, sync step `fp` |
+| `src/scrapefp.js` | FantasyPros **public pages** (no key). Rankings (`ecrData`, current-week + ROS) and projections (`<table id="data">`, current week only — the projections page has no real ROS mode, only a static preseason total, so ROS comes from the rankings board) are two separate FantasyPros products; the projections board is paywalled to the top ~10 players/position without `FP_COOKIE`, and `enrich.js` falls back to the rankings board's implied points. Also injury-news pages | `data/fp/<season>/` | `fpSync` |
+| `src/fpapi.js` | FantasyPros public API v2 client, down to the two endpoints with no public-page equivalent (`players`, `playerPoints`) plus `ping`; serialized per-key queue; home of `SCORING_KEY`, `LEAGUE_SCORING_TO_API` and `scoringsInUse` (which formats the account's leagues use) | none | `fpsync`, `fp:check` |
+| `src/draftsharks.js` | Draft Sharks current-week rankings + ROS board (SSR top-25 + HTMX `load-table`). `dsSync` fetches the current week + ROS for every scoring format in use — there is no other mode | `data/draftsharks/<season>/` | `ds:sync`, sync step `draftsharks` |
+
+Two more sources are demand signals, not projections, and are not part of the
+current-week/ROS scope above:
+
+| File | Source | Writes | Called by |
+|---|---|---|---|
 | `src/sleepertrend.js` | Sleeper trending (6h/24h/72h rolling lookbacks, the demand signal's *acceleration*) | `data/trend/<season>/` | `trend:sync`, `trend`, sync step `trend` |
 | `src/buzz.js` | Yahoo BuzzIndex daily add/drop/trade boards, fanned out over position × sort × date (the demand signal's *volume*) | `data/buzz/<season>/` | `buzz:sync`, `buzz`, sync step `buzz`, `serve` |
-| `src/schedule.js` | NFL opponents + byes from ESPN (`cdn.espn.com/core/nfl/schedule`), one request per week; `MIN_GAMES_TRUSTED` guards empty weeks | `data/schedule/<season>/` | `schedule:sync`, `schedule:import`, sync step, read by `proj` |
+
+And the rest of the fetch layer:
+
+| File | Purpose | Writes | Called by |
+|---|---|---|---|
+| `src/schedule.js` | NFL opponents + byes from ESPN (`cdn.espn.com/core/nfl/schedule`), one request per week, and only for weeks not yet stored (`missingWeeks`; `schedule:sync --force` re-pulls all 18) — the schedule is fixed for the season; `MIN_GAMES_TRUSTED` guards empty weeks; also home of the shared `LAST_WEEK` constant | `data/schedule/<season>/` | `schedule:sync`, `schedule:import`, sync step |
 | `src/trademarket.js` | FantasyPros trade market values + 10-day volume series (`tradeMarketValues`) | `data/fp/<season>/trade/` | `trade:sync`, sync step `trade` |
+| `src/dynastydaddy.js` | Dynasty Daddy (`api.dynasty-daddy.com`, public): player rows in ONE request (`player/all/today?market=22` — every market returns the same rows; its trade values are not kept): ids, ADP, ESPN/FanDuel/FantasyGuys ROS ranks; and `league/load` for Sleeper/ESPN leagues (every week's pairings, Sleeper potential points; a private ESPN league is a frozen cache unless `ESPN_S2`/`ESPN_SWID` are set). Joined in `enrich.js` by Sleeper → ESPN → Yahoo id | `data/dynastydaddy/<season>/{players.json,leagues/}` | `dd:players`, `dd:league`, sync steps `ddplayers`, `ddleague` |
 | `src/matchups.js` | every league's live scoreboard via `mpbadvanced.getMatchup`; **accumulates** season points/standings on disk (ESPN/Yahoo expose no other source) | reads/writes `data/scores/<season>/week-N.json` | `matchups:sync`, `matchups`, sync step, `serve` |
+| `src/scoresingest.js` | recover ESPN/Yahoo past weeks MyPlaybook can no longer answer for: parse a logged-in browser dump (ESPN `mMatchupScore`, Yahoo scoreboard, or Dynasty Daddy `league/load`) into the same `data/scores/` ledger | reads/writes `data/scores/<season>/week-N.json` | `scores:script`, `scores:ingest` |
+| `src/actuals.js` | every player's fantasy points for each week, from Sleeper's public stats (`pts_ppr` / `pts_half_ppr` / `pts_std`). Finished weeks stay on disk; the current week refreshes. The page uses this when a matchup lineup has no score for that player | `data/actuals/<season>/week-N.json` | `actuals:sync`, sync step `actuals` |
 | `src/players.js` | FP ECR dictionary: scrapes ten ranking boards into `data/cache/players.json` (fpId → player) | `data/cache/players.json` | `players` |
 
-### Joins, consensus, derived data
+### Joins and derived data
 
 | File | Purpose | Reads / Writes | Called by |
 |---|---|---|---|
-| `src/idmap.js` | the id bridge (FantasyPros `fpId` ↔ Sleeper ↔ ESPN/Yahoo) built from FP external ids + scraped model, cached 12h | `data/cache/idmap.json` | `enrich`, `lineup`, `compare` |
-| `src/enrich.js` | **the big join** — every source onto the row-per-player universe, then `data/enriched.json`. Degrades cleanly: whatever slice of `data/` exists gets joined, the rest is null | reads every per-source tree + caches; writes `data/enriched.json` | `enrich`, `lineup`, `compare`, sync step |
-| `src/consensus.js` | the one consensus derivation (calibration to the FP anchor, stale-source exclusion, played-game-removed ROS) — imported by Node **and inlined verbatim into the page** | none | `status`, dashboard build, the page |
-| `src/weekshape.js` | splits a season/ROS total across remaining weeks using Sleeper's per-week shape (shares sum to 1); `splitRos` reconciles to its source total | none | `proj`, `enrich`, inlined into page |
-| `src/weekhorizon.js` | the look-ahead window keys (`w-7`, `n-3`, `p`, `ros`, `szn`): `parseHorizon`, `weeksIn`, `labelHorizon` | none | `proj`, inlined into page |
-| `src/accuracy.js` | scores each source's stored projections against actual points for finished weeks (MAE, bias, RMSE, correlation) | `data/fp/<season>/…` | dashboard Accuracy tab |
+| `src/idmap.js` | the id bridge (FantasyPros `fpId` ↔ Sleeper ↔ ESPN/Yahoo) built from FP external ids + scraped model, cached 12h | `data/cache/idmap.json` | `enrich`, `lineup` |
+| `src/enrich.js` | **the join** — FantasyPros (current week + ROS rank/points/injury/news/trade) and Draft Sharks (current-week cell + ROS total) onto the row-per-player universe, then `data/enriched.json`. Degrades cleanly: whatever slice of `data/` exists gets joined, the rest is null. No cross-source blending and no per-week curve beyond the current week — that machinery (`weekshape.js`, `consensus.js`) was removed | reads `data/fp/`, `data/draftsharks/`, schedule, trade market, signals; writes `data/enriched.json` | `enrich`, `lineup`, sync step |
+| `src/powerrank.js` | team scoring from one source's player values (League Value by default): contender (best legal lineup), trade value (whole roster), Dynasty Daddy's six tiers and needs, remaining-schedule strength — pure logic, inlined verbatim into the page (`/*__INLINE:powerrank.js__*/`) | none | inlined into page (Power Rankings, player Values tab) |
+| `src/leaguevalue.js` | `lvConsensus`: the agreed week/ROS position rank and points every player table shows (no league, any positions incl. K/DST). League Value on top of the same consensus: each signal's within-position ranks (absent from a deep board → ranked past its end at half weight; best/worst dropped at ≥4) → consensus order over the ROS inputs in `valuescale.js`, one vote per site (no market trade values) → this league's ROS points curve from FP + Draft Sharks projections → lineup filled league-wide (`lvDemand`, flex by points), depth from the league's real rosters → replacement halfway between last starter and waiver (`LV_REPLACEMENT_BLEND`) → value over replacement + 0–100 index. `lvRanksBy` + `lvWorth` price ANY source's position rank the same way, which is how the page puts every source on the league's axis (League Value = `lvWorth` at the consensus rank). Pure, inlined (`/*__INLINE:leaguevalue.js__*/`); the page passes signals as functions | none | Values, Power Rankings (default source), player Values tab |
+| `src/valuescale.js` | the sources a pool can answer for: ROS (`VS_SOURCES`: FantasyPros ROS — once, its points are its rank board's — Draft Sharks ROS + 3D Value, and ESPN/FanDuel/FantasyGuys ROS ranks for comparison only) and this week (`VS_WEEK_SOURCES`: FantasyPros ECR + projections model, Draft Sharks week), each one's own number (`vsRaw`), its higher-is-better score (`vsScore`), and `vsSignals` — the inputs as signals, one vote per site. No market trade values. Pure, inlined (`/*__INLINE:valuescale.js__*/`) | none | League Value signals, Values + Power Rankings pages, player Values tab |
+| `src/weekhorizon.js` | the window keys — `w-<current>`, `ros`, `szn`; any other key reads as the current week: `parseHorizon`, `labelHorizon`, `horizonOptions` — pure logic, inlined verbatim into the page | none | inlined into page |
+| `src/accuracy.js` | scores FantasyPros' and Draft Sharks' stored projections against actual points for finished weeks (MAE, bias, RMSE, correlation); Draft Sharks' past-week data is whatever was captured while that week was current, never re-fetched | `data/fp/<season>/…`, `data/draftsharks/<season>/` | the Sources overview's Accuracy panels |
 | `src/signals.js` | demand signal per player: Sleeper trending acceleration × Yahoo buzz, percentile heat | `data/trend/`, `data/buzz/` | `signal`, dashboard build |
-| `src/sourceaudit.js` | verifies stored sources (scale band, week labels, age, site-side moves); `audit` exits 1 on failure | reads every source tree | `audit`, sync step |
-| `src/sourcetables.js` | the Sources page's per-source wide tables (`buildSourceTables`), read off the *same* universe rows as the player tables | none (takes rows) | dashboard build |
-| `src/sourceweek.js` | which week the data we fetched actually *is* (`resolveSourceWeek`: declared vs requested mismatch) | none | `sourceaudit` |
+| `src/sourceaudit.js` | verifies the stored FantasyPros/Draft Sharks data (scale band, week labels); `audit` exits 1 on failure | reads `data/fp/`, `data/draftsharks/` | `audit`, sync step |
+| `src/sourcetables.js` | per-source tables (`buildSourceTables`), read off the *same* universe rows as the player tables (the page reads FP's for points already scored; the build logs coverage), and `SOURCE_META` — each source's plain-language scope; `SOURCE_ORDER` is `['fp', 'draftsharks']` | none (takes rows) | dashboard build |
+| `src/sourcefeeds.js` | the Sources pages: `FEED_SITES` is one page per site and one tab per file it gives us, each with its columns (by `kind`), its data/ path and the freshness-ledger key whose two clocks it shows. Reads universe rows only — a path is provenance, not a second read — and no tab reads another site's field (`opp` is the ESPN schedule's, so FP tabs omit it). Pure, inlined (`/*__INLINE:sourcefeeds.js__*/`) before `PAGES`, which generates a `src-<site>` page per site | none | Sources pages |
 
 ### Week resolution (shared by nearly everything)
 
 | File | Purpose |
 |---|---|
-| `src/week.js` | NFL season/week resolution: kickoff heuristic, `FP_SEASON`/`FP_WEEK` pins, week 0 = preseason |
+| `src/week.js` | NFL season/week resolution: kickoff heuristic, `FP_SEASON`/`FP_WEEK` pins, week 0 = preseason; also exports the shared `LAST_WEEK` constant |
 | `src/accuracy.js` | (listed above) |
 
 ### Dashboard & serving
 
 | File | Purpose | Reads / Writes | Called by |
 |---|---|---|---|
-| `src/dashboard.js` | builds the compact page payload from `data/enriched.json` + league detail/advanced/accuracy, runs `buildUniverse` (one row per player), renders `src/dashboard.template.html` with the inlined consensus + payload → `dist/dashboard.html` | reads `data/enriched.json`, `data/leaguedetail/`, `data/mpbadvanced/`, caches, template; writes `dist/dashboard.html` | `dashboard`, sync step, `serve` |
-| `src/dashboard.template.html` | the ~3,000-line inline `<script>` in-browser app + markup + CSS; a placeholder is replaced with the payload | — | `dashboard`, `serve` |
-| `src/serve.js` | localhost-only HTTP server (`npm run serve`) serving `dist/dashboard.html` with a Sync panel that runs the same sync steps and a League Setup editor that saves back to `data/league-overrides.json` | `data/latest.json`, `dist/dashboard.html` | `serve` |
+| `src/dashboard.js` | builds the compact page payload from `data/enriched.json` + league detail/advanced/accuracy, runs `buildUniverse` (one row per player), adds the league directory (`leagueDirectory`), the step table and the run log's tail, renders `src/dashboard.template.html` → `dist/dashboard.html` | reads `data/enriched.json`, `data/leaguedetail/`, `data/mpbadvanced/`, `data/runlog.jsonl`, caches, template; writes `dist/dashboard.html` | `dashboard`, sync step, `serve` |
+| `src/dashboard.template.html` | the in-browser app: one inline `<script>` + markup + CSS. `GROUPS`/`PAGES`/`RENDER` define the rail and the pages. Near the end: `LOG` (the log store), `toast`, the server bridge (`api`, `probe`, `runSync`, log polling), the Log / Sync / All Leagues pages, and the command palette (`openPalette`, ⌘K) | — | `dashboard`, `serve` |
+| `src/serve.js` | localhost-only HTTP server (`npm run serve`): serves `dist/dashboard.html`; `/api/state`, `/api/sync` (one run at a time, 409 otherwise), `/api/log?after=` (the live tail), `/api/leagues` (on/off), `/api/overrides`, `/api/scores-ingest`, `/api/scores-bookmarklet` | `data/`, `dist/dashboard.html` | `serve` |
+| `src/runlog.js` | the permanent run log, `data/runlog.jsonl`: `logger` (prints and keeps, tagged per step), `append`, `tail({after})`, `levelOf`; trimmed to 3,000 lines | `data/runlog.jsonl` | `sync.js`, `serve.js`, `log`, dashboard build |
 
 ## The `sync` pipeline (what actually runs)
 
@@ -125,13 +142,17 @@ Seen in `src/sync.js` — `steps(mods)` returns the ordered step list; `runPipel
 applies `--force/--only/--skip/--max-age/--dry-run/--watch N` and consults the
 freshness ledger (`freshness.check`) before fetching. Notable rules codified there:
 
-- Fetch steps in order: `scrape, fp, trade, sleeper-proj, draftsharks, schedule,
-  vegas, vegas-dist, wwo, firstdown, fanduel, buzz, trend, leaguedetail,
-  matchups`.
+- Fetch steps in order: `scrape, fp, draftsharks, trade, schedule, buzz,
+  trend, leaguedetail, leaguedetail-backfill, matchups, actuals`. Presets
+  (`PRESETS`): `live`, `projections`, `leagues` — `--only live` etc.
+- `pipelineMods()` is the single wiring of those names to the sync functions;
+  each step's `run` receives `{ season, week, log }`, where `log` writes to the
+  terminal (CLI) and to the run log tagged with the step's name.
+- `current.run` is the run in progress; the server refuses a second one.
 - `enrich`, `dashboard`, `audit` are `always: true` — exempt from `--only`,
   because a fetch you cannot see on the page has achieved nothing. `--skip`
   still stops them.
-- A failed fetch is recorded and the pipeline **continues**: the other twelve
+- A failed fetch is recorded and the pipeline **continues**: the other
   sources are on disk, and a dashboard built from them is better than none.
 - `data/freshness.json` is the ledger: `fetchedAt` (our clock) vs `sourceAt`
   (the site's own recompute time) vs `prevSourceAt` (to detect "moved").
@@ -146,8 +167,8 @@ Mapping (file → target module):
 
 | Test | Targets |
 |---|---|
+| `accuracy.test.js` | `accuracy.js` (MAE/bias/RMSE/correlation) |
 | `args.test.js` | `args.js` (boolean flags don't eat the next arg) |
-| `consensus.test.js` | `consensus.js` (matrix/calibration/table) |
 | `dashboard-build.test.js` | `dashboard.js` render, `sourcetables.js`, template script compiles |
 | `dates.test.js` | `buzz.js` date boundary, `signals.js` heat |
 | `freshness.test.js` | `freshness.js` (since rounding, siteMoved) |
@@ -156,14 +177,18 @@ Mapping (file → target module):
 | `nav-and-analysis-payload.test.js` | `dashboard.js` slimAnalysis + template nav tables |
 | `render.test.js` | `dashboard.js` renderHtml injection safety |
 | `schedule.test.js` | `schedule.js` bye inference, repairStore |
-| `source-trust.test.js` | `vegas.js`, `sourceweek.js`, `sourceaudit.js`, `winwithodds.js` |
+| `source-trust.test.js` | `sourceaudit.js` (scale band, week/provenance judging) |
+| `runlog-and-pipeline.test.js` | `sync.js` (every step wired, run log per step, lock released), `runlog.js`, `weekhorizon.js`, `dashboard.js` leagueDirectory |
 | `team-overrides.test.js` | `overrides.js`, `sourcetables.js` |
 | `trademarket.test.js` | `trademarket.js` |
-| `values.test.js` | `export.js` esc, `config.js` parseEnv, `leaguedata.js`, `sleeperproj.js` |
+| `dynastydaddy.test.js` | `dynastydaddy.js` (unpriced ≠ 0, picks skipped, stale league snapshot, ESPN cookie gating), `dashboard.js` slimDDLeague |
+| `leaguevalue.test.js` | `leaguevalue.js` (flex/superflex demand, real roster depth, superflex prices QBs up, replacement blend, consensus + mix, imputation, trimming) |
+| `sourcefeeds.test.js` | `sourcefeeds.js` (every ledger is tracked, no tab reads another site's field, FP rankings vs projections are separate tabs, Dynasty Daddy keeps only its player data, file paths, stat/week columns, site pages are generated with renderers) |
+| `valuescale.test.js` | `valuescale.js` (no trade value is a source, FantasyPros counts once, ranks turn higher-is-better, empty sources dropped, no name collisions) |
+| `powerrank.test.js` | `powerrank.js` (lineup fill, IR exclusion, tiers, needs, schedule strength, no name collisions with the page) |
+| `values.test.js` | `export.js` esc, `config.js` parseEnv, `leaguedata.js` |
 | `week.test.js` | `week.js` |
-| `weekly-outlook.test.js` | `draftsharks.js`, `schedule.js`, `weekhorizon.js`, `teams.js`, `weekshape.js` |
-| `weekshape.test.js` | `weekshape.js` (shares sum to 1, split reconciles) |
 
-`http.js`, `fpapi.js`, `idmap.js`, `vegas.js` (network), `serve.js`,
-`sleeper.js` cache, and `sync.js` have no dedicated unit tests — they are the
-network-touching or whole-run pieces, exercised via the CLI/sync path.
+`http.js`, `fpapi.js`, `idmap.js`, `serve.js` and the `sleeper.js` cache have
+no dedicated unit tests — they are the network-touching pieces, exercised via
+the CLI/sync path.

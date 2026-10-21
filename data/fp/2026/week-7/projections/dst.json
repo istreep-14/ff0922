@@ -1,0 +1,230 @@
+{
+  "fetchedAt": "2026-10-21T03:42:58.493Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 8120,
+      "name": "Houston Texans",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 8.422
+      }
+    },
+    {
+      "fpid": 8170,
+      "name": "Minnesota Vikings",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.834
+      }
+    },
+    {
+      "fpid": 8300,
+      "name": "Tennessee Titans",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.63
+      }
+    },
+    {
+      "fpid": 8210,
+      "name": "New York Jets",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.276
+      }
+    },
+    {
+      "fpid": 8070,
+      "name": "Cleveland Browns",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.153
+      }
+    },
+    {
+      "fpid": 8090,
+      "name": "Denver Broncos",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.988
+      }
+    },
+    {
+      "fpid": 8240,
+      "name": "Pittsburgh Steelers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.512
+      }
+    },
+    {
+      "fpid": 8050,
+      "name": "Chicago Bears",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.334
+      }
+    },
+    {
+      "fpid": 8080,
+      "name": "Dallas Cowboys",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.126
+      }
+    },
+    {
+      "fpid": 8040,
+      "name": "Carolina Panthers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.004
+      }
+    },
+    {
+      "fpid": 8150,
+      "name": "Kansas City Chiefs",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.82
+      }
+    },
+    {
+      "fpid": 8280,
+      "name": "Los Angeles Rams",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.691
+      }
+    },
+    {
+      "fpid": 8100,
+      "name": "Detroit Lions",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.554
+      }
+    },
+    {
+      "fpid": 8270,
+      "name": "San Francisco 49ers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.544
+      }
+    },
+    {
+      "fpid": 8020,
+      "name": "Baltimore Ravens",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.518
+      }
+    },
+    {
+      "fpid": 8260,
+      "name": "Seattle Seahawks",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.473
+      }
+    },
+    {
+      "fpid": 8060,
+      "name": "Cincinnati Bengals",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.464
+      }
+    },
+    {
+      "fpid": 8130,
+      "name": "Indianapolis Colts",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.446
+      }
+    },
+    {
+      "fpid": 8190,
+      "name": "New Orleans Saints",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.304
+      }
+    },
+    {
+      "fpid": 8160,
+      "name": "Miami Dolphins",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.3
+      }
+    },
+    {
+      "fpid": 8290,
+      "name": "Tampa Bay Buccaneers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.232
+      }
+    },
+    {
+      "fpid": 8180,
+      "name": "New England Patriots",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 5.072
+      }
+    },
+    {
+      "fpid": 8230,
+      "name": "Philadelphia Eagles",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 4.991
+      }
+    },
+    {
+      "fpid": 8220,
+      "name": "Las Vegas Raiders",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 4.908
+      }
+    },
+    {
+      "fpid": 8010,
+      "name": "Atlanta Falcons",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 4.878
+      }
+    },
+    {
+      "fpid": 8110,
+      "name": "Green Bay Packers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 4.854
+      }
+    },
+    {
+      "fpid": 8200,
+      "name": "New York Giants",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 4.708
+      }
+    },
+    {
+      "fpid": 8000,
+      "name": "Arizona Cardinals",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 4.522
+      }
+    }
+  ]
+}

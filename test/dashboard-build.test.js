@@ -7,10 +7,9 @@ import { buildSourceTables, SOURCE_ORDER } from '../src/sourcetables.js';
 
 const template = readFileSync(new URL('../src/dashboard.template.html', import.meta.url), 'utf8');
 
-test('the built page carries the consensus module, and its script still compiles', () => {
+test('the built page has no leftover template placeholders, and its script still compiles', () => {
   const html = renderHtml(template, { leagues: [] });
-  assert.ok(!html.includes('/*__CONSENSUS__*/'), 'placeholder replaced');
-  assert.ok(html.includes('function consensusTable('), 'module is in the page');
+  assert.ok(!/\/\*__[A-Z]/.test(html), 'every placeholder replaced');
   const script = html.match(/<script(?![^>]*type=)[^>]*>([\s\S]*?)<\/script>/)[1];
   // `export` is not valid in a classic script; the build strips it from the inlined module.
   assert.ok(!/^export /m.test(script), 'no export left in the page script');
@@ -18,20 +17,72 @@ test('the built page carries the consensus module, and its script still compiles
   assert.doesNotThrow(() => new vm.Script(script));
 });
 
-test('the page runs the same consensus functions the tests do', () => {
-  const module = readFileSync(new URL('../src/consensus.js', import.meta.url), 'utf8').replace(/^export /gm, '');
-  assert.ok(renderHtml(template, {}).includes(module), 'the inlined text is the module, unchanged');
+test('every pure module the page inlines is in it, unchanged', () => {
+  const html = renderHtml(template, {});
+  for (const file of ['weekhorizon.js', 'valuescale.js', 'powerrank.js', 'leaguevalue.js', 'sourcefeeds.js']) {
+    const src = readFileSync(new URL(`../src/${file}`, import.meta.url), 'utf8').replace(/^export /gm, '');
+    assert.ok(html.includes(src), `${file} is inlined`);
+  }
+});
+
+test('a placeholder the renderer cannot fill fails the build instead of shipping a page that dies on load', () => {
+  // A renderer older than the template: it knows HORIZON, not LEAGUEVALUE. This shipped.
+  assert.throws(() => renderHtml(`${template}\n/*__LEAGUEVALUE__*/`, {}), /LEAGUEVALUE__\*\/ was not filled/);
+  assert.throws(() => renderHtml('<script>/*__INLINE:nope.js__*/</script>/*__DATA__*/null', {}), /ENOENT/);
+});
+
+test('the large tables are DataGrids: one builder, not a hand-rolled table per page', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    const b = template.indexOf('\nfunction ', a + 1);
+    return template.slice(a, b);
+  };
+  for (const name of ['playersTable', 'leaguePlayersTable', 'sourceTable', 'pageValues', 'pageTrade']) {
+    const body = fnBody(name);
+    assert.ok(/\bgrid\(\{/.test(body), `${name} renders through grid()`);
+    assert.ok(!/el\('table'|table2\(/.test(body), `${name} does not build its own table`);
+  }
+});
+
+test('the small tables are smallTable()s, sorted by their columns, not hand-rolled', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    const b = template.indexOf('\nfunction ', a + 1);
+    return template.slice(a, b);
+  };
+  for (const name of ['pagePower', 'valTeamsMatrix', 'pageStandings', 'pageWaivers', 'pageAnalysis', 'storedWeekPanel']) {
+    const body = fnBody(name);
+    assert.ok(/\bsmallTable\(\{/.test(body), `${name} renders through smallTable()`);
+    assert.ok(!/el\('table'|table2\(|[^.\w]table\(\[/.test(body), `${name} does not build its own table`);
+  }
+  // The DOM-text sorter's own builders for these pages are gone.
+  assert.ok(!/function (sortableTable|sortTh|waiverSheetRow|srcBands)\(/.test(template));
+});
+
+test('phase-four views use the shared List, Compare and KeyValue components', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    const b = template.indexOf('\nfunction ', a + 1);
+    return template.slice(a, b);
+  };
+  assert.match(template, /function list\(\{/);
+  assert.match(template, /function compare\(\{/);
+  assert.match(template, /function keyValue\(/);
+  assert.match(fnBody('pageMoves'), /\blist\(\{/);
+  assert.match(fnBody('matchupPanel'), /\bcompare\(\{/);
+  assert.match(fnBody('muRows'), /\bcompare\(\{/);
+  assert.match(fnBody('muRosterFallback'), /\bcompare\(\{/);
+  assert.match(fnBody('sleeperMatchupFallback'), /\bcompare\(\{/);
+  assert.match(fnBody('mdCard'), /\bkeyValue\(/);
+  assert.doesNotMatch(fnBody('pageMoves'), /table2\(|[^.\w]table\(\[/);
 });
 
 test('a Sources table is read off the player row, so the two cannot disagree', () => {
   const rows = [
     { i: 1, n: 'A', p: 'RB', wk: 20, ros: 250, pr: 'RB1', rosPr: 'RB2', pts: 19,
-      sl: { wk: 19, ros: 240 }, ds: { wk: 18, ros: 245, floor: 10, ceiling: 30 },
-      vg: 17, vc: false, vdist: { floor: 8, ceiling: 28 },
-      wwo: { proj: 21, seasonProj: 300, rosDerived: 280, floor: 9, ceiling: 31, actual: 12 },
-      fd: { proj: 16, seasonProj: 290, rosDerived: 270 },
-      fdl: { proj: 15, posRank: 4, seasonProj: 200, seasonPosRank: 6 },
-      yh: { wk: 14, ros: 180 } },
+      ds: { wk: 18, ros: 245, floor: 10, ceiling: 30 } },
     { i: 2, n: 'B', p: 'RB', wk: 10, ros: 100, pr: 'RB2', rosPr: 'RB1' },
   ];
   const t = buildSourceTables({ rows });
@@ -39,29 +90,256 @@ test('a Sources table is read off the player row, so the two cannot disagree', (
   const of = (source, i = 1) => t[source].find((r) => r.i === i);
   assert.equal(of('fp').wk, 20);
   assert.equal(of('fp').wkAct, 19);
-  assert.equal(of('sleeper').ros, 240);
   assert.equal(of('draftsharks').ceiling, 30);
-  assert.equal(of('vegas').wk, 17);
-  assert.equal(of('vegas').partial, true, 'a partly priced line is marked, not averaged');
-  assert.equal(of('wwo').ros, 300);
-  assert.equal(of('wwo').rosRest, 280, 'a static season total carries what is left of it');
-  assert.equal(of('firstdown').rosRest, 270);
-  assert.equal(of('fanduel').rosRk, 6);
-  assert.equal(of('yahoo').wk, 14);
-  assert.equal(of('sleeper', 2), undefined, 'a source that does not price him has no row');
+  assert.equal(of('draftsharks', 2), undefined, 'a source that does not price him has no row');
 });
 
 test('a source’s own positional rank is computed within its own numbers', () => {
-  const rows = [1, 2, 3].map((i) => ({ i, n: String(i), p: 'WR', sl: { wk: 10 - i, ros: 100 - i } }));
+  const rows = [1, 2, 3].map((i) => ({ i, n: String(i), p: 'WR', ds: { wk: 10 - i, ros: 100 - i } }));
   const t = buildSourceTables({ rows });
-  assert.deepEqual(t.sleeper.map((r) => [r.i, r.wkRk]), [[1, 1], [2, 2], [3, 3]]);
+  assert.deepEqual(t.draftsharks.map((r) => [r.i, r.wkRk]), [[1, 1], [2, 2], [3, 3]]);
 });
 
 test('the page parses and labels a look-ahead window with the tested module', async () => {
   const html = renderHtml(template, {});
   const horizon = readFileSync(new URL('../src/weekhorizon.js', import.meta.url), 'utf8').replace(/^export /gm, '');
   assert.ok(html.includes(horizon), 'weekhorizon.js is inlined unchanged');
-  assert.ok(!html.includes('/*__HORIZON__*/'));
   const { parseHorizon, labelHorizon } = await import('../src/weekhorizon.js');
   assert.equal(labelHorizon(parseHorizon('ros', { now: 2 }), { now: 2 }), 'Rest of season (wk 2–18)');
+});
+
+test('My Team: recent moves read the move shape, and controls only show where they act', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    const b = template.indexOf('\nfunction ', a + 1);
+    return template.slice(a, b);
+  };
+  // A move is {kind, teamName, adds[], drops[]}. The Overview read per-player
+  // fields (x.playerName, x.action) a move no longer has, so every row said "—".
+  const parts = fnBody('overviewParts');
+  assert.match(parts, /\blist\(\{items:recent, row:moveRow\}\)/);
+  assert.doesNotMatch(parts, /\.playerName|\.playerPos|\.action\b/);
+  const row = fnBody('moveRow');
+  assert.match(row, /movePlayers\(t\.adds,1\)/);
+  assert.match(row, /movePlayers\(t\.drops,-1\)/);
+  // Only Overview and This week can show a stored week; the picker did nothing on the other tabs.
+  assert.match(fnBody('pageMyTeam'), /\(teamTab==='overview'\|\|teamTab==='week'\)\? weekPicker\(l\) : null/);
+  // Before kickoff the score column is all dashes and a 0.0 total.
+  assert.match(fnBody('teamRosterTable'), /if\(!anyScored\(t\)\) cols=cols\.filter\(c=>c\.key!=='pts'\)/);
+});
+
+test('projection columns carry a tone: the headline number of each band leads', () => {
+  const tone = template.match(/const COL_TONE = (\{[^}]*\})/);
+  assert.ok(tone, 'COL_TONE exists');
+  const map = Function(`return ${tone[1]}`)();
+  for (const k of ['cons', 'tm', 'pts']) assert.equal(map[k], 'key', `${k} leads its band`);
+  for (const k of ['ecr', 'ecrrng', 'dsfloor', 'dsceil', 'own']) assert.equal(map[k], 'aux', `${k} is context`);
+  // Applied inside columnsFor, so My Team, Players and All Rosters all get it.
+  const a = template.indexOf('function columnsFor('), b = template.indexOf('\nfunction ', a + 1);
+  assert.match(template.slice(a, b), /td\.classList\.add\('t-'\+tone\)/);
+});
+
+test('My Team shows League Value beside its ROS inputs, and each window its own position rank', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    const b = template.indexOf('\nfunction ', a + 1);
+    return template.slice(a, b);
+  };
+  // One League Value: the module's number, read through lvFor, never recomputed per page.
+  const lv = fnBody('lvCols');
+  assert.match(lv, /const lv=lvFor\(l\)/);
+  assert.doesNotMatch(lv, /lvValues\(/);
+  const cols = fnBody('teamColumns');
+  assert.equal((cols.match(/\.\.\.lvCols\(L\(\)\)/g) || []).length, 3, 'Overview, Rest of season and Trade value');
+  // The agreed points and their position rank are two columns, named for the
+  // window ("Week" / "Wk rank", "ROS" / "ROS rank"); My Team keeps the pair.
+  assert.match(fnBody('consPtsCell'), /stackCell\(fmt\(c&&c\.v\), null/);
+  assert.match(fnBody('columnsFor'), /key:'consrk', label:rkLab/);
+  assert.match(cols, /const CONS=\['cons','consrk'\]/);
+});
+
+test('lean tables: one line per row, on the player tables', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    const b = template.indexOf('\nfunction ', a + 1);
+    return template.slice(a, b);
+  };
+  // Lean is a table class, styled in CSS, so no page builds its own one-line player.
+  assert.match(fnBody('grid'), /\(o\.lean\? ' lean' : ''\)\+\(o\.nopos\? ' nopos' : ''\)/);
+  for (const name of ['playersTable', 'leaguePlayersTable', 'sourceTable', 'pageWaivers', 'storedWeekPanel', 'overviewParts']) {
+    assert.match(fnBody(name), /lean:true/, `${name} is lean`);
+  }
+  assert.match(fnBody('lineupTableView'), /cls:'roster lean'/);
+  assert.match(fnBody('positionTableView'), /cls:'roster lean nopos'/, 'grouped by position: no position on each row');
+  assert.match(fnBody('rosterTable'), /cls:'lean'/);
+  // The kickoff a lean row hides stays on hover.
+  assert.match(fnBody('oppCell'), /td\.title=kickoff/);
+  assert.match(template, /table\.lean \.stack\{flex-direction:row-reverse/);
+  assert.doesNotMatch(fnBody('overviewParts'), /table2\(|[^.\w]table\(\[/, 'the Overview side panels do not hand-build tables');
+});
+
+test('League Players: an owner column of badges, a leading rank, and rows tinted by owner', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  const cols = fnBody('leaguePlayerColumns');
+  assert.match(cols, /label:'#', r:1, rank:true/);
+  assert.match(cols, /key:'roster', label:'Owner', r:1, cell:rosterBadgeCell/);
+  assert.match(fnBody('leaguePlayersTable'), /rowClass:ownerRowClass/);
+  assert.match(fnBody('rosterBadgeCell'), /ownerBadge\(o\)/);
+  assert.match(fnBody('ownerOf'), /fxOwner\(/);
+  // Values and the Waiver Wire draw the same badge, not a team name in text.
+  assert.match(fnBody('pageValues'), /ownerBadge\(valOwner\(p\)\)/);
+  assert.match(template, /rowClass:r=> ownerRowClass\(r\.p\)/);
+  assert.doesNotMatch(template, /teambadge/, 'the old pill is gone');
+});
+
+test('one header row: a column group rides in the label, never a band row above it', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  for (const name of ['grid', 'table2']) {
+    assert.doesNotMatch(fnBody(name), /'bands'|th\.band|colSpan=n/, `${name} draws no band row`);
+    assert.match(fnBody(name), /headCell\(c/, `${name} heads through headCell`);
+  }
+  assert.doesNotMatch(template, /function projBands\(/);
+  // Two "Pts" columns still say whose: FP pts, DS pts.
+  const short = template.match(/const BAND_SHORT = (\{[^}]*\})/);
+  const map = Function(`return ${short[1]}`)();
+  assert.equal(map.FantasyPros, 'FP');
+  assert.equal(map['Draft Sharks'], 'DS');
+  // A single-row header is never clipped: widths are floors, not fixed layout.
+  assert.match(template, /table\.fixed\{table-layout:auto\}/);
+  assert.doesNotMatch(template, /table-layout:fixed/);
+  // Sortable headers show both arrows dim; the sorted one the accent.
+  assert.match(fnBody('sortIcon'), /var\(--sort-on\)/);
+});
+
+test('the table system: dark tokens by default, light as the same tokens, and no bold', () => {
+  const root = template.slice(template.indexOf(':root{'), template.indexOf('}', template.indexOf(':root{')));
+  for (const hex of ['#12161F', '#29304A', '#222A3E', '#424B69', '#3A4360', '#E6E9EF', '#EEF1F6', '#FACD39']) {
+    assert.ok(root.includes(hex), `dark default carries ${hex}`);
+  }
+  const light = template.slice(template.indexOf(':root[data-theme="light"]{'));
+  for (const hex of ['#DFE4EC', '#FFFFFF', '#F3F5F9', '#D6DCE5', '#E2E7EE', '#262B33', '#1F242C', '#525A67']) {
+    assert.ok(light.slice(0, light.indexOf('}')).includes(hex), `light carries ${hex}`);
+  }
+  // Light is chosen, never inferred: the toggle treats "no theme" as dark.
+  assert.match(template, /const isDark = cur!=='light';/);
+  assert.doesNotMatch(template, /font-weight:\s*[78]00|fontWeight='[78]00'/, 'weights 400/500/600 only');
+  assert.match(template, /Poppins:wght@400;500;600&/);
+  // Density: 32 / 38 / 48px rows, switched in place.
+  assert.match(template, /table\.compact\{--row-h:32px\} table\.comfy\{--row-h:48px\}/);
+  assert.match(template, /--row-h:38px/);
+  // No zebra, no vertical column rules.
+  assert.match(template, /td\.bandsep,\.tsep\{border-left:0\}/);
+  assert.doesNotMatch(template, /tr\.benchrow td\{background/);
+});
+
+test('the player identity is one line: badge, headshot with logo, name, team, status', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  const id = fnBody('playerIdentity');
+  const row = id.slice(id.indexOf("el('div','pid')"));
+  const order = ['posChip(p.p)', "avatarFor(p,{logo:true})", 'plink(p)', "el('span','tm',p.t)", 'who.append(tag)'];
+  let at = -1;
+  for (const k of order) { const i = row.indexOf(k); assert.ok(i > at, `${k} comes next`); at = i; }
+  // The lineup leads with the slot badge and keeps the POS - TEAM line.
+  assert.match(id, /posChip\(o\.slot,'slot'\)/);
+  assert.match(id, /\[p\.p,p\.t\]\.filter\(Boolean\)\.join\(' - '\)/);
+  assert.match(fnBody('avatarFor'), /imgEl\(teamLogo\(p\.t\),'lg'\)/);
+  assert.match(fnBody('statusTag'), /'BYE'/);
+});
+
+test('row states: shaded cells are rounded, rows expand into a tray, sections are labels', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  // A heated cell's shade moves onto a rounded wrapper (full-bleed fills shipped before).
+  assert.match(fnBody('shadeCell'), /el\('span','hc h'/);
+  assert.doesNotMatch(template, /td\.h[ud][123]\{background/);
+  // Every table builder marks player rows expandable.
+  assert.match(fnBody('grid'), /expandable\(tr\)/);
+  assert.match(fnBody('table2'), /expandable\(r\)/);
+  assert.match(fnBody('playerTray'), /agreed\(p,false\)/);
+  assert.match(fnBody('playerTray'), /agreed\(p,true\)/);
+  // A frozen cell keeps the row's tint (it painted over yours / FA before).
+  assert.match(template, /table\.dg \.stk\{position:sticky;z-index:1;background:linear-gradient\(var\(--cell-bg/);
+  // Bench and reserve are section labels in the lineup, not filled bands.
+  const lu = fnBody('lineupTableView');
+  assert.match(lu, /section\('Bench'\)/);
+  assert.match(lu, /section\('Injured reserve'\)/);
+  assert.match(template, /table tbody tr\.sec>td,table tbody tr\.grouphdr>td,table tbody tr\.cutrow>td\{height:20px;/);
+});
+
+test('the player tables’ main number is the agreed one, not one site’s', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  // consFor fed every table, total, sort and lineup with FantasyPros' own
+  // `wk`/`ros`; it now reads the FantasyPros + Draft Sharks consensus.
+  const cons = fnBody('consFor');
+  assert.match(cons, /agreed\(p,\s*(true|false)\)/);
+  assert.doesNotMatch(cons, /p\.wk\b|p\.ros\b/);
+  assert.match(template, /lvConsensus\(DATA\.pools\[sc\]\|\|\[\], vsSignals\(ros\? VS_SOURCES : VS_WEEK_SOURCES\)/);
+  // A best-fit lineup is picked on the agreed week number too.
+  assert.match(fnBody('lineupFor'), /wkPts\(b\)/);
+  assert.match(template, /const wkPts = p=>\{ const m=metric\(p,'agreed'/);
+  assert.match(fnBody('columnsFor'), /metric\(p,'agreed'/);
+});
+
+test('metric() is the one table accessor: agreed vs each site’s published number', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  const met = fnBody('metric');
+  assert.match(met, /id==='agreed'/);
+  assert.match(met, /id==='fp'/);
+  assert.match(met, /id==='ds'/);
+  assert.match(met, /p\.wk\b/);
+  assert.match(met, /p\.ros\b/);
+  // FantasyPros as published, not the agreed blend — this labeled the card "FP"
+  // and filled it with consFor.
+  const src = fnBody('srcValue');
+  assert.match(src, /metric\(p,\s*key/);
+  assert.doesNotMatch(src, /consFor/);
+  assert.match(fnBody('fpOwn'), /metric\(p,'fp'/);
+  assert.match(fnBody('mdProjections'), /srcValue\(p,k,/);
+  assert.doesNotMatch(fnBody('mdProjections'), /consFor/);
+  assert.match(fnBody('mdOverview'), /metric\(p,'fp'/);
+  assert.match(fnBody('mdKpis'), /metric\(p,'agreed'/);
+});
+
+test('grid() draws kind+get columns when cell is absent, and sorts by get', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  const draw = fnBody('dgCell');
+  assert.match(draw, /c\.cell\) return shadeCell\(c\.cell\(r\)\)/);
+  assert.match(draw, /c\.kind\) return cell\(c\.kind,\s*c\.get/);
+  assert.match(fnBody('grid'), /!c\.sort && c\.get/);
+  assert.match(fnBody('grid'), /dgCell\(c,r\)/);
+  const cols = fnBody('columnsFor');
+  assert.match(cols, /kind:'num'/);
+  assert.match(cols, /get:p=>\{ const m=metric\(p,'agreed'/);
+  assert.match(cols, /get:p=>\{ const m=metric\(p,'fp'/);
+  assert.match(cols, /get:p=>\{ const m=metric\(p,k,h\)/);
 });
