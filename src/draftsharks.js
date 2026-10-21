@@ -5,28 +5,30 @@ import { DATA } from './config.js';
 import { resolve as resolveWeek } from './week.js';
 import { record } from './freshness.js';
 import { writeJsonAtomic } from './jsonfile.js';
-import { LAST_WEEK } from './sleeperproj.js';
-import { scoringsInUse } from './fpsync.js';
+import { scoringsInUse } from './fpapi.js';
 import { nameKey } from './sleeper.js';
 import { normPos, normTeam, parseMatchup } from './teams.js';
 
 /**
- * Draft Sharks weekly rankings — a second per-week projection, not a curve.
+ * Draft Sharks — current-week rankings and a rest-of-season board.
  *
- * Sleeper is the only API in this stack that publishes a number for week 12
- * in September, but that number is whatever Sleeper's nightly batch last
- * wrote. Draft Sharks re-ranks each week independently
- * (`/weekly-rankings/7/ppr` … `/weekly-rankings/18/ppr`) and moves when news
- * moves: a teammate on IR shows up in weeks 2–4 here on the same day, even
- * if Sleeper's week-4 projection has not been touched since last night.
+ * The page SSR-renders the top 25; its table script pages the rest through
+ * `GET /{weekly,ros}-rankings/load-rows?offset=&limit=`. `load-table` stops at
+ * the top 250 OVERALL — IDP included — which was only ~28 QBs and ~45 RBs, so
+ * most waiver-wire players had no Draft Sharks number at all. One `load-rows`
+ * call with a large limit returns the whole board (~750 weekly, ~1,150 ROS).
  *
- * The public page SSR-renders the top 25; the rest of the board (250 players)
- * is the same table behind HTMX `GET /weekly-rankings/load-table`. Rest-of-
- * season totals come from `/ros-rankings/load-table`. Last-Modified on the
- * response is the site's own clock.
+ * Each board has two views of the same rows (`researchDepth`):
  *
- * There are no stable cross-site ids. The join is name + position, same as
- * WinWithOdds.
+ *   rankings     rank, tiers, floor/ceiling, consensus, SOS, bye; ROS adds
+ *                games left, injury risk, 3D Value, its trend and market value
+ *   projections  the projected stat line behind the number (per game on ROS)
+ *
+ * so a board is two requests, merged on Draft Sharks' own player id. The
+ * `fantasyPosition` filter is applied in the browser, not by the server.
+ * Last-Modified is always 01 Jan 2000 here, so there is no site clock.
+ *
+ * There are no stable cross-site ids. The join is name + position.
  */
 
 const BASE = 'https://www.draftsharks.com';
@@ -38,6 +40,20 @@ const UA_HEADERS = {
 
 /** Scoring format -> the slug Draft Sharks puts in the URL and the load-table query. */
 export const SCORING_SLUG = { PPR: 'ppr', HALF: 'half-ppr', STD: '' };
+
+/** Every row on the board fits in one page at this size (~1,150 ROS rows measured). */
+const PAGE_LIMIT = 2000;
+
+/** IDP and team-QB/K placeholder rows — no league here rosters them. */
+const SKIP_POSITIONS = new Set(['DB', 'DL', 'LB', 'TK', 'TQB']);
+
+/** Projections-view cells kept as the stat line. Fantasy-point subtotals (`*Total`) are skipped. */
+export const STAT_KEYS = [
+  'pass_att', 'pass_cmp', 'pass_yds', 'pass_tds', 'pass_int',
+  'rush_yds', 'rush_tds', 'rec_catch', 'rec_yds', 'rec_tds',
+  'k_xp', 'k_fg_0_29', 'k_fg_30_39', 'k_fg_40_49', 'k_fg_50_59', 'k_fg_60',
+  'def_sack', 'def_int', 'def_fum_rec', 'def_tds', 'def_opp_pts', 'def_opp_yds',
+];
 
 const dir = (season) => join(DATA, 'draftsharks', String(season));
 const filePath = (season, scoring) => join(dir(season), `${String(scoring).toLowerCase()}.json`);
@@ -84,19 +100,31 @@ function teamFrom(block) {
  */
 export function parsePlayerBlock(block) {
   const name = attr(block, 'data-player-name');
-  const position = normPos(attr(block, 'data-fantasy-position'));
-  if (!name || !position) return null;
+  const rawPos = String(attr(block, 'data-fantasy-position') || '').toUpperCase();
+  const position = normPos(rawPos);
+  if (!name || !position || SKIP_POSITIONS.has(rawPos)) return null;
   const matchupRaw = cellValue(block, 'matchup');
   const matchup = parseMatchup(matchupRaw);
   const sosRaw = cellValue(block, 'strength_of_schedule');
   const rankText = block.match(/rank-index[^>]*>\s*<span>(\d+)<\/span>/i);
+  // The position rank is the <pos-roster-spot> text. `data-tier-positional` is
+  // the positional TIER, and was read as the rank until the two were compared.
+  const posRank = block.match(/<pos-roster-spot[^>]*>\s*(\d+)\s*</i);
+  const stats = {};
+  for (const k of STAT_KEYS) {
+    const v = numOr(cellValue(block, k));
+    if (v != null && v !== 0) stats[k] = v;
+  }
   return {
     id: attr(block, 'data-key'),
     name,
     position,
     team: teamFrom(block),
-    rank: rankText ? Number(rankText[1]) : numOr(attr(block, 'data-tier-overall')),
-    posRank: numOr(attr(block, 'data-tier-positional')),
+    rank: rankText ? Number(rankText[1]) : null,
+    posRank: posRank ? Number(posRank[1]) : null,
+    tier: numOr(attr(block, 'data-tier-overall')),
+    posTier: numOr(attr(block, 'data-tier-positional')),
+    rookie: attr(block, 'data-is-rookie') === 'true',
     matchup: matchupRaw,
     opp: matchup.bye ? null : matchup.opp,
     home: matchup.home,
@@ -107,12 +135,31 @@ export function parsePlayerBlock(block) {
     d3: numOr(cellValue(block, 'weekly3dPts')),
     floor: numOr(cellValue(block, 'weeklyFloorPts')),
     ceiling: numOr(cellValue(block, 'weeklyCeilingPts')),
-    consensus: numOr(cellValue(block, 'consensus_projection')),
-    // ROS / season boards. rosWeeklyPts is a per-week average of the remainder;
-    // fantasy_points is a season (or rest-of-season) total.
+    // The site's name for consensus has been `consensus_projection`; the board
+    // now says consensusWeeklyPts / consensusRosWeeklyPts, and the old name
+    // left every consensus figure null.
+    consensus: numOr(cellValue(block, 'consensusWeeklyPts') ?? cellValue(block, 'consensus_projection')),
+    rosConsensus: numOr(cellValue(block, 'consensusRosWeeklyPts')),
+    rosD3: numOr(cellValue(block, 'rosWeekly3dPts')),
+    injuryRisk: numOr(cellValue(block, 'player.sipPlayerProfile.injury_prob')),
+    // 3D Value (0-100, the trade-value scale) and its change since the last
+    // update; market value is what the trade market says, on the same scale.
+    value: numOr(cellValue(block, 'dsValue')),
+    valueDelta: numOr(cellValue(block, 'dsValueDelta')),
+    marketValue: numOr(attr(block, 'data-market-value')),
+    stats,
+    // ROS / season boards. rosWeeklyPts is a per-week average of the remainder.
+    // The site used to publish a season/ROS total directly under
+    // `fantasy_points`; a redesign dropped that attribute (still checked here
+    // in case it returns) and left only the per-week average plus a
+    // `games_played` cell that — despite its name — is how many of the
+    // remaining games this ROS figure covers (bye subtracted, verified against
+    // the current week's games-left count on real data). rosTotal is the
+    // product of the two when there is no published total to use as-is.
     rosWeekly: numOr(cellValue(block, 'rosWeeklyPts')),
     rosFloor: numOr(cellValue(block, 'rosWeeklyFloorPts') || cellValue(block, 'floor_points')),
     rosCeiling: numOr(cellValue(block, 'rosWeeklyCeilingPts') || cellValue(block, 'ceiling_points')),
+    rosGames: numOr(cellValue(block, 'games_played')),
     rosTotal: numOr(cellValue(block, 'fantasy_points')),
   };
 }
@@ -129,15 +176,26 @@ export function parseRankingsTable(html) {
   return players;
 }
 
-function loadUrl(kind, { week, scoring } = {}) {
+export function loadUrl(kind, { week, scoring, depth = 'rankings' } = {}) {
   const slug = SCORING_SLUG[String(scoring || 'PPR').toUpperCase()];
-  const q = new URLSearchParams();
+  const q = new URLSearchParams({ offset: '0', limit: String(PAGE_LIMIT) });
   if (slug) q.set('pprSuperflexSlug', slug);
+  q.set('researchDepth', depth);
   if (kind === 'week') {
     q.set('week', String(week));
-    return `${BASE}/weekly-rankings/load-table?${q}`;
+    return `${BASE}/weekly-rankings/load-rows?${q}`;
   }
-  return `${BASE}/ros-rankings/load-table?${q}`;
+  return `${BASE}/ros-rankings/load-rows?${q}`;
+}
+
+/** The projections view's stat line folded onto the rankings view's rows, by Draft Sharks id. */
+export function mergeViews(rankRows, projRows) {
+  const byId = new Map(projRows.filter((p) => p.id).map((p) => [p.id, p]));
+  return rankRows.map((r) => {
+    const p = byId.get(r.id);
+    if (!p) return r;
+    return { ...r, stats: p.stats, d3: r.d3 ?? p.d3, rosD3: r.rosD3 ?? p.rosD3 };
+  });
 }
 
 /** Draft Sharks sometimes sends `Last-Modified: 01 Jan 2000`, which is not a clock. */
@@ -158,6 +216,18 @@ async function fetchTable(url) {
   return { players, sourceAt, etag: res.headers?.etag ?? null };
 }
 
+/** One board, both views. A failed projections view keeps the rankings view. */
+async function fetchBoard(kind, opts, log) {
+  const rank = await fetchTable(loadUrl(kind, { ...opts, depth: 'rankings' }));
+  try {
+    const proj = await fetchTable(loadUrl(kind, { ...opts, depth: 'projections' }));
+    return { ...rank, players: mergeViews(rank.players, proj.players) };
+  } catch (err) {
+    log(`  note ${kind} projections view failed — ${err.message.split('\n')[0]}; rankings kept`);
+    return rank;
+  }
+}
+
 export function readDraftSharks(season, scoring = 'PPR') {
   const p = filePath(season, scoring);
   if (!existsSync(p)) return null;
@@ -168,18 +238,9 @@ export function readDraftSharks(season, scoring = 'PPR') {
   }
 }
 
-/** nameKey -> player record in the stored season file. */
-export function playerByKey(store, name, position) {
-  if (!store) return null;
-  const pos = normPos(position);
-  return store.players?.[nameKey(name, pos)]
-    || store.players?.[nameKey(name, position)]
-    || null;
-}
-
 const empty = (season, scoring) => ({ season, scoring, fetchedAt: null, weeks: {}, ros: null, players: {} });
 
-function upsertPlayer(store, rec, { week = null, ros = false } = {}) {
+export function upsertPlayer(store, rec, { week = null, ros = false } = {}) {
   const key = nameKey(rec.name, rec.position);
   const prev = store.players[key] || { n: rec.name, p: rec.position, t: rec.team, id: rec.id, w: {} };
   prev.n = rec.name;
@@ -197,52 +258,72 @@ function upsertPlayer(store, rec, { week = null, ros = false } = {}) {
       home: rec.home,
       sos: rec.sos,
       rank: rec.rank,
+      posRank: rec.posRank ?? null,
+      tier: rec.tier ?? null,
+      posTier: rec.posTier ?? null,
       bye: rec.bye === true || rec.bye === week,
+      stats: rec.stats && Object.keys(rec.stats).length ? rec.stats : null,
     };
   }
   if (ros) {
+    // Published total wins; otherwise the per-week average times how many of
+    // the remaining games it covers (see parsePlayerBlock).
+    const derived = rec.rosWeekly != null && rec.rosGames != null
+      ? Math.round(rec.rosWeekly * rec.rosGames * 10) / 10
+      : null;
     prev.ros = {
-      proj: rec.rosTotal ?? null,
+      proj: rec.rosTotal ?? derived,
       weekly: rec.rosWeekly,
       floor: rec.rosFloor,
       ceiling: rec.rosCeiling,
-      consensus: rec.consensus,
+      consensus: rec.rosConsensus ?? rec.consensus ?? null,
+      d3: rec.rosD3 ?? null,
+      games: rec.rosGames ?? null,
       sos: rec.sos,
       rank: rec.rank,
+      posRank: rec.posRank ?? null,
+      tier: rec.tier ?? null,
+      posTier: rec.posTier ?? null,
+      injuryRisk: rec.injuryRisk ?? null,
+      value: rec.value ?? null,
+      valueDelta: rec.valueDelta ?? null,
+      marketValue: rec.marketValue ?? null,
+      // Per game, like `weekly` — the ROS projections view is per-game, not a total.
+      stats: rec.stats && Object.keys(rec.stats).length ? rec.stats : null,
     };
+    prev.rookie = rec.rookie ?? prev.rookie ?? false;
   }
   store.players[key] = prev;
 }
 
 /**
- * Fetch some or all weeks (and the ROS board) for one scoring format.
+ * The current week and the ROS board, for every scoring format in use —
+ * nothing else.
  *
- * Same merge-not-replace contract as Sleeper projections: the live week can
- * be re-pulled on its own without discarding week 12, which is the point of
- * having a source that moves when news moves.
+ * A lineup decision only ever needs this week and the rest of the season, and
+ * the page shows nothing further out (see AGENTS.md). There used to be a
+ * `--full` mode that pulled all eighteen weeks and a `--week N` for any one;
+ * neither fed a single number on the page, and every extra week was another
+ * 250-row table on disk for `enrich` to index.
+ *
+ * Merge, not replace: weeks already on disk (the scores a past week was
+ * projected at) stay, but only the current one is ever re-asked.
  */
-export async function dsSync({ season, week, weeks = null, scoring = null, ros = true, log = console.log, formats = null } = {}) {
+export async function dsSync({ season, week, scorings = null, log = console.log } = {}) {
   const { season: yr, week: wk } = resolveWeek({ season, week });
-  const wantWeeks = (weeks && weeks.length ? weeks : Array.from({ length: LAST_WEEK }, (_, i) => i + 1))
-    .map(Number).filter((w) => w >= 1 && w <= LAST_WEEK);
-  const scorings = formats || (scoring ? [String(scoring).toUpperCase()] : scoringsInUse());
-
-  log(`Draft Sharks — season ${yr}, week ${wk}; ${scorings.join('/')} ; `
-    + `${wantWeeks.length === 1 ? `week ${wantWeeks[0]}` : `weeks ${wantWeeks[0]}–${wantWeeks[wantWeeks.length - 1]}`}`
-    + (ros ? ' + ROS' : ''));
+  const formats = scorings || scoringsInUse();
+  log(`Draft Sharks — season ${yr}, week ${wk} + ROS; ${formats.join('/')}`);
 
   const ok = [], failed = [];
   let newest = null, items = 0;
 
-  for (const sc of scorings) {
+  for (const sc of formats) {
     const store = readDraftSharks(yr, sc) || empty(yr, sc);
-    const jobs = wantWeeks.map((w) => ({ kind: 'week', week: w, scoring: sc }));
-    if (ros) jobs.push({ kind: 'ros', scoring: sc });
+    const jobs = [{ kind: 'week', week: wk, scoring: sc }, { kind: 'ros', scoring: sc }];
 
     const results = await pool(jobs, async (job) => {
-      const url = loadUrl(job.kind, job);
       try {
-        const r = await fetchTable(url);
+        const r = await fetchBoard(job.kind, job, log);
         return { ...job, ...r };
       } catch (err) {
         const label = job.kind === 'ros' ? `${sc} ROS` : `${sc} wk${job.week}`;
@@ -263,6 +344,12 @@ export async function dsSync({ season, week, weeks = null, scoring = null, ros =
         log(`  ok   ${sc.padEnd(4)} wk${String(r.week).padStart(2)} ${String(r.players.length).padStart(3)} players`
           + (r.sourceAt ? `  site ${r.sourceAt}` : ''));
       } else {
+        // Replace, not merge: a player who fell off the ROS board (or an IDP
+        // row from before those were dropped) must not keep an old ROS figure.
+        for (const [k, p] of Object.entries(store.players)) {
+          delete p.ros;
+          if (SKIP_POSITIONS.has(String(p.p).toUpperCase())) delete store.players[k];
+        }
         for (const p of r.players) upsertPlayer(store, p, { ros: true });
         store.ros = { sourceAt: r.sourceAt, etag: r.etag, players: r.players.length, fetchedAt: now };
         ok.push(`${sc} ROS (${r.players.length})`);
@@ -280,41 +367,10 @@ export async function dsSync({ season, week, weeks = null, scoring = null, ros =
 
   const rep = record('draftsharks', {
     ok, failed, sourceAt: newest, season: yr, week: wk,
-    items, note: `${scorings.join(', ')} · ${wantWeeks.length} week(s)${ros ? ' + ROS' : ''}`,
+    items, note: `${formats.join(', ')} · week ${wk} + ROS`,
   });
   log(`  ${ok.length} ok, ${failed.length} failed`);
   return rep;
-}
-
-const FULL_MAX_AGE_MS = 12 * 60 * 60 * 1000;
-
-/**
- * Live week (and ROS) every time; the other seventeen weeks when the file is
- * incomplete or the nightly-scale refresh has since come due.
- *
- * Draft Sharks is the source that is supposed to move when news moves, so the
- * current week is cheap to re-ask and the rest of the season is not left to
- * rot for a week.
- */
-export async function dsSyncAuto({ season, week, log = console.log } = {}) {
-  const { season: yr, week: wk } = resolveWeek({ season, week });
-  const formats = scoringsInUse();
-  const sample = readDraftSharks(yr, formats[0] || 'PPR');
-  const complete = sample && Array.from({ length: LAST_WEEK }, (_, i) => i + 1).every((w) => sample.weeks?.[w]);
-  const fullAge = sample?.fetchedAt && sample.weeks?.[LAST_WEEK]?.fetchedAt
-    ? Date.now() - new Date(sample.weeks[LAST_WEEK].fetchedAt).getTime()
-    : Infinity;
-  const wantFull = !complete || fullAge >= FULL_MAX_AGE_MS;
-  // News that changes week 4 but not week 1 is the reason this source exists.
-  // Re-ask the next three remaining weeks on the short cadence, not only Sunday.
-  const lookahead = [];
-  for (let w = Math.max(1, wk); w <= Math.min(LAST_WEEK, wk + 2); w++) lookahead.push(w);
-  if (!wantFull) log(`  (rest of season pulled ${Math.round(fullAge / 60000)}m ago — weeks ${lookahead.join(', ')} + ROS)`);
-  return dsSync({
-    season: yr, week: wk, log, formats,
-    weeks: wantFull ? null : lookahead,
-    ros: true,
-  });
 }
 
 /** Per-week report, newest week first-ish, for the freshness strip. */

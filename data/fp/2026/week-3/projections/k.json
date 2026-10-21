@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-22T21:42:27.683Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 26075,
+      "name": "Jake Bates",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 8.836
+      }
+    },
+    {
+      "fpid": 17575,
+      "name": "Eddy Pineiro",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 8.732
+      }
+    },
+    {
+      "fpid": 16712,
+      "name": "Harrison Butker",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 8.592
+      }
+    },
+    {
+      "fpid": 26068,
+      "name": "Brandon Aubrey",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 8.556
+      }
+    },
+    {
+      "fpid": 14003,
+      "name": "Jason Myers",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 8.504
+      }
+    },
+    {
+      "fpid": 15756,
+      "name": "Ka'imi Fairbairn",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 8.292
+      }
+    },
+    {
+      "fpid": 28507,
+      "name": "Trey Smack",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 8.188
+      }
+    },
+    {
+      "fpid": 27534,
+      "name": "Tyler Loop",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 7.924
+      }
+    },
+    {
+      "fpid": 17420,
+      "name": "Daniel Carlson",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 7.91
+      }
+    },
+    {
+      "fpid": 19760,
+      "name": "Tyler Bass",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 7.842
+      }
+    }
+  ]
+}

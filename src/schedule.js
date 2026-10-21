@@ -2,10 +2,9 @@ import { existsSync, readFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { get, pool } from './http.js';
 import { DATA } from './config.js';
-import { resolve as resolveWeek } from './week.js';
+import { resolve as resolveWeek, LAST_WEEK } from './week.js';
 import { record } from './freshness.js';
 import { writeJsonAtomic } from './jsonfile.js';
-import { LAST_WEEK } from './sleeperproj.js';
 import { normTeam } from './teams.js';
 
 /**
@@ -235,15 +234,29 @@ export function importScheduleWeeks(store, data, now = new Date().toISOString())
   return folded;
 }
 
-export async function scheduleSync({ season, week, weeks = null, log = console.log } = {}) {
+/** Regular-season weeks the store has no trustworthy copy of, in order. */
+export function missingWeeks(store) {
+  return Array.from({ length: LAST_WEEK }, (_, i) => i + 1).filter((w) => (store?.weeks?.[w]?.games ?? 0) < MIN_GAMES_TRUSTED);
+}
+
+/**
+ * Fetch the weeks not yet stored. The schedule is fixed for the season, so a
+ * stored week is never re-asked unless `weeks` names it or `full` is set; with
+ * every week stored this makes no request at all and records nothing (the
+ * ledger's `fetchedAt` is when we last pulled, not when we last looked).
+ */
+export async function scheduleSync({ season, week, weeks = null, full = false, log = console.log } = {}) {
   const { season: yr, week: wk } = resolveWeek({ season, week });
-  const want = (weeks && weeks.length ? weeks : Array.from({ length: LAST_WEEK }, (_, i) => i + 1))
-    .map(Number).filter((w) => w >= 1 && w <= LAST_WEEK);
-
-  log(`NFL schedule — season ${yr}; fetching ${want.length === 1 ? `week ${want[0]}` : `weeks ${want[0]}–${want[want.length - 1]}`}`);
-
   const store = repairStore(readSchedule(yr) || { season: yr, fetchedAt: null, weeks: {}, teams: emptyTeams() });
   if (!store.teams || Object.keys(store.teams).length < 32) store.teams = { ...emptyTeams(), ...(store.teams || {}) };
+  const want = (weeks && weeks.length ? weeks : full ? Array.from({ length: LAST_WEEK }, (_, i) => i + 1) : missingWeeks(store))
+    .map(Number).filter((w) => w >= 1 && w <= LAST_WEEK);
+
+  if (!want.length) {
+    log(`NFL schedule — season ${yr}; all ${LAST_WEEK} weeks stored, nothing to fetch (schedule:sync --force re-pulls them)`);
+    return { ok: [], failed: [], skipped: true };
+  }
+  log(`NFL schedule — season ${yr}; fetching ${want.length === 1 ? `week ${want[0]}` : `weeks ${want.join(', ')}`}`);
 
   const ok = [], failed = [];
   const results = await pool(want, async (w) => {

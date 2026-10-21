@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-22T21:42:27.677Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 17298,
+      "name": "Josh Allen",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 24.075
+      }
+    },
+    {
+      "fpid": 17233,
+      "name": "Lamar Jackson",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 23.264
+      }
+    },
+    {
+      "fpid": 19797,
+      "name": "Brock Purdy",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 22.073
+      }
+    },
+    {
+      "fpid": 16413,
+      "name": "Patrick Mahomes II",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 21.909
+      }
+    },
+    {
+      "fpid": 15501,
+      "name": "Jared Goff",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 19.847
+      }
+    },
+    {
+      "fpid": 19275,
+      "name": "Jalen Hurts",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 19.801
+      }
+    },
+    {
+      "fpid": 19780,
+      "name": "Trevor Lawrence",
+      "team_id": "JAC",
+      "stats": {
+        "points_ppr": 19.559
+      }
+    },
+    {
+      "fpid": 15600,
+      "name": "Dak Prescott",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 19.55
+      }
+    },
+    {
+      "fpid": 23046,
+      "name": "Drake Maye",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 19.243
+      }
+    },
+    {
+      "fpid": 23096,
+      "name": "Tyler Shough",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 19.167
+      }
+    }
+  ]
+}

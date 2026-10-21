@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-29T22:46:01.063Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 17298,
+      "name": "Josh Allen",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 22.645
+      }
+    },
+    {
+      "fpid": 17233,
+      "name": "Lamar Jackson",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 21.506
+      }
+    },
+    {
+      "fpid": 16413,
+      "name": "Patrick Mahomes II",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 19.84
+      }
+    },
+    {
+      "fpid": 19780,
+      "name": "Trevor Lawrence",
+      "team_id": "JAC",
+      "stats": {
+        "points_ppr": 19.399
+      }
+    },
+    {
+      "fpid": 23096,
+      "name": "Tyler Shough",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 19.317
+      }
+    },
+    {
+      "fpid": 18600,
+      "name": "Kyler Murray",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 19.11
+      }
+    },
+    {
+      "fpid": 19196,
+      "name": "Joe Burrow",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 19.024
+      }
+    },
+    {
+      "fpid": 19797,
+      "name": "Brock Purdy",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 18.975
+      }
+    },
+    {
+      "fpid": 22900,
+      "name": "Bryce Young",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 18.766
+      }
+    },
+    {
+      "fpid": 23071,
+      "name": "C.J. Stroud",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 18.247
+      }
+    }
+  ]
+}

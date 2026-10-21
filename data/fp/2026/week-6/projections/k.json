@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-10-15T08:53:03.001Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 26763,
+      "name": "Spencer Shrader",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 9.758
+      }
+    },
+    {
+      "fpid": 17575,
+      "name": "Eddy Pineiro",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 8.578
+      }
+    },
+    {
+      "fpid": 16712,
+      "name": "Harrison Butker",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 8.374
+      }
+    },
+    {
+      "fpid": 27534,
+      "name": "Tyler Loop",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 8.224
+      }
+    },
+    {
+      "fpid": 18545,
+      "name": "Matt Gay",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 8.194
+      }
+    },
+    {
+      "fpid": 19760,
+      "name": "Tyler Bass",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 8.17
+      }
+    },
+    {
+      "fpid": 25533,
+      "name": "Blake Grupe",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 8.012
+      }
+    },
+    {
+      "fpid": 26475,
+      "name": "Cam Little",
+      "team_id": "JAC",
+      "stats": {
+        "points_ppr": 8.002
+      }
+    },
+    {
+      "fpid": 9491,
+      "name": "Nick Folk",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 8
+      }
+    },
+    {
+      "fpid": 15756,
+      "name": "Ka'imi Fairbairn",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 7.998
+      }
+    }
+  ]
+}

@@ -1,0 +1,934 @@
+{
+  "fetchedAt": "2026-10-21T03:42:58.485Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 22968,
+      "name": "Jahmyr Gibbs",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 25.599
+      }
+    },
+    {
+      "fpid": 23133,
+      "name": "Bijan Robinson",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 20.681
+      }
+    },
+    {
+      "fpid": 16393,
+      "name": "Christian McCaffrey",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 20.509
+      }
+    },
+    {
+      "fpid": 23059,
+      "name": "Kyren Williams",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 18.71
+      }
+    },
+    {
+      "fpid": 15514,
+      "name": "Derrick Henry",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 18.6
+      }
+    },
+    {
+      "fpid": 23021,
+      "name": "Kenneth Walker III",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 17.841
+      }
+    },
+    {
+      "fpid": 19792,
+      "name": "Chuba Hubbard",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 16.561
+      }
+    },
+    {
+      "fpid": 24209,
+      "name": "Jaylen Warren",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 16.491
+      }
+    },
+    {
+      "fpid": 19217,
+      "name": "Jonathan Taylor",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 16.33
+      }
+    },
+    {
+      "fpid": 22739,
+      "name": "Javonte Williams",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 15.778
+      }
+    },
+    {
+      "fpid": 25324,
+      "name": "Chase Brown",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 15.385
+      }
+    },
+    {
+      "fpid": 25989,
+      "name": "Ashton Jeanty",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 15.223
+      }
+    },
+    {
+      "fpid": 25981,
+      "name": "Bucky Irving",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 14.972
+      }
+    },
+    {
+      "fpid": 19210,
+      "name": "D'Andre Swift",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 14.527
+      }
+    },
+    {
+      "fpid": 22982,
+      "name": "Breece Hall",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 13.473
+      }
+    },
+    {
+      "fpid": 18269,
+      "name": "Josh Jacobs",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 12.953
+      }
+    },
+    {
+      "fpid": 17240,
+      "name": "Saquon Barkley",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 12.611
+      }
+    },
+    {
+      "fpid": 25391,
+      "name": "Quinshon Judkins",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 12.365
+      }
+    },
+    {
+      "fpid": 22726,
+      "name": "Rhamondre Stevenson",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 11.698
+      }
+    },
+    {
+      "fpid": 16673,
+      "name": "Aaron Jones Sr.",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 11.683
+      }
+    },
+    {
+      "fpid": 19245,
+      "name": "J.K. Dobbins",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 11.681
+      }
+    },
+    {
+      "fpid": 18705,
+      "name": "Tony Pollard",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 11.264
+      }
+    },
+    {
+      "fpid": 25984,
+      "name": "Ollie Gordon II",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 10.941
+      }
+    },
+    {
+      "fpid": 27520,
+      "name": "Woody Marks",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 10.585
+      }
+    },
+    {
+      "fpid": 27142,
+      "name": "RJ Harvey",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 10.39
+      }
+    },
+    {
+      "fpid": 22969,
+      "name": "Jordan Mason",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 9.93
+      }
+    },
+    {
+      "fpid": 18239,
+      "name": "David Montgomery",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 9.408
+      }
+    },
+    {
+      "fpid": 25403,
+      "name": "Jeremiyah Love",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 8.96
+      }
+    },
+    {
+      "fpid": 16421,
+      "name": "Alvin Kamara",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 8.935
+      }
+    },
+    {
+      "fpid": 24346,
+      "name": "Braelon Allen",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 8.044
+      }
+    },
+    {
+      "fpid": 23013,
+      "name": "Blake Corum",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 7.804
+      }
+    },
+    {
+      "fpid": 19647,
+      "name": "Rico Dowdle",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 7.759
+      }
+    },
+    {
+      "fpid": 24360,
+      "name": "Kendre Miller",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 7.626
+      }
+    },
+    {
+      "fpid": 27166,
+      "name": "Cam Skattebo",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 7.558
+      }
+    },
+    {
+      "fpid": 23152,
+      "name": "Zach Charbonnet",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 7.361
+      }
+    },
+    {
+      "fpid": 23065,
+      "name": "TreVeyon Henderson",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 7.251
+      }
+    },
+    {
+      "fpid": 25885,
+      "name": "Emanuel Wilson",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 7.202
+      }
+    },
+    {
+      "fpid": 24172,
+      "name": "Tyler Allgeier",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 7.116
+      }
+    },
+    {
+      "fpid": 25323,
+      "name": "Tyjae Spears",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 6.838
+      }
+    },
+    {
+      "fpid": 27131,
+      "name": "Kyle Monangai",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 6.806
+      }
+    },
+    {
+      "fpid": 23310,
+      "name": "Kenny Gainwell",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 6.759
+      }
+    },
+    {
+      "fpid": 18256,
+      "name": "Justice Hill",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 6.288
+      }
+    },
+    {
+      "fpid": 20094,
+      "name": "Brian Robinson Jr.",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 6.146
+      }
+    },
+    {
+      "fpid": 22947,
+      "name": "Dameon Pierce",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 6.007
+      }
+    },
+    {
+      "fpid": 22980,
+      "name": "Tyrone Tracy Jr.",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 5.808
+      }
+    },
+    {
+      "fpid": 23118,
+      "name": "MarShawn Lloyd",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 5.651
+      }
+    },
+    {
+      "fpid": 28108,
+      "name": "Mike Washington Jr.",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 5.553
+      }
+    },
+    {
+      "fpid": 16423,
+      "name": "Samaje Perine",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 5.527
+      }
+    },
+    {
+      "fpid": 28401,
+      "name": "Kaelon Black",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 5.211
+      }
+    },
+    {
+      "fpid": 22915,
+      "name": "George Holani",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 4.385
+      }
+    },
+    {
+      "fpid": 18280,
+      "name": "Devin Singletary",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 4.28
+      }
+    },
+    {
+      "fpid": 27102,
+      "name": "Dylan Sampson",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 4.264
+      }
+    },
+    {
+      "fpid": 28107,
+      "name": "Emmett Johnson",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 4.175
+      }
+    },
+    {
+      "fpid": 25987,
+      "name": "Jaylen Wright",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 4.096
+      }
+    },
+    {
+      "fpid": 27320,
+      "name": "Jonah Coleman",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 4.005
+      }
+    },
+    {
+      "fpid": 24901,
+      "name": "Bam Knight",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 3.847
+      }
+    },
+    {
+      "fpid": 26329,
+      "name": "Jawhar Jordan",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 3.666
+      }
+    },
+    {
+      "fpid": 25396,
+      "name": "CJ Donaldson",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 3.45
+      }
+    },
+    {
+      "fpid": 26309,
+      "name": "Sione Vaki",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 3.354
+      }
+    },
+    {
+      "fpid": 25322,
+      "name": "Roschon Johnson",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 3.157
+      }
+    },
+    {
+      "fpid": 11798,
+      "name": "Kyle Juszczyk",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 3.056
+      }
+    },
+    {
+      "fpid": 25876,
+      "name": "Jaleel McLaughlin",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 2.946
+      }
+    },
+    {
+      "fpid": 22997,
+      "name": "Corey Kiner",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 2.905
+      }
+    },
+    {
+      "fpid": 23812,
+      "name": "Tyler Badie",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 2.866
+      }
+    },
+    {
+      "fpid": 22976,
+      "name": "Tyler Goodson",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 2.772
+      }
+    },
+    {
+      "fpid": 24173,
+      "name": "Pierre Strong Jr.",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 2.77
+      }
+    },
+    {
+      "fpid": 23079,
+      "name": "Seth McGowan",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 2.343
+      }
+    },
+    {
+      "fpid": 19358,
+      "name": "AJ Dillon",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 2.317
+      }
+    },
+    {
+      "fpid": 27165,
+      "name": "Kaleb Johnson",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 2.194
+      }
+    },
+    {
+      "fpid": 28888,
+      "name": "DJ Herman",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 2.054
+      }
+    },
+    {
+      "fpid": 24335,
+      "name": "Jarquez Hunter",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 1.74
+      }
+    },
+    {
+      "fpid": 23679,
+      "name": "Sean Tucker",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 1.684
+      }
+    },
+    {
+      "fpid": 26194,
+      "name": "Dylan Laube",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 1.351
+      }
+    },
+    {
+      "fpid": 25941,
+      "name": "Hunter Luepke",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 1.221
+      }
+    },
+    {
+      "fpid": 25393,
+      "name": "Trevor Etienne",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 1.045
+      }
+    },
+    {
+      "fpid": 26392,
+      "name": "Isaac Guerendo",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 0.92
+      }
+    },
+    {
+      "fpid": 19521,
+      "name": "DeeJay Dallas",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 0.855
+      }
+    },
+    {
+      "fpid": 25748,
+      "name": "Zavier Scott",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 0.843
+      }
+    },
+    {
+      "fpid": 28084,
+      "name": "Demond Claiborne",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 0.779
+      }
+    },
+    {
+      "fpid": 24367,
+      "name": "Adam Randall",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 0.749
+      }
+    },
+    {
+      "fpid": 14191,
+      "name": "Michael Burton",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 0.712
+      }
+    },
+    {
+      "fpid": 25443,
+      "name": "Lew Nichols III",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0.692
+      }
+    },
+    {
+      "fpid": 25977,
+      "name": "Isaiah Davis",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 0.678
+      }
+    },
+    {
+      "fpid": 24343,
+      "name": "Nicholas Singleton",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 0.657
+      }
+    },
+    {
+      "fpid": 24362,
+      "name": "Kaytron Allen",
+      "team_id": "MIA",
+      "stats": {
+        "points_ppr": 0.653
+      }
+    },
+    {
+      "fpid": 26212,
+      "name": "Tahj Brooks",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 0.605
+      }
+    },
+    {
+      "fpid": 25731,
+      "name": "Brady Russell",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 0.601
+      }
+    },
+    {
+      "fpid": 23054,
+      "name": "Audric Estime",
+      "team_id": "CLE",
+      "stats": {
+        "points_ppr": 0.599
+      }
+    },
+    {
+      "fpid": 25654,
+      "name": "Emari Demercado",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 0.54
+      }
+    },
+    {
+      "fpid": 24562,
+      "name": "Connor Heyward",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 0.505
+      }
+    },
+    {
+      "fpid": 18748,
+      "name": "Andrew Beck",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 0.48
+      }
+    },
+    {
+      "fpid": 16447,
+      "name": "James Conner",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 0.45
+      }
+    },
+    {
+      "fpid": 28297,
+      "name": "Eli Heidenreich",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0.435
+      }
+    },
+    {
+      "fpid": 27259,
+      "name": "Brashard Smith",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 0.412
+      }
+    },
+    {
+      "fpid": 16879,
+      "name": "Dare Ogunbowale",
+      "team_id": "HOU",
+      "stats": {
+        "points_ppr": 0.386
+      }
+    },
+    {
+      "fpid": 23249,
+      "name": "Kene Nwangwu",
+      "team_id": "NYJ",
+      "stats": {
+        "points_ppr": 0.366
+      }
+    },
+    {
+      "fpid": 27310,
+      "name": "Jordan James",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 0.358
+      }
+    },
+    {
+      "fpid": 27097,
+      "name": "DJ Giddens",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 0.244
+      }
+    },
+    {
+      "fpid": 17145,
+      "name": "Patrick Ricard",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 0.238
+      }
+    },
+    {
+      "fpid": 25693,
+      "name": "Jacob Saylors",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 0.208
+      }
+    },
+    {
+      "fpid": 25983,
+      "name": "Rasheen Ali",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 0.19
+      }
+    },
+    {
+      "fpid": 18616,
+      "name": "Travis Homer",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0.17
+      }
+    },
+    {
+      "fpid": 28113,
+      "name": "Dean Connors",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 0.092
+      }
+    },
+    {
+      "fpid": 24689,
+      "name": "Julius Chestnut",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 0.091
+      }
+    },
+    {
+      "fpid": 22728,
+      "name": "Michael Carter",
+      "team_id": "TEN",
+      "stats": {
+        "points_ppr": 0.076
+      }
+    },
+    {
+      "fpid": 28437,
+      "name": "Riley Nowakowski",
+      "team_id": "PIT",
+      "stats": {
+        "points_ppr": 0.039
+      }
+    },
+    {
+      "fpid": 28434,
+      "name": "Max Bredeson",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 0.035
+      }
+    },
+    {
+      "fpid": 27700,
+      "name": "Anthony Tyus III",
+      "team_id": "CAR",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 27444,
+      "name": "Josh Williams",
+      "team_id": "TB",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 22928,
+      "name": "Phil Mafah",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 22921,
+      "name": "Jerome Ford",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 24214,
+      "name": "Velus Jones Jr.",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 26597,
+      "name": "Chris Collier",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 23451,
+      "name": "Adam Prentice",
+      "team_id": "DEN",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 25388,
+      "name": "Trey Benson",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 0
+      }
+    },
+    {
+      "fpid": 24333,
+      "name": "Isiah Pacheco",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-22T21:42:27.680Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 23070,
+      "name": "Jaxon Smith-Njigba",
+      "team_id": "SEA",
+      "stats": {
+        "points_ppr": 22.331
+      }
+    },
+    {
+      "fpid": 19799,
+      "name": "Amon-Ra St. Brown",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 21.874
+      }
+    },
+    {
+      "fpid": 23180,
+      "name": "Puka Nacua",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 20.561
+      }
+    },
+    {
+      "fpid": 19202,
+      "name": "CeeDee Lamb",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 19.344
+      }
+    },
+    {
+      "fpid": 19788,
+      "name": "Ja'Marr Chase",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 19.136
+      }
+    },
+    {
+      "fpid": 20111,
+      "name": "Chris Olave",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 19.086
+      }
+    },
+    {
+      "fpid": 22916,
+      "name": "Zay Flowers",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 17.629
+      }
+    },
+    {
+      "fpid": 19236,
+      "name": "Justin Jefferson",
+      "team_id": "MIN",
+      "stats": {
+        "points_ppr": 17.385
+      }
+    },
+    {
+      "fpid": 19222,
+      "name": "DeVonta Smith",
+      "team_id": "PHI",
+      "stats": {
+        "points_ppr": 16.664
+      }
+    },
+    {
+      "fpid": 23113,
+      "name": "Rashee Rice",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 16.437
+      }
+    }
+  ]
+}

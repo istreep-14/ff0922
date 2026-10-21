@@ -17,8 +17,8 @@
  * `roster --refresh Cville` printed every league.
  */
 export const BOOLEAN_FLAGS = new Set([
-  'all', 'by-diff', 'clear', 'dry-run', 'force', 'full', 'help',
-  'include-partial', 'refresh', 'ros', 'velocity', 'version', 'weeks',
+  'all', 'clear', 'console', 'dry-run', 'errors', 'force', 'help',
+  'refresh', 'schedule', 'velocity', 'version',
 ]);
 
 /**

@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-10-15T08:53:02.999Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 17298,
+      "name": "Josh Allen",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 25.55
+      }
+    },
+    {
+      "fpid": 19797,
+      "name": "Brock Purdy",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 21.801
+      }
+    },
+    {
+      "fpid": 9451,
+      "name": "Matthew Stafford",
+      "team_id": "LAR",
+      "stats": {
+        "points_ppr": 21.085
+      }
+    },
+    {
+      "fpid": 23046,
+      "name": "Drake Maye",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 20.575
+      }
+    },
+    {
+      "fpid": 19246,
+      "name": "Jordan Love",
+      "team_id": "GB",
+      "stats": {
+        "points_ppr": 20.568
+      }
+    },
+    {
+      "fpid": 16413,
+      "name": "Patrick Mahomes II",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 18.967
+      }
+    },
+    {
+      "fpid": 22902,
+      "name": "Jayden Daniels",
+      "team_id": "WAS",
+      "stats": {
+        "points_ppr": 18.756
+      }
+    },
+    {
+      "fpid": 15600,
+      "name": "Dak Prescott",
+      "team_id": "DAL",
+      "stats": {
+        "points_ppr": 18.416
+      }
+    },
+    {
+      "fpid": 23084,
+      "name": "Caleb Williams",
+      "team_id": "CHI",
+      "stats": {
+        "points_ppr": 18.23
+      }
+    },
+    {
+      "fpid": 23096,
+      "name": "Tyler Shough",
+      "team_id": "NO",
+      "stats": {
+        "points_ppr": 17.61
+      }
+    }
+  ]
+}

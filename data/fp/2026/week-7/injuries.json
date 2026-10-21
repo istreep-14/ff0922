@@ -1,0 +1,330 @@
+{
+  "fetchedAt": "2026-10-21T03:42:59.259Z",
+  "source": "https://www.fantasypros.com/nfl/injury-news.php",
+  "injuries": [
+    {
+      "player_id": 23091,
+      "name": "Terrance Ferguson",
+      "status": "ACTIVE",
+      "injury_type": "ankle",
+      "headline": "Terrance Ferguson (ankle) not expected to be activated next week",
+      "comment": "Ferguson will remain on injured reserve. He remains week-to-week.",
+      "injury_update_date": "Tue, Oct 20th 5:59pm EDT"
+    },
+    {
+      "player_id": 19334,
+      "name": "Jonah Jackson",
+      "status": "LIMITED",
+      "injury_type": null,
+      "headline": "Jonah Jackson (hip/quad) limited in practice Tuesday",
+      "comment": "Jackson left Sunday’s game with the injury. His status will need to be monitored in practice on Wednesday.",
+      "injury_update_date": "Tue, Oct 20th 5:41pm EDT"
+    },
+    {
+      "player_id": 25314,
+      "name": "DeMarvion Overshown",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "DeMarvion Overshown (hamstring) expected to return in Week 7",
+      "comment": "The Cowboys play the Eagles next Monday. “I’ve definitely taken this rehab, this recovery, very serious,\" Overshown said. \"I’ve been trying to get back on the field since the week after I got out, so getting this opportunity to go this week. I’m thankful that I’m still able to get to do what I love.”",
+      "injury_update_date": "Tue, Oct 20th 1:28pm EDT"
+    },
+    {
+      "player_id": 17381,
+      "name": "Poona Ford",
+      "status": "IR",
+      "injury_type": null,
+      "headline": "Poona Ford placed on IR",
+      "comment": "Ford will miss the rest of the season for the Rams.",
+      "injury_update_date": "Mon, Oct 19th 7:24pm EDT"
+    },
+    {
+      "player_id": 25283,
+      "name": "Kobie Turner",
+      "status": "IR",
+      "injury_type": "groin",
+      "headline": "Kobie Turner (groin) placed on IR",
+      "comment": "Turner will officially miss at least the next four weeks. It is another injury for the Rams defensive line.",
+      "injury_update_date": "Mon, Oct 19th 7:23pm EDT"
+    },
+    {
+      "player_id": 17268,
+      "name": "Christian Kirk",
+      "status": "OUT",
+      "injury_type": "calf",
+      "headline": "Christian Kirk (calf) will not play Monday",
+      "comment": "Kirk was listed as questionable entering Monday. He will hope to return in Week 7.",
+      "injury_update_date": "Mon, Oct 19th 4:51pm EDT"
+    },
+    {
+      "player_id": 27316,
+      "name": "Jacory Croskey-Merritt",
+      "status": "IR",
+      "injury_type": "groin",
+      "headline": "Jacory Croskey-Merritt (groin) placed on IR",
+      "comment": "Croskey-Merritt will officially miss the next four weeks. Rachaad White and Austin Ekeler will lead the Commanders backfield.",
+      "injury_update_date": "Mon, Oct 19th 4:49pm EDT"
+    },
+    {
+      "player_id": 27150,
+      "name": "Trey Amos",
+      "status": "ACTIVE",
+      "injury_type": "fibula",
+      "headline": "Trey Amos (fibula) activated from IR",
+      "comment": "Amos worked his way back from a broken fibula suffered last November. He should return to his starting role.",
+      "injury_update_date": "Mon, Oct 19th 4:48pm EDT"
+    },
+    {
+      "player_id": 16445,
+      "name": "Jeremy McNichols",
+      "status": "ACTIVE",
+      "injury_type": "quad",
+      "headline": "Jeremy McNichols (quad) activated from IR",
+      "comment": "McNichols will be good to go for Monday's game against the 49ers. He'll add depth in the Commanders backfield.",
+      "injury_update_date": "Mon, Oct 19th 4:44pm EDT"
+    },
+    {
+      "player_id": 22969,
+      "name": "Jordan Mason",
+      "status": "ACTIVE",
+      "injury_type": "thumb",
+      "headline": "Jordan Mason (thumb) designated to return to practice",
+      "comment": "Mason will return to practice this week. He remains hopeful to return in Week 7 on Sunday.",
+      "injury_update_date": "Mon, Oct 19th 4:43pm EDT"
+    },
+    {
+      "player_id": 20138,
+      "name": "Cade Mays",
+      "status": "ACTIVE",
+      "injury_type": "wrist",
+      "headline": "Cade Mays (wrist) on track to return in Week 7",
+      "comment": "Mays has returned to practice and he is expected to be activated later this week. The same goes for safety Brian Branch. “Barring anything negatively happening between now and the game, we plan on playing both of those guys,” Lions head coach Dan Campbell said.",
+      "injury_update_date": "Mon, Oct 19th 2:00pm EDT"
+    },
+    {
+      "player_id": 25235,
+      "name": "Brian Branch",
+      "status": "ACTIVE",
+      "injury_type": "achilles",
+      "headline": "Brian Branch (Achilles) on track to return in Week 7",
+      "comment": "Branch has returned to practice and he is expected to be activated later this week. The same goes for center Cade Mays. “Barring anything negatively happening between now and the game, we plan on playing both of those guys,” Lions head coach Dan Campbell said.",
+      "injury_update_date": "Mon, Oct 19th 1:58pm EDT"
+    },
+    {
+      "player_id": 23004,
+      "name": "Elijah Arroyo",
+      "status": "IR",
+      "injury_type": "shoulder",
+      "headline": "Elijah Arroyo (shoulder) to likely be placed on IR",
+      "comment": "Arroyo is expected to miss an extended period of time. He'll miss at least four weeks if/when he is placed on injured reserve.",
+      "injury_update_date": "Mon, Oct 19th 1:33pm EDT"
+    },
+    {
+      "player_id": 28076,
+      "name": "Monroe Freeling",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Monroe Freeling (knee) could return in Week 7",
+      "comment": "\"This is a first-round pick for us but we're gonna do what's best for the Panthers,\" Panthers coach Dave Canales said. Freeling will need to be monitored in practice throughout the week.",
+      "injury_update_date": "Mon, Oct 19th 1:31pm EDT"
+    },
+    {
+      "player_id": 19275,
+      "name": "Jalen Hurts",
+      "status": "OUT",
+      "injury_type": "blood clot",
+      "headline": "Jalen Hurts (blood clot) out for the season as additional clots are found",
+      "comment": "A report by Rapoport noted Hurts played in London with no sleep, as sleep was a risk for the QB. This is obviously extremely serious news for Hurts, his family, and the team, so don’t lose sight of that, but it’s relieving to hear he should make a full recovery. As for football, it’s a big blow for an already struggling Eagles team, who will now proceed with Tanner McKee at QB. Don’t be surprised if Cole Payton also sees some run towards the end of the year if things really fly south for the Eagles.",
+      "injury_update_date": "Mon, Oct 19th 10:27am EDT"
+    },
+    {
+      "player_id": 26372,
+      "name": "Carson Steele",
+      "status": "QUESTIONABLE",
+      "injury_type": "shoulder",
+      "headline": "Carson Steele (shoulder) questionable to return",
+      "comment": "Steele suffered the injury in the first quarter and was taken to the locker room for further evaluation. Dameon Pierce will continue to see the bulk of the touches at running back, with Jaydon Blue serving as the primary backup if Steele cannot return.",
+      "injury_update_date": "Sun, Oct 18th 1:48pm EDT"
+    },
+    {
+      "player_id": 27010,
+      "name": "Mason Graham",
+      "status": "ACTIVE",
+      "injury_type": null,
+      "headline": "Mason Graham (knee/ankle) not expected to play Sunday",
+      "comment": "Graham struggled to reach the practice field throughout the week for head coach Todd Monken and barring anything unforeseen will leave the Cleveland defensive front shorthanded against the Ravens Sunday.",
+      "injury_update_date": "Sun, Oct 18th 9:12am EDT"
+    },
+    {
+      "player_id": 28896,
+      "name": "Roman Wilson",
+      "status": "IR",
+      "injury_type": "finger",
+      "headline": "Roman Wilson (finger) placed on IR",
+      "comment": "Wilson injured his finger last week. He will miss at least the next four games.",
+      "injury_update_date": "Sun, Oct 18th 3:04am EDT"
+    },
+    {
+      "player_id": 13890,
+      "name": "Marcus Mariota",
+      "status": "OUT",
+      "injury_type": "knee",
+      "headline": "Marcus Mariota (knee) ruled out Monday",
+      "comment": "Mariota will miss his second straight game. Athan Kaliakmanis will continue to serve as the primary backup to Jayden Daniels.",
+      "injury_update_date": "Sun, Oct 18th 3:03am EDT"
+    },
+    {
+      "player_id": 18218,
+      "name": "A.J. Brown",
+      "status": "ACTIVE",
+      "injury_type": "ankle",
+      "headline": "A.J. Brown (ankle) activated from IR",
+      "comment": "Brown will make his return for the first time since Week 1. He'll be a WR2 with some risk in his first game back for fantasy managers.",
+      "injury_update_date": "Sun, Oct 18th 3:02am EDT"
+    },
+    {
+      "player_id": 18244,
+      "name": "Deebo Samuel Sr.",
+      "status": "OUT",
+      "injury_type": "hamstring",
+      "headline": "Deebo Samuel Sr. (hamstring) ruled out Monday",
+      "comment": "Samuel will miss at least one game as expected. He remains week-to-week.",
+      "injury_update_date": "Sun, Oct 18th 3:01am EDT"
+    },
+    {
+      "player_id": 27337,
+      "name": "Ja'Kobi Lane",
+      "status": "ACTIVE",
+      "injury_type": "wrist",
+      "headline": "Ja'Kobi Lane (wrist) activated off of IR, will play against Cleveland",
+      "comment": "Lane has been out since fracturing his wrist in Week 1, so it will be interesting to see what his snap counts and route shares look like after the IR stint. The team praised him all offseason and focused on him during his brief playing time in Week 1, so hopefully he will be able to find himself a decent role as the WR2 of the offense.",
+      "injury_update_date": "Sat, Oct 17th 4:45pm EDT"
+    },
+    {
+      "player_id": 18219,
+      "name": "DK Metcalf",
+      "status": "ACTIVE",
+      "injury_type": "illness",
+      "headline": "DK Metcalf (illness) off injury report Sunday",
+      "comment": "Metcalf had been listed as questionable with an illness. He'll be good to go with the Steelers wide receiver room depleted.",
+      "injury_update_date": "Sat, Oct 17th 12:40pm EDT"
+    },
+    {
+      "player_id": 27013,
+      "name": "Mykel Williams",
+      "status": "LIMITED",
+      "injury_type": "knee",
+      "headline": "Mykel Williams (knee) limited in practice Friday",
+      "comment": "Williams will need to be monitored in practice on Saturday ahead of Monday's game against the Commanders.",
+      "injury_update_date": "Sat, Oct 17th 1:19am EDT"
+    },
+    {
+      "player_id": 28559,
+      "name": "James Thompson Jr.",
+      "status": "LIMITED",
+      "injury_type": "ankle",
+      "headline": "James Thompson Jr. (ankle) limited in practice Friday",
+      "comment": "Thompson will need to be monitored in practice on Saturday ahead of Monday's game against the Commanders.",
+      "injury_update_date": "Sat, Oct 17th 1:18am EDT"
+    },
+    {
+      "player_id": 27246,
+      "name": "Upton Stout",
+      "status": "LIMITED",
+      "injury_type": "shoulder",
+      "headline": "Upton Stout (shoulder) limited in practice Friday",
+      "comment": "Stout will need to be monitored in practice on Saturday ahead of Monday's game against the Commanders.",
+      "injury_update_date": "Sat, Oct 17th 1:17am EDT"
+    },
+    {
+      "player_id": 17531,
+      "name": "Siran Neal",
+      "status": "LIMITED",
+      "injury_type": "neck",
+      "headline": "Siran Neal (neck) limited in practice Friday",
+      "comment": "Neal will need to be monitored in practice on Saturday ahead of Monday's game against the Commanders.",
+      "injury_update_date": "Sat, Oct 17th 1:17am EDT"
+    },
+    {
+      "player_id": 19576,
+      "name": "Colton McKivitz",
+      "status": "LIMITED",
+      "injury_type": "illness",
+      "headline": "Colton McKivitz (illness) limited in practice Friday",
+      "comment": "McKivitz will need to be monitored in practice on Saturday ahead of Monday's game against the Commanders.",
+      "injury_update_date": "Sat, Oct 17th 1:16am EDT"
+    },
+    {
+      "player_id": 19386,
+      "name": "Ben Bartch",
+      "status": "IR",
+      "injury_type": "foot",
+      "headline": "Ben Bartch (foot) placed on IR",
+      "comment": "Bartch will be sidelined for at least the next four weeks.",
+      "injury_update_date": "Fri, Oct 16th 5:32pm EDT"
+    },
+    {
+      "player_id": 18663,
+      "name": "Tytus Howard",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Tytus Howard (knee) will play Sunday",
+      "comment": "Howard missed practice earlier in the week due to a knee issue, but it's no longer an issue for him and won't prevent him from playing in Week 6. Cleveland's offensive line will be stronger with him in the lineup against Baltimore.",
+      "injury_update_date": "Fri, Oct 16th 5:12pm EDT"
+    },
+    {
+      "player_id": 19372,
+      "name": "Colby Parkinson",
+      "status": "ACTIVE",
+      "injury_type": "shoulder",
+      "headline": "Colby Parkinson (shoulder) off injury report Sunday",
+      "comment": "Parkinson closed the week with a full practice on Friday.",
+      "injury_update_date": "Fri, Oct 16th 5:08pm EDT"
+    },
+    {
+      "player_id": 27339,
+      "name": "Denzel Boston",
+      "status": "ACTIVE",
+      "injury_type": "foot",
+      "headline": "Denzel Boston (foot) good to go for Sunday",
+      "comment": "The rookie will be good to go on Sunday, despite dealing with a foot injury at practice throughout the week. He has been good through the first five weeks of the season and can safely be started in most league formats at this point.",
+      "injury_update_date": "Fri, Oct 16th 5:07pm EDT"
+    },
+    {
+      "player_id": 15623,
+      "name": "Tyler Higbee",
+      "status": "ACTIVE",
+      "injury_type": null,
+      "headline": "Tyler Higbee off injury report Sunday",
+      "comment": "Higbee will be good to go despite not practicing on Friday.",
+      "injury_update_date": "Fri, Oct 16th 5:07pm EDT"
+    },
+    {
+      "player_id": 23836,
+      "name": "Andrew Vorhees",
+      "status": "QUESTIONABLE",
+      "injury_type": "foot",
+      "headline": "Andrew Vorhees (foot) questionable for Week 6",
+      "comment": "Vorhees is uncertain to play on Sunday, as he's still dealing with a foot issue of some kind. If he's sidelined, the interior of Baltimore's offensive line will be weakened with Cam Jurgens (concussion) also out and Emery Jones Jr. (ankle) questionable for Week 6.",
+      "injury_update_date": "Fri, Oct 16th 5:06pm EDT"
+    },
+    {
+      "player_id": 23761,
+      "name": "Davis Allen",
+      "status": "ACTIVE",
+      "injury_type": "foot",
+      "headline": "Davis Allen (foot) off injury report Sunday",
+      "comment": "Allen remains off the fantasy radar.",
+      "injury_update_date": "Fri, Oct 16th 5:06pm EDT"
+    },
+    {
+      "player_id": 19459,
+      "name": "Kam Curl",
+      "status": "QUESTIONABLE",
+      "injury_type": "ankle",
+      "headline": "Kam Curl (ankle) listed questionable Sunday",
+      "comment": "Curl did not practice on Friday. His status will need to be monitored closer to kickoff.",
+      "injury_update_date": "Fri, Oct 16th 5:05pm EDT"
+    }
+  ]
+}

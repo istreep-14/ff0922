@@ -1,7 +1,7 @@
 /**
  * Builds dist/dashboard.html: the page payload assembled from data/enriched.json
  * plus the league-detail/advanced/accuracy/source-table layers, rendered into
- * src/dashboard.template.html with the consensus module inlined beside it.
+ * src/dashboard.template.html with the look-ahead-window module inlined beside it.
  *
  * Nothing here changes what the numbers MEAN — that is enrich.js's job. It
  * shapes rows for the page: buildUniverse makes the one row-per-player universe
@@ -13,22 +13,21 @@ import { join, dirname } from 'node:path';
 import { DATA, FPDIR, ROOT } from './config.js';
 import { LEAGUE_SCORING_TO_API } from './fpapi.js';
 import { resolve as resolveWeek } from './week.js';
-import { fetchLeagueDetail, loadDetailCache, writeDetailCache } from './leaguedata.js';
+import { fetchLeagueDetail, loadDetailCache, writeDetailCache, supportsLeagueDetail } from './leaguedata.js';
 import { fetchAdvanced, loadAdvancedCache, writeAdvancedCache } from './mpbadvanced.js';
 import { loadIdMap } from './idmap.js';
 import { loadSignals } from './signals.js';
 import { report as freshnessReport } from './freshness.js';
 import { readWeek as readScores, seasonTotals, storedWeeks, completeWeeks, isFinal } from './matchups.js';
 import { load as loadOverrides, forLeague, applyToLeague, describeRule, SEED_RULES, TIEBREAK } from './overrides.js';
-import { weekReport } from './sleeperproj.js';
-import { weekReport as yahooWeekReport } from './yahooproj.js';
 import { dsWeekReport } from './draftsharks.js';
-import { readSchedule, teamWeek } from './schedule.js';
-import { normTeam } from './teams.js';
 import { buildSourceTables, SOURCE_META, SOURCE_ORDER, ROS_BASIS } from './sourcetables.js';
 import { buildAccuracy } from './accuracy.js';
 import { createEnricher } from './enrich.js';
-import { CONS_SRC, buildMatrix, calibration, sourceStats } from './consensus.js';
+import { tail as runlogTail } from './runlog.js';
+import { stepRows, PRESETS } from './sync.js';
+import { loadDirectory, loadState, isActive } from './leaguestate.js';
+import { loadDDLeague } from './dynastydaddy.js';
 
 /**
  * Builds the compact payload the dashboard runs on.
@@ -40,8 +39,6 @@ import { CONS_SRC, buildMatrix, calibration, sourceStats } from './consensus.js'
 
 /** A src module as plain script text for the page (see renderHtml): `export` is not valid in a classic script. */
 const inlineModule = (file) => readFileSync(join(dirname(new URL(import.meta.url).pathname), file), 'utf8').replace(/^export /gm, '');
-const CONSENSUS_SRC = inlineModule('consensus.js');
-const HORIZON_SRC = inlineModule('weekhorizon.js');
 
 const readJson = (p) => (existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null);
 
@@ -153,6 +150,10 @@ const slim = (p) => {
     bye: p.byeWeek ?? sch.bye ?? null,
     s: f.sleeperId ?? null,
     wk: f.weekPoints ?? null,
+    // Rankings-implied vs. FantasyPros' own projections model, kept apart —
+    // see the note on weekExpertPoints/weekProjPoints in enrich.js.
+    wkX: f.weekExpertPoints ?? null,
+    wkP: f.weekProjPoints ?? null,
     rk: f.weekRank ?? null,
     pr: f.weekPosRank ?? null,
     tr: f.weekTrend ?? null,
@@ -176,9 +177,7 @@ const slim = (p) => {
       pr: f.trade.posRank ?? null,
       s: f.trade.series ?? null,
       n: f.trade.volume ?? null,
-      x: f.trade.expert?.gap ?? null,
-      // Expert value itself, where FantasyPros publishes one (few players today).
-      xv: f.trade.expert?.value ?? null,
+      ...tmExpert(f),
     } : null,
     ros: f.rosPoints ?? null,
     rosRk: f.rosRank ?? null,
@@ -188,66 +187,18 @@ const slim = (p) => {
     // only fills in where the schedule has no row.
     opp: sch.opp ? (sch.home ? sch.opp : `@${sch.opp}`) : (f.opponent ?? null),
     own: f.ownedPct ?? null,
-    vg: f.vegas?.points ?? null,
-    vc: f.vegas?.complete ?? null,
-    vol: f.vegas?.volatility ?? null,
-    vd: f.vegasVsFp ?? null,
-    // VegasEdge's own distribution, so the market column carries a range the
-    // same way WinWithOdds does rather than a bare point estimate.
-    vdist: f.vegasDist ? {
-      floor: f.vegasDist.floor ?? null,
-      ceiling: f.vegasDist.ceiling ?? null,
-      boom: f.vegasDist.boomPct ?? null,
-      bust: f.vegasDist.bustPct ?? null,
-      p: f.vegasDist.percentiles ?? null,
-    } : null,
     sig: slimSignal(f.signal),
-    inj: f.injury?.status ?? f.vegas?.injuryStatus ?? null,
+    inj: f.injury?.status ?? null,
     injT: f.injury?.type ?? null,
+    // Cheat-sheet copy: the ranking blurb when FantasyPros wrote one, else the
+    // latest injury-news headline. Kickoff text is not a note.
+    blurb: f.note ? String(f.note).replace(/\s+/g, ' ').trim().slice(0, 240) : null,
+    nw: (f.news && f.news[0] && f.news[0].title) || null,
     pts: f.scored?.points ?? null,
-    // WinWithOdds: third projection source, plus this week's actual points.
-    wwo: f.wwo ? {
-      proj: f.wwo.proj ?? null,
-      floor: f.wwo.floor ?? null,
-      ceiling: f.wwo.ceiling ?? null,
-      actual: f.wwo.actual ?? null,
-      seasonProj: f.wwo.seasonProj ?? null,
-      rosDerived: f.wwo.rosDerived ?? null,
-      vsFp: f.wwo.wwoVsFp ?? null,
-    } : null,
-    // First Down Studio: fourth source, joined exactly by Sleeper id.
-    fd: f.fd ? {
-      proj: f.fd.proj ?? null,
-      rank: f.fd.rank ?? null,
-      seasonProj: f.fd.seasonProj ?? null,
-      rosDerived: f.fd.rosDerived ?? null,
-      vsFp: f.fd.vsFp ?? null,
-      locked: !!f.fd.locked,
-    } : null,
-    /**
-     * Sleeper's published weekly numbers, remaining weeks.
-     *
-     * `crv` is [week, points] as Sleeper actually published them — not a
-     * rest-of-season total pushed through a share. The page reads this when
-     * the Sleeper column is selected, so it lines up with sleeper.com.
-     */
-    sl: f.sleeper ? {
-      wk: f.sleeper.week ?? null,
-      opp: f.sleeper.opponent ?? null,
-      home: f.sleeper.home ?? null,
-      bye: !!f.sleeper.bye,
-      ros: f.sleeper.rosTotal ?? null,
-      left: f.sleeper.weeksLeft ?? null,
-      byes: f.sleeper.byeWeeks ?? null,
-      crv: f.sleeper.weeks
-        ? Object.entries(f.sleeper.weeks).map(([w, c]) => [Number(w), c.proj, c.opp ?? null])
-        : null,
-    } : null,
-    /**
-     * Draft Sharks weekly rankings. A real projection for week N, independently
-     * re-ranked, so a three-week spike from a teammate's injury shows up here
-     * even when Sleeper's week N has not moved.
-     */
+    // Week -> points scored, for every week the stat file (or FP) has.
+    // The matchup board's league points still win on the page when present.
+    act: f.actualWeeks ?? null,
+    /** Draft Sharks' current-week cell + its own ROS total — a second opinion, not a curve. */
     ds: f.draftsharks ? {
       wk: f.draftsharks.week ?? null,
       d3: f.draftsharks.d3 ?? null,
@@ -258,41 +209,75 @@ const slim = (p) => {
       rk: f.draftsharks.rank ?? null,
       bye: !!f.draftsharks.bye,
       ros: f.draftsharks.rosTotal ?? null,
-      byes: f.draftsharks.byeWeeks ?? null,
-      crv: f.draftsharks.weeks
-        ? Object.entries(f.draftsharks.weeks).map(([w, c]) => [Number(w), c.proj, c.opp ?? null, c.sos ?? null])
-        : null,
-    } : null,
-    /**
-     * Yahoo Fantasy's own weekly re-projection, for this league's scoring
-     * settings — published, like Sleeper/Draft Sharks, not derived from a
-     * season total. See src/yahooproj.js for how it's captured and src/enrich.js
-     * for the name+position join (there is no reliable id join for this one).
-     */
-    yh: f.yahoo ? {
-      wk: f.yahoo.week ?? null,
-      opp: f.yahoo.opponent ?? null,
-      bye: !!f.yahoo.bye,
-      ros: f.yahoo.rosTotal ?? null,
-      byes: f.yahoo.byeWeeks ?? null,
-      crv: f.yahoo.weeks
-        ? Object.entries(f.yahoo.weeks).map(([w, c]) => [Number(w), c.proj, c.opp ?? null])
-        : null,
+      // Draft Sharks publishes floor/ceiling for the ROS board too, not just the week.
+      rosFloor: f.draftsharks.rosFloor ?? null,
+      rosCeiling: f.draftsharks.rosCeiling ?? null,
+      cons: f.draftsharks.consensus ?? null,
+      prk: f.draftsharks.posRank ?? null,
+      tier: f.draftsharks.tier ?? null,
+      st: f.draftsharks.stats ?? null,
+      rosCons: f.draftsharks.rosConsensus ?? null,
+      rosD3: f.draftsharks.rosD3 ?? null,
+      rosG: f.draftsharks.rosGames ?? null,
+      rosPrk: f.draftsharks.rosPosRank ?? null,
+      rosTier: f.draftsharks.rosTier ?? null,
+      rosSt: f.draftsharks.rosStats ?? null,
+      // 3D Value (0-100) is Draft Sharks' trade value; `dv` is its latest change.
+      val: f.draftsharks.value ?? null,
+      dv: f.draftsharks.valueDelta ?? null,
+      mkt: f.draftsharks.marketValue ?? null,
+      inj: f.draftsharks.injuryRisk ?? null,
     } : null,
     sch: f.schedule || null,
-    // FanDuel / numberFire: fifth source, with opponent-strength rank.
-    fdl: f.fanduel ? {
-      proj: f.fanduel.proj ?? null,
-      posRank: f.fanduel.posRank ?? null,
-      oppRank: f.fanduel.oppRank ?? null,
-      seasonProj: f.fanduel.seasonProj ?? null,
-      seasonPosRank: f.fanduel.seasonPosRank ?? null,
-      rosDerived: f.fanduel.rosDerived ?? null,
-      vsFp: f.fanduel.vsFp ?? null,
-      halfDerived: !!f.fanduel.halfDerived,
+    /** Dynasty Daddy's player data: age, ADP, Sleeper roster/start rates and three sites' ROS ranks. */
+    dd: f.dd ? {
+      age: f.dd.age ?? null,
+      adp: f.dd.adp ?? null,
+      own: f.dd.owned ?? null,
+      st: f.dd.started ?? null,
+      inj: f.dd.inj ?? null,
+      // ESPN, FanDuel and FantasyGuys rest-of-season overall ranks (FantasyPros'
+      // own is `rosRk`) — League Value reads them as expert-rank signals.
+      r: f.dd.ros ? [f.dd.ros.espn ?? null, f.dd.ros.fanduel ?? null, f.dd.ros.fantasyguys ?? null] : null,
     } : null,
   };
 };
+
+/**
+ * The experts' side of FantasyPros' trade market.
+ *
+ * `tradeMarketValues` carries `expertValue` for only a handful of players.
+ * Dynasty Daddy's FantasyPros redraft market used to fill the rest; it went
+ * with the other markets, so an expert value is shown only where FantasyPros
+ * itself publishes one.
+ */
+export function tmExpert(f) {
+  const xv = f.trade?.expert?.value ?? null;
+  const v = f.trade?.value ?? null;
+  return {
+    xv,
+    x: f.trade?.expert?.gap ?? (xv != null && v != null ? Math.round(xv - v) : null),
+    xs: xv != null ? 'fp' : null,
+  };
+}
+
+/**
+ * Dynasty Daddy's copy of a league, for what MyPlaybook cannot give: every
+ * week's pairings (future ones included) and Sleeper's potential points.
+ * Team ids are the host's own, the same ids the scrape uses.
+ */
+export function slimDDLeague(snap, week) {
+  if (!snap) return null;
+  return {
+    fetchedAt: snap.fetchedAt ?? null,
+    scoredThrough: snap.scoredThrough ?? 0,
+    // A cached ESPN copy keeps answering with scores frozen at its last load.
+    stale: (snap.scoredThrough ?? 0) < Number(week) - 1,
+    playoffStartWeek: snap.playoffStartWeek ?? null,
+    schedule: Object.fromEntries(Object.entries(snap.schedule || {}).map(([w, rows]) => [w, rows.map((sides) => sides.map((x) => ({ id: x.id })))])),
+    metrics: Object.fromEntries((snap.teams || []).filter((t) => t.metrics).map((t) => [t.id, { ppts: t.metrics.ppts ?? null }])),
+  };
+}
 
 /**
  * What only a LEAGUE knows about a rostered player: this league's actual points
@@ -352,10 +337,12 @@ const slimLine = (x) => ({
  * keyed by fpId — a stale week that was captured mid-game carries whatever it
  * captured, which is why the UI always labels the source week.
  */
-function buildScoreBoard(season, weeks, leagueKey) {
+function buildScoreBoard(season, weeks, league, currentWeek) {
+  const leagueKey = league.key;
   const board = {};
   for (const w of weeks) {
-    const lg = readScores(season, w)?.leagues?.[leagueKey];
+    const wkFile = readScores(season, w);
+    const lg = wkFile?.leagues?.[leagueKey];
     if (!lg?.ok || !(lg.matchups || []).length) continue;
     // Older files can still hold the all-noMatchup garbage; never surface it.
     const matchups = lg.matchups.filter((x) => x.sides.length > 1 || !/no\s*matchup/i.test(String(x.status || '')));
@@ -372,6 +359,14 @@ function buildScoreBoard(season, weeks, leagueKey) {
     }
     board[String(w)] = {
       week: w,
+      fetchedAt: lg.fetchedAt ?? wkFile?.fetchedAt ?? null,
+      // A past week whose board still has an unfinished matchup is not "in
+      // progress" — MyPlaybook has no way to answer for a past week, so this
+      // is the last snapshot this app will ever have of it. A stuck 0-0 or
+      // notStarted card here means the sync that would have caught the real
+      // score never ran before the week rolled over, not that the game
+      // hasn't happened.
+      stale: w < currentWeek && !matchups.every(isFinal),
       matchups: matchups.map((x) => ({
         status: x.status, pre: x.isPreGame, final: isFinal(x),
         minutesLeft: x.minutesLeft, winProb: x.winProbability, result: x.result,
@@ -384,6 +379,41 @@ function buildScoreBoard(season, weeks, leagueKey) {
       })),
       playerPts,
     };
+  }
+
+  /**
+   * Fill gaps with Sleeper's own record, where MyPlaybook's frozen snapshot
+   * is missing or caught the week before it finished.
+   *
+   * Unlike MyPlaybook's matchup endpoint, Sleeper's takes a week and answers
+   * for any of them — `leaguedetail:backfill` is what populates this cache
+   * for past weeks. No per-player lineup here (Sleeper's player ids need the
+   * idmap join `buildScoreBoard` does not have at this point), so this covers
+   * the team score and final result, not the roster breakdown MyPlaybook's
+   * own capture carries when it has one.
+   */
+  if (supportsLeagueDetail(league.host)) {
+    for (let w = 1; w < currentWeek; w++) {
+      if (board[String(w)] && !board[String(w)].stale) continue;
+      const cache = loadDetailCache(season, w);
+      const detail = cache?.leagues?.[leagueKey];
+      if (!detail?.supported || !(detail.matchups || []).length) continue;
+      const byRoster = new Map((detail.standings || []).map((s) => [s.rosterId, s]));
+      board[String(w)] = {
+        week: w,
+        fetchedAt: cache.fetchedAt ?? null,
+        stale: false,
+        source: 'sleeper',
+        matchups: detail.matchups.map((m) => ({
+          status: 'final', pre: false, final: true, minutesLeft: 0, winProb: null, result: null,
+          sides: m.sides.map((s) => ({
+            id: s.rosterId, name: s.team, logo: s.avatar || byRoster.get(s.rosterId)?.avatar || null,
+            pts: s.points, proj: null, starters: [], bench: [],
+          })),
+        })),
+        playerPts: {},
+      };
+    }
   }
   return board;
 }
@@ -403,48 +433,32 @@ function slimSchedule(store) {
 }
 
 /**
- * One line per source at build time: how many players it prices, the level it
- * runs at against FantasyPros, and whether its rest-of-season still counts a
- * game already played. The same numbers the Sources -> Health tab shows, so a
- * bad source is visible in the terminal before anyone opens the page.
+ * One line per source at build time: how many players it prices and how its
+ * level compares with FantasyPros', so a scale problem is visible in the
+ * terminal before anyone opens the page.
  */
-function logSourceHealth(log, sc, rows, tables, schedule, week) {
-  const teamOf = new Map(rows.map((r) => [r.i, normTeam(r.t)]));
-  const posOf = new Map(rows.map((r) => [r.i, r.p]));
-  const played = (id) => teamWeek(schedule, teamOf.get(id), week)?.final === true;
-  const matrix = buildMatrix(tables, { played });
-  const calib = calibration(matrix, (id) => posOf.get(id));
-  const stats = sourceStats(matrix, (id) => posOf.get(id), calib);
-  log(`  ${sc} sources (level vs FantasyPros | players wk/ros | implied games left):`);
-  for (const src of CONS_SRC) {
-    const st = stats[src.k];
-    const f = (v) => (v == null ? '  — ' : `${v.toFixed(2)}x`);
-    log(`    ${src.k.padEnd(3)} wk ${f(st.scale.wk)}  ros ${f(st.scale.ros)}  | ${String(st.n.wk).padStart(3)}/${String(st.n.ros).padStart(3)} | ${st.impliedGames ?? '—'} games`
-      + (matrix.dropped[src.k] === true ? '  (already drops the played game)' : ''));
-  }
+function logSourceHealth(log, sc, tables) {
+  const fpRows = tables.fp || [], dsRows = tables.draftsharks || [];
+  const fpWk = new Map(fpRows.filter((r) => r.wk != null).map((r) => [r.i, r.wk]));
+  const ratios = dsRows.filter((r) => r.wk != null && fpWk.has(r.i)).map((r) => r.wk / fpWk.get(r.i)).sort((a, b) => a - b);
+  const median = ratios.length ? ratios[ratios.length >> 1] : null;
+  log(`  ${sc} sources — fp ${fpRows.length} players, draftsharks ${dsRows.length} players`
+    + (median != null ? ` (draftsharks median x${median.toFixed(2)} vs fp)` : ''));
 }
 
 /**
  * When each source's numbers for THIS week were last known good, by the short
  * source key the page uses. The site's own recompute time where it publishes
- * one, else when we pulled it - and for the sources stored per week (Sleeper,
- * Draft Sharks, Yahoo) the age of the CURRENT week's record, not of the source
- * as a whole: Yahoo's ledger entry can look recent while its week-N capture is
- * days old.
+ * one, else when we pulled it — and for Draft Sharks, which is stored per
+ * week, the age of the CURRENT week's record, not of the source as a whole.
  */
-export function sourceAsOf({ freshness, projectionAges, dsAges, yahooAges, week }) {
+export function sourceAsOf({ freshness, dsAges, week }) {
   const led = (name) => freshness.find((f) => f.source === name) || null;
   const wk = (rows) => (rows || []).find((r) => Number(r.week) === Number(week)) || null;
   const pick = (r) => (r ? { asOf: r.sourceAt || r.fetchedAt || null, fetchedAt: r.fetchedAt || null, siteAt: r.sourceAt || null } : { asOf: null, fetchedAt: null, siteAt: null });
   return {
     fp: pick(led('fp')),
-    vg: pick(led('vegas')),
-    wwo: pick(led('wwo')),
-    fd: pick(led('firstdown')),
-    fdl: pick(led('fanduel')),
-    sl: pick(wk(projectionAges)),
     ds: pick(wk(dsAges)),
-    yh: pick(wk(yahooAges)),
   };
 }
 
@@ -511,6 +525,8 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
       status: l.status,
       leagueId: l.leagueId,
       url: l.url,
+      // Players carry over to next season: League Value then weighs the dynasty markets too.
+      keepers: !!(l.keepers || l.dynasty),
       myTeamId: l.myTeamId,
       myTeamName: l.myTeamName,
       rosterSlots: l.rosterSlots,
@@ -561,6 +577,7 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
         return {
           ok: true,
           week: wk,
+          fetchedAt: scores?.fetchedAt ?? null,
           rows: rows.map((x) => ({
             status: x.status, pre: x.isPreGame, final: isFinal(x),
             minutesLeft: x.minutesLeft, winProb: x.winProbability, result: x.result,
@@ -577,7 +594,7 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
       })(),
       // Every past week this app has stored for the league, keyed by week
       // number — the week picker's data source (see buildScoreBoard).
-      scoreBoard: buildScoreBoard(yr, weeksOnDisk, l.key),
+      scoreBoard: buildScoreBoard(yr, weeksOnDisk, l, wk),
       divisions: l.divisions || [],
       // The override record itself rides along, so the dashboard's league
       // editor starts from what is on disk rather than from an empty form.
@@ -609,6 +626,7 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
       detail: detail.supported
         ? { supported: true, standings: detail.standings.map(({ playerIds, starters, ...rest }) => rest), matchups: detail.matchups, settings: detail.settings }
         : { supported: false, reason: detail.reason },
+      dd: slimDDLeague(loadDDLeague(yr, l.leagueId), wk),
       // MyPlaybook advanced data — only served for the FantasyPros-active league.
       adv: {
         inactive: adv.inactive,
@@ -630,7 +648,7 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
   // `leagues` carry ids only; the page joins them to these rows.
   const formats = [...new Set(model.leagues.map((l) => LEAGUE_SCORING_TO_API[String(l.scoring || '').toUpperCase()] || 'PPR'))];
   const idMap = await loadIdMap({ season: yr }).catch(() => ({ fpToSleeper: {} }));
-  const enricher = createEnricher({ season: yr, week: wk, bookmaker: model.bookmaker || 'Average', idMap });
+  const enricher = createEnricher({ season: yr, week: wk, idMap });
   const nflSchedule = enricher.schedule;
   const pools = {};
   const sourceTables = {};
@@ -643,19 +661,17 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
     accuracy[sc] = buildAccuracy({ season: yr, week: wk, scoring: sc, pool: pools[sc] });
     const tm = enricher.tradeMeta(sc);
     if (tm) tradeMeta[sc] = { sourceAt: tm.sourceAt ?? null, fetchedAt: tm.fetchedAt ?? null, anchorDate: tm.anchorDate ?? null, windowDays: tm.windowDays ?? null, dates: tm.dates ?? [], priced: tm.counts?.priced ?? null };
-    logSourceHealth(log, sc, pools[sc], sourceTables[sc], nflSchedule, wk);
+    logSourceHealth(log, sc, sourceTables[sc]);
   }
 
   const freshness = freshnessReport();
-  const projectionAges = weekReport(yr);
   const dsAges = dsWeekReport(yr, formats[0] || 'PPR');
-  const yahooAges = yahooWeekReport(yr);
+  const directory = leagueDirectory(model.leagues);
 
   const payload = {
     generatedAt: new Date().toISOString(),
     season: yr,
     week: wk,
-    bookmaker: model.bookmaker || 'Average',
     leagues,
     pools,
     // Each source's own numbers, one table per source per scoring format —
@@ -683,18 +699,22 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
     // two pulls — a source fetched a minute ago that has not moved since this
     // morning is the case that looks fine and is not.
     freshness,
-    // Sleeper recomputes the live week through the day and the rest of the
-    // season overnight, so its weeks have genuinely different ages.
-    projectionAges,
+    // Draft Sharks is stored per week, so its age is the CURRENT week's
+    // record, not the source as a whole.
     dsAges,
-    // Yahoo has no site clock to read (see src/yahooproj.js) — this is our
-    // own fetchedAt per week, same limitation as VegasEdge/FanDuel.
-    yahooAges,
-    // What each source's THIS-week numbers are as of - the input to "leave stale
-    // sources out of the consensus" and to the Health tab.
-    sourceAsOf: sourceAsOf({ freshness, projectionAges, dsAges, yahooAges, week: wk }),
+    // What each source's THIS-week numbers are as of.
+    sourceAsOf: sourceAsOf({ freshness, dsAges, week: wk }),
     schedule: slimSchedule(nflSchedule),
     scoreWeeks: weeksOnDisk,
+    // Every league on the account with its on/off state, scraped or not — the
+    // All Leagues page is where an inactive league is switched back on.
+    directory,
+    // What a sync can run, for the Sync page (and the command palette) to offer
+    // even when no server is answering.
+    steps: stepRows(),
+    presets: PRESETS,
+    // The permanent log's tail, so the Log page has history without a server.
+    runlog: runlogTail({ limit: 500 }),
     // The vocabulary the league editor offers, defined once in overrides.js so
     // the UI and the CLI cannot drift apart on what a rule is called.
     rules: {
@@ -706,6 +726,31 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
   return payload;
 }
 
+/**
+ * Every league the account has: the scrape's directory, plus anything scraped
+ * or switched off before the directory existed. Scraped leagues are the ones
+ * with data on the page; the rest are names and a switch.
+ */
+export function leagueDirectory(scraped = [], { directory = loadDirectory(), state = loadState() } = {}) {
+  const out = new Map();
+  for (const l of directory) out.set(l.key, { ...l });
+  for (const l of scraped) {
+    const prev = out.get(l.key) || {};
+    out.set(l.key, { ...prev, key: l.key, name: l.nickname || prev.name, host: l.host || prev.host, scoring: l.scoring || prev.scoring });
+  }
+  // A league known only from the on/off file is one you switched OFF before
+  // the directory existed. One still marked on there but absent from both
+  // lists is a league the account no longer has (last season's), not one to show.
+  for (const [key, st] of Object.entries(state.leagues || {})) {
+    if (!out.has(key) && st.active === false) out.set(key, { key, name: st.nickname || key, host: st.host || null, scoring: null });
+  }
+  const have = new Set(scraped.map((l) => l.key));
+  return [...out.values()].map((l) => ({
+    key: l.key, name: l.name, host: l.host ?? null, scoring: l.scoring ?? null,
+    active: isActive(state, l.key), scraped: have.has(l.key),
+  }));
+}
+
 /** Injects the payload into the HTML shell and writes the standalone file. */
 /**
  * Put the payload into the template.
@@ -715,8 +760,13 @@ export async function buildPayload({ season, week, log = console.log } = {}) {
  * visible in anything but a browser.
  */
 export function renderHtml(shell, payload) {
-  // The consensus and look-ahead-window modules are inlined as text so the page
-  // runs the very functions the tests do.
+  // Pure modules are inlined as text (`/*__INLINE:file.js__*/`) so the page
+  // runs the very functions the tests do. They are named in the template and
+  // read here, at render time, never at import: `serve` and a dashboard Sync
+  // keep one Node process alive for hours, and a renderer holding its own list
+  // of modules, loaded at startup, rebuilt the page from a NEWER template that
+  // named a module it did not know. The placeholder stayed a comment and the
+  // page died on load with "LV_MIXES is not defined".
   // Escape everything that can end a script block or break the parse: `<` for
   // `</script>`, and U+2028/U+2029, which are literal line terminators in JS
   // source but legal inside a JSON string — a player note containing one would
@@ -728,10 +778,13 @@ export function renderHtml(shell, payload) {
   // A function replacement, because a string one would interpret `$&`, `$'` and
   // `$$` in the payload as substitution patterns — a team named "Money$$" was
   // enough to silently corrupt the JSON and blank the whole page.
-  return shell
-    .replace('/*__HORIZON__*/', () => HORIZON_SRC)
-    .replace('/*__CONSENSUS__*/', () => CONSENSUS_SRC)
-    .replace('/*__DATA__*/null', () => json);
+  const filled = shell.replace(/\/\*__INLINE:([\w.-]+\.js)__\*\//g, (_, file) => inlineModule(file));
+  // Anything still shaped like a placeholder would ship a page that cannot
+  // start. Refuse to write it; the previous dist/dashboard.html stays. Checked
+  // before the payload goes in, which may quote anything.
+  const left = filled.replace('/*__DATA__*/null', '').match(/\/\*__[A-Z][\w:.-]*__\*\//);
+  if (left) throw new Error(`renderHtml: template placeholder ${left[0]} was not filled — is this process older than src/dashboard.template.html? Restart it.`);
+  return filled.replace('/*__DATA__*/null', () => json);
 }
 
 export async function buildDashboard({ season, week, out = join(ROOT, 'dist', 'dashboard.html'), log = console.log } = {}) {

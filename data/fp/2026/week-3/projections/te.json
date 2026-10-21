@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-22T21:42:27.682Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 22936,
+      "name": "Trey McBride",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 18.027
+      }
+    },
+    {
+      "fpid": 25247,
+      "name": "Dalton Kincaid",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 14.391
+      }
+    },
+    {
+      "fpid": 11594,
+      "name": "Travis Kelce",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 13.588
+      }
+    },
+    {
+      "fpid": 22955,
+      "name": "Brock Bowers",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 13.324
+      }
+    },
+    {
+      "fpid": 16499,
+      "name": "George Kittle",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 13.233
+      }
+    },
+    {
+      "fpid": 26434,
+      "name": "Tyler Warren",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 12.717
+      }
+    },
+    {
+      "fpid": 22978,
+      "name": "Sam LaPorta",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 12.707
+      }
+    },
+    {
+      "fpid": 23781,
+      "name": "Isaiah Likely",
+      "team_id": "NYG",
+      "stats": {
+        "points_ppr": 12.621
+      }
+    },
+    {
+      "fpid": 17269,
+      "name": "Mark Andrews",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 12.356
+      }
+    },
+    {
+      "fpid": 15561,
+      "name": "Hunter Henry",
+      "team_id": "NE",
+      "stats": {
+        "points_ppr": 11.788
+      }
+    }
+  ]
+}

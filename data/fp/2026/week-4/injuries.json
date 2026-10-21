@@ -1,0 +1,249 @@
+{
+  "fetchedAt": "2026-09-29T22:46:01.690Z",
+  "source": "https://www.fantasypros.com/nfl/injury-news.php",
+  "injuries": [
+    {
+      "player_id": 18487,
+      "name": "Josh Oliver",
+      "status": "IR",
+      "injury_type": "biceps",
+      "headline": "Josh Oliver (biceps) placed on IR",
+      "comment": "Oliver was slated to undergo surgery. He will miss at least the next four games.",
+      "injury_update_date": "Tue, Sep 29th 5:38pm EDT"
+    },
+    {
+      "player_id": 17648,
+      "name": "Jalen Davis",
+      "status": "IR",
+      "injury_type": null,
+      "headline": "Jalen Davis placed on IR",
+      "comment": "Davis injured his hamstring in Sunday’s loss to the Steelers. He will miss at least the next four games.",
+      "injury_update_date": "Tue, Sep 29th 3:32pm EDT"
+    },
+    {
+      "player_id": 27523,
+      "name": "Jackson Slater",
+      "status": "IR",
+      "injury_type": null,
+      "headline": "Jackson Slater placed on IR",
+      "comment": "Slater will miss at least the next four weeks.",
+      "injury_update_date": "Tue, Sep 29th 3:22pm EDT"
+    },
+    {
+      "player_id": 28476,
+      "name": "Fernando Carmona Jr.",
+      "status": "IR",
+      "injury_type": "ankle",
+      "headline": "Fernando Carmona Jr. (ankle) placed on IR",
+      "comment": "Carmona will miss at least the next four weeks.",
+      "injury_update_date": "Tue, Sep 29th 3:21pm EDT"
+    },
+    {
+      "player_id": 26109,
+      "name": "Kamren Kinchens",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "Kamren Kinchens (hamstring) hopeful to return in Week 4",
+      "comment": "Kinchens is working his way back from a hamstring injury.",
+      "injury_update_date": "Tue, Sep 29th 3:16pm EDT"
+    },
+    {
+      "player_id": 23179,
+      "name": "Jalen McMillan",
+      "status": "IR",
+      "injury_type": "knee",
+      "headline": "Jalen McMillan (knee) placed on IR",
+      "comment": "McMillan underwent an MRI that confirmed a PCL sprain. He is expected to miss 6-to-8 weeks.",
+      "injury_update_date": "Tue, Sep 29th 12:08am EDT"
+    },
+    {
+      "player_id": 19647,
+      "name": "Rico Dowdle",
+      "status": "LIMITED",
+      "injury_type": "toe",
+      "headline": "Rico Dowdle (toe) listed as 'DNP' on Monday’s estimated practice report",
+      "comment": "Dowdle was sidelined this past week. He is likely to remain sidelined for the Steelers on a short week against the Browns. Jaylen Warren would remain the clear lead back for Pittsburgh.",
+      "injury_update_date": "Mon, Sep 28th 7:19pm EDT"
+    },
+    {
+      "player_id": 18242,
+      "name": "Elgton Jenkins",
+      "status": "LIMITED",
+      "injury_type": "concussion",
+      "headline": "Elgton Jenkins (concussion) listed as DNP on Monday's practice report",
+      "comment": "It is a short week for Cleveland playing its division rival Steelers on Thursday. The status of Jenkins will need to be monitored the next couple of days.",
+      "injury_update_date": "Mon, Sep 28th 7:17pm EDT"
+    },
+    {
+      "player_id": 22755,
+      "name": "Teven Jenkins",
+      "status": "LIMITED",
+      "injury_type": "back",
+      "headline": "Teven Jenkins (back) listed as DNP on Monday's estimated practice report",
+      "comment": "It is a short week for Cleveland playing its division rival Steelers on Thursday. The status of Jenkins will need to be monitored the next couple of days.",
+      "injury_update_date": "Mon, Sep 28th 7:15pm EDT"
+    },
+    {
+      "player_id": 23091,
+      "name": "Terrance Ferguson",
+      "status": "OUT",
+      "injury_type": "ankle",
+      "headline": "Terrance Ferguson (ankle) to likely miss Week 4",
+      "comment": "Ferguson left Sunday's game against the Broncos. He did return, but then left again after making one catch. With Colby Parkinson also banged up, Tyler Higbee could be in line for a bigger role.",
+      "injury_update_date": "Mon, Sep 28th 7:12pm EDT"
+    },
+    {
+      "player_id": 28052,
+      "name": "Romello Height",
+      "status": "ACTIVE",
+      "injury_type": "hand",
+      "headline": "Romello Height (hand) hopeful to return in Week 4",
+      "comment": "Height was sidelined this past week after going down with a hand injury. His status will need to be monitored in practice throughout the week.",
+      "injury_update_date": "Mon, Sep 28th 5:13pm EDT"
+    },
+    {
+      "player_id": 26403,
+      "name": "Jalen Coker",
+      "status": "OUT",
+      "injury_type": "quad",
+      "headline": "Jalen Coker (quad) out for the remainder of Week 3",
+      "comment": "Coker was questionable to play today but that was due to an ankle injury. Coker has now picked up a new injury and will not return. He will finish the day with 18 receiving yards on two receptions.",
+      "injury_update_date": "Sun, Sep 27th 3:18pm EDT"
+    },
+    {
+      "player_id": 25984,
+      "name": "Ollie Gordon II",
+      "status": "QUESTIONABLE",
+      "injury_type": "cramping",
+      "headline": "Ollie Gordon II (cramping) questionable to return",
+      "comment": "Gordon jogged off to the locker room and is now officially questionable to return. This is a big blow to the Dolphins' offense with De'Von Achane (knee) already ruled out.",
+      "injury_update_date": "Sun, Sep 27th 3:13pm EDT"
+    },
+    {
+      "player_id": 23891,
+      "name": "Rachaad White",
+      "status": "QUESTIONABLE",
+      "injury_type": "shoulder",
+      "headline": "Rachaad White (shoulder) questionable to return",
+      "comment": "White had four rushing yards on two carries and one receptions for six yards prior to the injury. Jacory Croskey-Merritt will continue to see the bulk of the carries with White sidelined.",
+      "injury_update_date": "Sun, Sep 27th 3:07pm EDT"
+    },
+    {
+      "player_id": 19278,
+      "name": "Michael Pittman Jr.",
+      "status": "ACTIVE",
+      "injury_type": "foot",
+      "headline": "Michael Pittman Jr. (foot) expected to play on Sunday against Cincy",
+      "comment": "Pittman should give Aaron Rodgers a reliable possession receiver over the middle of the field, opening things up for the offense. Germie Bernard tried to play that role last week, but didn’t quite have the same fluidity as Pittman. He should be a decent WR3 with upside.",
+      "injury_update_date": "Sun, Sep 27th 7:35am EDT"
+    },
+    {
+      "player_id": 18781,
+      "name": "P.J. Locke",
+      "status": "IR",
+      "injury_type": "foot",
+      "headline": "P.J. Locke (foot) placed on IR",
+      "comment": "Locke will miss at least the next four games.",
+      "injury_update_date": "Sat, Sep 26th 5:41pm EDT"
+    },
+    {
+      "player_id": 23084,
+      "name": "Caleb Williams",
+      "status": "OUT",
+      "injury_type": "hamstring",
+      "headline": "Caleb Williams (hamstring) ruled out Monday",
+      "comment": "Williams was never expected to play this week after going down with his injury last week. It will be Tyson Bagent or Case Keenum starting on Monday.",
+      "injury_update_date": "Sat, Sep 26th 5:40pm EDT"
+    },
+    {
+      "player_id": 27320,
+      "name": "Jonah Coleman",
+      "status": "IR",
+      "injury_type": "ankle",
+      "headline": "Jonah Coleman (ankle) placed on IR",
+      "comment": "Coleman had already been ruled out for this week's game. He will now miss at least the next four games. J.K. Dobbins and RJ Harvey will continue to lead the Broncos backfield.",
+      "injury_update_date": "Sat, Sep 26th 5:39pm EDT"
+    },
+    {
+      "player_id": 19222,
+      "name": "DeVonta Smith",
+      "status": "ACTIVE",
+      "injury_type": "hamstring",
+      "headline": "DeVonta Smith (hamstring) cleared for Week 3",
+      "comment": "Smith is good to go for head coach Nick Sirianni after logging practice sessions on back-to-back days to end the week while battling a lingering hamstring injury, offering quarterback Jalen Hurts is primary pass-catching target against a shaky Bears secondary Monday night.",
+      "injury_update_date": "Sat, Sep 26th 4:24pm EDT"
+    },
+    {
+      "player_id": 17240,
+      "name": "Saquon Barkley",
+      "status": "ACTIVE",
+      "injury_type": "stinger",
+      "headline": "Saquon Barkley (stinger) off injury report for Eagles",
+      "comment": "Barkley is good to go after logging full practice sessions to end the week for head coach Nick Sirianni, boosting a Philadelphia rushing attack that will look to take advantage of a susceptible Bears defense Monday night.",
+      "injury_update_date": "Sat, Sep 26th 4:20pm EDT"
+    },
+    {
+      "player_id": 25857,
+      "name": "Ryan Miller",
+      "status": "QUESTIONABLE",
+      "injury_type": null,
+      "headline": "Ryan Miller (hip/back) officially questionable for Sunday",
+      "comment": "Miller is uncertain to play on Sunday. He's dealing with a pair of injuries right now and is likely considered day-to-day as a result. If he's cleared to play, he will see more work than usual with Caleb Douglas (ankle) set to be sidelined against the Chiefs.",
+      "injury_update_date": "Fri, Sep 25th 6:13pm EDT"
+    },
+    {
+      "player_id": 26038,
+      "name": "Chris Bell",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "Chris Bell (knee) good to go for Sunday",
+      "comment": "The rookie will be available to play on Sunday after being limited at practice earlier in the week due to a knee issue of some kind. Expect him to see even more work with Caleb Douglas (ankle) set to be sidelined against the Chiefs this week.",
+      "injury_update_date": "Fri, Sep 25th 6:11pm EDT"
+    },
+    {
+      "player_id": 27047,
+      "name": "Mansoor Delane",
+      "status": "ACTIVE",
+      "injury_type": "shoulder",
+      "headline": "Mansoor Delane (shoulder) will play Sunday",
+      "comment": "The rookie will be available to play on Sunday, despite dealing with a shoulder injury throughout the week at practice. Kansas City's defense projects to be a great fantasy option this week in an easy matchup against the Dolphins.",
+      "injury_update_date": "Fri, Sep 25th 6:06pm EDT"
+    },
+    {
+      "player_id": 19671,
+      "name": "L'Jarius Sneed",
+      "status": "ACTIVE",
+      "injury_type": "knee",
+      "headline": "L'Jarius Sneed (knee) cleared to play Sunday",
+      "comment": "The veteran was limited at practice all week due to a knee injury, but he has been cleared to play and should be good to go against the Dolphins this week. He will continue to play an important role on Kansas City's stellar defense for the foreseeable future.",
+      "injury_update_date": "Fri, Sep 25th 6:05pm EDT"
+    },
+    {
+      "player_id": 27026,
+      "name": "Josh Simmons",
+      "status": "OUT",
+      "injury_type": "back",
+      "headline": "Josh Simmons (back) ruled out for Sunday",
+      "comment": "Simmons is set to miss yet another game on Sunday due to his nagging back injury. Rookie Kahlil Benson will likely continue to start in the place of the absent veteran for the foreseeable future.",
+      "injury_update_date": "Fri, Sep 25th 6:03pm EDT"
+    },
+    {
+      "player_id": 15490,
+      "name": "Ronnie Stanley",
+      "status": "OUT",
+      "injury_type": "toe",
+      "headline": "Ronnie Stanley (toe) won't play Sunday",
+      "comment": "The veteran is going to be sidelined in Week 3. He's dealing with a toe injury of some kind right now, and it's unclear whether or not it will cause him to miss more time beyond this game. Baltimore's offense may struggle a bit more without their starting left tackle in a matchup against the Cowboys this week.",
+      "injury_update_date": "Fri, Sep 25th 6:01pm EDT"
+    },
+    {
+      "player_id": 16719,
+      "name": "Trey Hendrickson",
+      "status": "ACTIVE",
+      "injury_type": "finger",
+      "headline": "Trey Hendrickson (finger) good to go for Sunday",
+      "comment": "Baltimore's star edge rusher will be available to play on Sunday, despite being on the injury report all week due to a lingering finger issue. The team will need him to step up in a tough matchup against Dallas' high-powered offense this week.",
+      "injury_update_date": "Fri, Sep 25th 5:55pm EDT"
+    }
+  ]
+}

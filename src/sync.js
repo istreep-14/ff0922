@@ -1,117 +1,187 @@
-import { check, report, since, MAX_AGE_MIN } from './freshness.js';
+import { check, report, MAX_AGE_MIN } from './freshness.js';
 import { resolve as resolveWeek } from './week.js';
 import { config } from './config.js';
+import { logger, RUNLOG } from './runlog.js';
 
 /**
  * One pipeline runner that asks "has this moved?" before paying to find out.
  *
- * `npm run all` was eleven unconditional network steps. Re-running it two
- * minutes later re-pulled every source, including the two that publish a
- * recompute time saying nothing had changed. That is the wrong default when the
- * whole reason to re-run is that ONE source (the demand signal) moves by the
- * minute and the rest move a few times a day.
- *
  * Each step declares a max age. A step under its age is skipped with a reason;
  * `--force`, `--only` and `--skip` override. Nothing here decides what data
  * means — it decides only whether to go and get it.
+ *
+ * The steps are wired ONCE, here (`pipelineMods`). The CLI and the server each
+ * used to carry their own copy of the wiring, and the server's had drifted:
+ * its Sync page listed `trade`, `actuals`, the backfill and the audit as
+ * steps, then reported every one of them "unavailable" because its table
+ * simply had no entry for them.
  */
 
 /** Step order matters: joins read what the fetches wrote. */
 export function steps(mods) {
   return [
     { name: 'scrape', label: 'MyPlaybook leagues + rosters', run: mods.scrape },
-    { name: 'fp', label: 'FantasyPros boards, news, injuries', run: mods.fp },
+    { name: 'fp', label: 'FantasyPros rankings, projections, news', run: mods.fp },
+    { name: 'draftsharks', label: 'Draft Sharks current week + ROS', run: mods.draftsharks },
     { name: 'trade', label: 'FantasyPros trade market values', run: mods.trade },
-    { name: 'sleeper-proj', label: 'Sleeper week-by-week projections', run: mods.sleeperProj },
-    { name: 'draftsharks', label: 'Draft Sharks weekly rankings', run: mods.draftsharks },
-    { name: 'schedule', label: 'NFL opponent schedule', run: mods.schedule },
-    { name: 'vegas', label: 'VegasEdge projections', run: mods.vegas },
-    { name: 'vegas-dist', label: 'VegasEdge distributions', run: mods.vegasDist },
-    { name: 'wwo', label: 'WinWithOdds', run: mods.wwo },
-    { name: 'firstdown', label: 'First Down Studio', run: mods.firstdown },
-    { name: 'fanduel', label: 'FanDuel / numberFire', run: mods.fanduel },
+    { name: 'ddplayers', label: 'Dynasty Daddy player data (ESPN/FanDuel/FantasyGuys ROS ranks)', run: mods.ddplayers },
+    { name: 'schedule', label: 'NFL opponent schedule (weeks not yet stored)', run: mods.schedule },
     { name: 'buzz', label: 'Yahoo BuzzIndex', run: mods.buzz },
     { name: 'trend', label: 'Sleeper trending', run: mods.trend },
     { name: 'leaguedetail', label: 'Sleeper standings + matchups', run: mods.leaguedetail },
-    { name: 'matchups', label: 'every league\'s live board + score ledger', run: mods.matchups },
+    { name: 'leaguedetail-backfill', label: 'Sleeper past weeks', run: mods.leaguedetailBackfill },
+    { name: 'ddleague', label: 'Dynasty Daddy league schedules (Sleeper, ESPN)', run: mods.ddleague },
+    { name: 'matchups', label: 'Every league\'s live board + score ledger', run: mods.matchups },
+    { name: 'actuals', label: 'Weekly fantasy points, every player', run: mods.actuals },
     // Joins are local and cheap; they always run, because a skipped fetch still
     // leaves the previous fetch's data un-joined if a different source moved.
-    { name: 'enrich', label: 'join every source onto rosters', run: mods.enrich, always: true },
-    { name: 'dashboard', label: 'build dist/dashboard.html', run: mods.dashboard, always: true },
+    { name: 'enrich', label: 'Join every source onto rosters', run: mods.enrich, always: true },
+    { name: 'dashboard', label: 'Build dist/dashboard.html', run: mods.dashboard, always: true },
     // Last, so it judges what was just built from: is each source at the right
     // scale, filed under the right week, and how old is it.
-    { name: 'audit', label: 'check every source\'s scale, week and age', run: mods.audit, always: true },
+    { name: 'audit', label: 'Check every source\'s scale, week and age', run: mods.audit, always: true },
   ];
 }
 
-const list = (v) => (v ? String(v).split(',').map((x) => x.trim().toLowerCase()).filter(Boolean) : null);
+/** Named groups the Sync page and `--only` both understand. */
+export const PRESETS = {
+  live: 'trend,buzz,matchups,actuals,draftsharks',
+  // Everything League Value is built from: rest-of-season projections and ranks.
+  projections: 'fp,draftsharks,ddplayers',
+  leagues: 'scrape,leaguedetail,ddleague,matchups',
+};
 
-export async function runPipeline(mods, { force = false, only = null, skip = null, maxAge = null, dryRun = false, log = console.log } = {}) {
+/**
+ * What every step actually runs. Imported lazily so that `steps()` and the
+ * pipeline runner stay cheap to import (the tests, `status`).
+ *
+ * `all` ignores the per-league on/off switches for the league steps.
+ */
+export async function pipelineMods({ all = false, scorings = null, days = 2 } = {}) {
+  const [
+    { scrape }, { fpSync }, { dsSync }, { tradeSync }, { ddPlayersSync, ddLeagueSync }, { scheduleSync }, { buzzSync }, { trendSync },
+    { syncLeagueDetail, backfillLeagueDetail }, { matchupsSync }, { syncActuals },
+    { resolveLeagues }, { applyFilters }, { runEnrich }, { buildDashboard }, { auditSources, formatAudit },
+    { readFileSync, existsSync }, { join }, { DATA },
+  ] = await Promise.all([
+    import('./scrape.js'), import('./fpsync.js'), import('./draftsharks.js'), import('./trademarket.js'), import('./dynastydaddy.js'),
+    import('./schedule.js'), import('./buzz.js'), import('./sleepertrend.js'), import('./leaguedata.js'),
+    import('./matchups.js'), import('./actuals.js'), import('./fantasypros.js'), import('./leaguestate.js'),
+    import('./enrich.js'), import('./dashboard.js'), import('./sourceaudit.js'),
+    import('node:fs'), import('node:path'), import('./config.js'),
+  ]);
+  const activeLeagues = async () => applyFilters(await resolveLeagues(), { all });
+  const scraped = () => {
+    const p = join(DATA, 'latest.json');
+    return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')).leagues : [];
+  };
+  return {
+    scrape: ({ log }) => scrape({ all, log }),
+    fp: ({ season, week, log }) => fpSync({ season, week, scorings, log }),
+    draftsharks: ({ season, week, log }) => dsSync({ season, week, scorings, log }),
+    trade: ({ season, week, log }) => tradeSync({ season, week, scorings, log }),
+    ddplayers: ({ season, week, log }) => ddPlayersSync({ season, week, log }),
+    ddleague: ({ season, week, log }) => ddLeagueSync({ season, week, leagues: scraped(), log }),
+    schedule: ({ season, week, log }) => scheduleSync({ season, week, log }),
+    buzz: ({ season, week, log }) => buzzSync({ season, week, days, log }),
+    trend: ({ season, week, log }) => trendSync({ season, week, log }),
+    leaguedetail: async ({ season, week, log }) => syncLeagueDetail({ season, week, leagues: await activeLeagues(), log }),
+    leaguedetailBackfill: async ({ season, week, log }) => backfillLeagueDetail({ season, throughWeek: week, leagues: await activeLeagues(), log }),
+    matchups: ({ season, week, log }) => matchupsSync({ season, week, leagues: scraped(), log }),
+    actuals: ({ season, week, log }) => syncActuals({ season, week, log }),
+    enrich: ({ season, week, log }) => runEnrich({ season, week, log }),
+    dashboard: ({ log }) => buildDashboard({ log }),
+    audit: async ({ season, week, log }) => formatAudit(await auditSources({ season, week }), log),
+  };
+}
+
+/** The steps as plain rows, for a page or an API: no run functions. */
+export function stepRows() {
+  return steps({}).map(({ name, label, always }) => ({ name, label, always: !!always, maxAgeMin: always ? null : (MAX_AGE_MIN[name] ?? 60) }));
+}
+
+const list = (v) => (v ? String(v).split(',').map((x) => x.trim().toLowerCase()).filter(Boolean) : null);
+const expand = (v) => (v && PRESETS[String(v).toLowerCase()]) || v;
+
+/**
+ * The run in progress, if any. The server refuses a second sync while one is
+ * going: two runs writing the same files is not twice the freshness.
+ */
+export const current = { run: null };
+
+export async function runPipeline(mods, {
+  force = false, only = null, skip = null, maxAge = null, dryRun = false,
+  log = console.log, runlog = RUNLOG, origin = 'cli',
+} = {}) {
   const { season, week } = resolveWeek({ season: config.season, week: config.week });
-  const onlySet = list(only), skipSet = list(skip);
+  const onlySet = list(expand(only)), skipSet = list(skip);
   const all = steps(mods);
   const results = [];
+  const say = logger({ src: 'sync', echo: log, file: runlog });
 
-  log(`Pipeline — season ${season}, week ${week}${force ? ' (forced)' : ''}${dryRun ? ' (dry run)' : ''}\n`);
+  const flags = [force && 'forced', dryRun && 'dry run', onlySet && `only ${onlySet.join(',')}`, skipSet && `skip ${skipSet.join(',')}`].filter(Boolean);
+  current.run = { startedAt: new Date().toISOString(), origin, flags, step: null };
+  say(`▶ sync — season ${season}, week ${week}${flags.length ? ` (${flags.join('; ')})` : ''} · from ${origin}`);
 
-  for (const step of all) {
-    if (!step.run) { results.push({ ...step, status: 'unavailable' }); continue; }
-    // `--only` names which FETCHES to run. The joins are marked `always` and
-    // are exempt, because the point of re-fetching one source is to see it on
-    // the page: `--only trend` that leaves the dashboard on the previous pull
-    // has done nothing at all. `--skip` still stops them, since that is an
-    // explicit instruction rather than a selection.
-    if (onlySet && !onlySet.includes(step.name) && !step.always) {
-      results.push({ ...step, status: 'not selected' });
-      continue;
-    }
-    if (skipSet && skipSet.includes(step.name)) {
-      log(`  skip  ${step.name.padEnd(13)} — asked to skip`);
-      results.push({ ...step, status: 'skipped' });
-      continue;
-    }
+  try {
+    for (const step of all) {
+      if (!step.run) { results.push({ ...step, status: 'unavailable' }); continue; }
+      // `--only` names which FETCHES to run. The joins are marked `always` and
+      // are exempt, because the point of re-fetching one source is to see it on
+      // the page: `--only trend` that leaves the dashboard on the previous pull
+      // has done nothing at all. `--skip` still stops them, since that is an
+      // explicit instruction rather than a selection.
+      if (onlySet && !onlySet.includes(step.name) && !step.always) {
+        results.push({ ...step, status: 'not selected' });
+        continue;
+      }
+      if (skipSet && skipSet.includes(step.name)) {
+        say(`  skip  ${step.name.padEnd(13)} — asked to skip`);
+        results.push({ ...step, status: 'skipped' });
+        continue;
+      }
 
-    let decision = { skip: false, reason: 'always runs' };
-    if (!step.always) {
-      // --only names a step explicitly, which is a request to run it.
-      decision = check(step.name, { maxAgeMin: maxAge != null ? Number(maxAge) : null, force: force || !!onlySet });
-    }
-    if (decision.skip) {
-      log(`  fresh ${step.name.padEnd(13)} — ${decision.reason}`);
-      results.push({ ...step, status: 'fresh', ...decision });
-      continue;
-    }
-    if (dryRun) {
-      log(`  would ${step.name.padEnd(13)} — ${decision.reason}`);
-      results.push({ ...step, status: 'would run', ...decision });
-      continue;
-    }
+      let decision = { skip: false, reason: 'always runs' };
+      if (!step.always) {
+        // --only names a step explicitly, which is a request to run it.
+        decision = check(step.name, { maxAgeMin: maxAge != null ? Number(maxAge) : null, force: force || !!onlySet });
+      }
+      if (decision.skip) {
+        say(`  fresh ${step.name.padEnd(13)} — ${decision.reason}`);
+        results.push({ ...step, status: 'fresh', ...decision });
+        continue;
+      }
+      if (dryRun) {
+        say(`  would ${step.name.padEnd(13)} — ${decision.reason}`);
+        results.push({ ...step, status: 'would run', ...decision });
+        continue;
+      }
 
-    const t0 = Date.now();
-    try {
-      await step.run({ season, week });
-      const secs = ((Date.now() - t0) / 1000).toFixed(1);
-      log(`  done  ${step.name.padEnd(13)} — ${secs}s`);
-      results.push({ ...step, status: 'ok', seconds: Number(secs) });
-    } catch (err) {
-      log(`  FAIL  ${step.name.padEnd(13)} — ${err.message.split('\n')[0]}`);
-      results.push({ ...step, status: 'failed', error: err.message });
-      // Recorded and carried on: a failed fetch must not stop the joins,
-      // because the other twelve sources are on disk and a dashboard built
-      // from them is strictly better than none.
-      //
-      // (There was an `if (!step.always) continue;` here, which as the last
-      // statement in the loop body did exactly nothing while implying that a
-      // failed join was handled differently. It is not.)
+      const t0 = Date.now();
+      current.run.step = step.name;
+      try {
+        await step.run({ season, week, log: say.as(step.name) });
+        const secs = ((Date.now() - t0) / 1000).toFixed(1);
+        say(`  done  ${step.name.padEnd(13)} — ${secs}s`);
+        results.push({ ...step, status: 'ok', seconds: Number(secs) });
+      } catch (err) {
+        say(`  FAIL  ${step.name.padEnd(13)} — ${err.message.split('\n')[0]}`);
+        results.push({ ...step, status: 'failed', error: err.message });
+        // Recorded and carried on: a failed fetch must not stop the joins,
+        // because the other sources are on disk and a dashboard built from
+        // them is strictly better than none.
+      }
     }
+  } finally {
+    current.run = null;
   }
 
   const ran = results.filter((r) => r.status === 'ok').length;
   const fresh = results.filter((r) => r.status === 'fresh').length;
   const failed = results.filter((r) => r.status === 'failed');
-  log(`\n${ran} run, ${fresh} already fresh, ${failed.length} failed`);
-  if (failed.length) for (const f of failed) log(`  ${f.name}: ${f.error.split('\n')[0]}`);
-  return results;
+  say(`■ ${ran} run, ${fresh} already fresh, ${failed.length} failed`);
+  for (const f of failed) say(`  ${f.name}: FAIL ${f.error.split('\n')[0]}`);
+  return results.map(({ run, ...r }) => r);
 }
 
 /**
@@ -126,9 +196,8 @@ export function printStatus(log = console.log) {
   if (!rows.length) return void log('No sync has been recorded yet — run `npm run sync`.');
   log('  SOURCE          FETCHED    SITE SAID   MOVED    ITEMS  STATE');
   for (const r of rows) {
-    const limit = MAX_AGE_MIN[r.source] ?? 60;
     const moved = r.moved === null ? '—' : (r.moved ? 'yes' : 'no');
-    const state = r.stale ? `stale (>${limit}m)` : 'fresh';
+    const state = r.stale ? `stale (>${r.limitMin}m)` : 'fresh';
     log(
       `  ${r.source.padEnd(15)} ${String(r.age).padStart(8)}  ${String(r.sourceAge || '—').padStart(10)}  ${moved.padStart(5)}  ` +
       `${String(r.items ?? '—').padStart(7)}  ${state}` +
@@ -138,24 +207,5 @@ export function printStatus(log = console.log) {
   }
   log('\n  "site said" is the source\'s OWN recompute time where it publishes one;');
   log('  "moved" is whether that time changed between our last two pulls.');
-  log('  FanDuel and MyPlaybook publish none, so those are governed by our clock alone.');
+  log('  MyPlaybook publishes none, so it is governed by our clock alone.');
 }
-
-/**
- * When each week of the Sleeper projection set was last recomputed upstream.
- *
- * The current week moves through the day and the rest of the season moves
- * overnight, so one age for the source as a whole would hide the only part of
- * it that is live.
- */
-export function printProjectionAges(season, weekRows, log = console.log, label = 'Sleeper projections') {
-  if (!weekRows.length) return void log(`No ${label} stored.`);
-  log(`  ${label}, season ${season} — when the SITE last recomputed each week\n`);
-  log('  WK  SITE RECOMPUTED           AGE      PLAYERS  OUR PULL');
-  for (const r of weekRows) {
-    log(`  ${String(r.week).padStart(2)}  ${(r.sourceAt || '—').padEnd(25)} ${String(since(r.sourceAt)).padStart(7)}  `
-      + `${String(r.players ?? '—').padStart(7)}  ${since(r.fetchedAt)}`);
-  }
-}
-
-export { since };

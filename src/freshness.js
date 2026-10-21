@@ -18,10 +18,9 @@ import { writeJsonAtomic } from './jsonfile.js';
  *
  *   fetchedAt    when WE pulled it. Always known.
  *   sourceAt     when the SITE says it last recomputed. Known for FantasyPros
- *                (last_updated_ts on every board), WinWithOdds (a
- *                rankings-updated-at tag), First Down (generatedAt) and via
- *                ETag for Sleeper. VegasEdge and FanDuel publish neither, so
- *                for those two `sourceAt` is null and age is ours alone.
+ *                (last_updated_ts on every board) and Draft Sharks (its
+ *                Last-Modified header). MyPlaybook publishes neither, so
+ *                `sourceAt` is null there and age is ours alone.
  *
  * A source whose sourceAt has not moved since our last pull has nothing new,
  * no matter how long ago we pulled it. A source with no sourceAt can only be
@@ -82,42 +81,43 @@ const MIN = 60_000;
  *   trend    Sleeper's counter is continuous; 15 min is the point at which a
  *            6h-window rate has visibly moved.
  *   buzz     Yahoo recomputes a day's board through the day, in the morning.
- *   vegas    lines move all day on game days, slowly otherwise.
  *   fp       FantasyPros re-runs consensus a few times a day.
- *   wwo/fd/fanduel  once or twice a day in practice.
  *   sleeper-players / idmap  rosters, not results.
  */
 export const MAX_AGE_MIN = {
   trend: 15,
   buzz: 60,
-  vegas: 90,
-  // Sleeper recomputes the CURRENT week continuously and the rest of the
-  // season in a nightly batch. The step only re-pulls the live week at this
-  // interval, and every week of it is an ETag-conditional GET, so an interval
-  // this short costs one round trip when nothing has moved.
-  'sleeper-proj': 20,
   // Draft Sharks re-ranks a week when news moves, which is the reason it is
   // here. 45 minutes is short enough that a teammate on IR shows up the same
-  // afternoon, long enough that 18 HTMX tables are not re-pulled every live
-  // poll. The step only re-asks the live week at this interval.
+  // afternoon, long enough that the current week and ROS board are not
+  // re-pulled every live poll.
   draftsharks: 45,
-  // The NFL schedule barely moves in-season. 12 hours is plenty; a flex
-  // announcement is overnight news.
-  schedule: 12 * 60,
-  'vegas-dist': 180,
+  // The NFL schedule is fixed for the season, and the sync fetches only weeks
+  // it does not have yet, so this is just how often to retry a missing week.
+  schedule: 7 * 24 * 60,
   fp: 180,
   // The trade market is rebuilt daily (one point per day in its series) and its
   // own timestamp is a cached build time, so pulling it more often than a few
   // times a day only re-reads the same payload.
   trade: 180,
-  wwo: 180,
-  firstdown: 180,
-  fanduel: 180,
+  // Dynasty Daddy rebuilds once a night (~08:00Z, its `most_recent_data_point`).
+  // Six hours catches the rebuild the same morning.
+  ddplayers: 360,
+  // Schedules are fixed for the season; what moves is last week's scores and
+  // Sleeper's potential points, which change once a week.
+  ddleague: 360,
   scrape: 60,
   leaguedetail: 30,
+  // Once a week is captured it never needs re-asking (see backfillLeagueDetail
+  // in leaguedata.js), so this is really "how often to check for a newly-past
+  // week", not a freshness window on real data.
+  'leaguedetail-backfill': 360,
   // Scores move during games and not at all between them; 10 minutes is about
   // the resolution a live board is worth refreshing at.
   matchups: 10,
+  // Points land as games finish. Past weeks are skipped inside the sync once
+  // the file has a full slate, so this interval is really the live week.
+  actuals: 10,
   'sleeper-players': 24 * 60,
   idmap: 12 * 60,
 };
@@ -183,9 +183,16 @@ export function siteMoved(e) {
 }
 
 /** The whole ledger, shaped for a status table or the dashboard payload. */
+/**
+ * Sources the ledger still reports. A source this project has dropped keeps
+ * its old row in data/freshness.json, and every page then showed it as
+ * "stale" forever — a warning about something nothing reads.
+ */
+export const TRACKED = new Set([...Object.keys(MAX_AGE_MIN), 'scores-ingest']);
+
 export function report() {
   const { sources } = loadLedger();
-  return Object.entries(sources).map(([name, e]) => ({
+  return Object.entries(sources).filter(([name]) => TRACKED.has(name)).map(([name, e]) => ({
     source: name,
     fetchedAt: e.fetchedAt,
     age: since(e.fetchedAt),

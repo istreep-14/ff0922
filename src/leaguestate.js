@@ -1,5 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { STATE } from './config.js';
+import { join } from 'node:path';
+import { STATE, DATA } from './config.js';
 import { writeJsonAtomic } from './jsonfile.js';
 
 /**
@@ -73,4 +74,48 @@ export function applyFilters(leagues, { all = false, filter = null, limit = null
   }
   if (limit != null && Number(limit) > 0) out = out.slice(0, Number(limit));
   return out;
+}
+
+/**
+ * Every league the account has, as of the last scrape — active or not.
+ *
+ * `latest.json` only ever holds the leagues that were scraped, i.e. the active
+ * ones, so a league switched off disappeared from every page, including the
+ * one where you would switch it back on. The scrape writes this list from what
+ * MyPlaybook reported, before filtering, and the dashboard shows it on All
+ * Leagues with each league's on/off state.
+ */
+export const DIRECTORY = join(DATA, 'leagues-directory.json');
+
+export function saveDirectory(leagues) {
+  const state = loadState();
+  writeJsonAtomic(DIRECTORY, {
+    updatedAt: new Date().toISOString(),
+    leagues: leagues.map((l) => ({
+      key: l.key,
+      name: l.nickname || l.name || l.key,
+      host: l.host || null,
+      scoring: l.scoring || null,
+      sport: l.sport || 'nfl',
+      standalone: !!l.standalone,
+      active: isActive(state, l.key),
+    })),
+  });
+}
+
+/** The directory with the CURRENT on/off state (the file's copy is as of the scrape). */
+export function loadDirectory() {
+  if (!existsSync(DIRECTORY)) return [];
+  let d;
+  try { d = JSON.parse(readFileSync(DIRECTORY, 'utf8')); } catch { return []; }
+  const state = loadState();
+  return (d.leagues || []).map((l) => ({ ...l, active: isActive(state, l.key) }));
+}
+
+/** Switch one league on or off by its exact key — what the dashboard sends. */
+export function setActiveByKey(key, active, meta = {}) {
+  const state = loadState();
+  state.leagues[key] = { ...(state.leagues[key] || {}), ...meta, active: !!active };
+  saveState(state);
+  return state.leagues[key];
 }

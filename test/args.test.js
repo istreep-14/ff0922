@@ -101,3 +101,17 @@ test('no match throws rather than picking one', () => {
   assert.throws(() => resolveLeague(leagues, ['nonsense']), /No league matched/);
   assert.throws(() => resolveLeague([], ['Cville']), /No league matched/);
 });
+
+/**
+ * `--console` and `--schedule` were read with flag() but missing from the set,
+ * so `scores:ingest --schedule --file dump.json` took "--file" as the value of
+ * --schedule and dropped both. Every flag() the CLI asks about must be here.
+ */
+test('every boolean the CLI asks about is declared boolean', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { BOOLEAN_FLAGS } = await import('../src/args.js');
+  const cli = readFileSync(new URL('../src/cli.js', import.meta.url), 'utf8');
+  const asked = [...new Set([...cli.matchAll(/flag\('([a-z-]+)'\)/g)].map((m) => m[1]))];
+  assert.ok(asked.length >= 8);
+  assert.deepEqual(asked.filter((f) => !BOOLEAN_FLAGS.has(f)), []);
+});

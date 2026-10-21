@@ -3,25 +3,52 @@ import { join } from 'node:path';
 import { get, pool } from './http.js';
 import { FPDIR, config } from './config.js';
 import { resolve as resolveWeek } from './week.js';
-import { scoringsInUse } from './fpsync.js';
+import { scoringsInUse } from './fpapi.js';
 import { record } from './freshness.js';
 
 /**
- * No-API-key source for the same universal data.
+ * FantasyPros' public pages — the bulk of its data, no API key needed. Called
+ * through `fpSync` (fpsync.js), which adds the two API-only files on top.
  *
- * FantasyPros renders its public ranking pages with the full dataset embedded as
- * `var ecrData = {...}`. Each board carries, per player:
- *   rank_ecr / rank_min / rank_max / rank_ave / rank_std  (expert spread)
- *   r2p_pts        -> PROJECTED POINTS for that board's scoring format
- *   start_sit_grade, tag, player_opponent, pos_rank, player_owned_avg, note
+ * FantasyPros publishes RANKINGS and PROJECTIONS as two separate products that
+ * disagree with each other, not one dataset under two URLs:
  *
- * Weekly boards are the current week; `ros-` prefixed boards are rest of season.
- * This covers rankings AND projections without a key. Injuries and news come
- * from the server-rendered injury-news listing.
+ *   /nfl/rankings/ppr-rb.php       expert-panel CONSENSUS RANKINGS for the week.
+ *                                   Embeds `var ecrData = {...}`; `r2p_pts` is a
+ *                                   points figure IMPLIED by the ranking, not a
+ *                                   projection in its own right.
+ *   /nfl/projections/rb.php        the site's own PROJECTIONS model, rendered as
+ *                                   an HTML table (`id="data"`); FPTS is the last
+ *                                   column, carrying a `data-sort-value`.
+ *
+ * These used to be treated as one thing (only rankings were scraped, and its
+ * r2p_pts stood in for "the projection" everywhere) — that was wrong and is
+ * fixed here: both are fetched, and `enrich.js` already prefers a dedicated
+ * projections file over the rankings r2p_pts fallback (see `projIndex`) once
+ * one exists on disk.
+ *
+ * ROS is NOT symmetric between the two. Rankings has a real rest-of-season
+ * board (`ros-` prefixed / `type=ROS`) that FantasyPros keeps current.
+ * Projections has no equivalent — its only non-weekly mode (`?week=draft`) is
+ * the static PRESEASON full-season projection, last recomputed before week 1
+ * and never touched again — the stale full-season figure this
+ * app refuses to show. So only CURRENT-WEEK projections are
+ * fetched here; rest-of-season stays sourced from the rankings ROS board.
+ *
+ * The projections page is also paywalled, unlike rankings: logged out, it
+ * renders only the top ~10 players/position behind a "create a free account"
+ * fence. `FP_COOKIE` (optional — the `Cookie:` header of a logged-in
+ * fantasypros.com session) unlocks the full board; see
+ * `fetchProjections`.
+ *
+ * Injuries and news come from the server-rendered injury-news listing.
  */
 
 const RANK_BASE = 'https://www.fantasypros.com/nfl/rankings';
+const PROJ_BASE = 'https://www.fantasypros.com/nfl/projections';
 const NEWS_BASE = 'https://www.fantasypros.com/nfl/injury-news.php';
+/** `enrich.js`'s POINTS_KEY, duplicated here rather than imported to avoid a cycle. */
+const STATS_KEY = { PPR: 'points_ppr', HALF: 'points_half', STD: 'points' };
 
 /**
  * Positions whose board varies by scoring format. QB/K/DST do not.
@@ -60,6 +87,59 @@ export async function fetchRankings({ position, scoring = 'PPR', ros = false } =
   const data = parseEcr(html, url);
   data._source = url;
   return data;
+}
+
+/* ------------------------------------------------------------- projections */
+
+export function projectionsUrl(position, scoring = 'PPR', { week } = {}) {
+  const qs = new URLSearchParams({ scoring });
+  if (week != null) qs.set('week', String(week));
+  return `${PROJ_BASE}/${String(position).toLowerCase()}.php?${qs.toString()}`;
+}
+
+/**
+ * Parse the projections table. FPTS is always the LAST stat column and the
+ * only one carrying `data-sort-value` (the un-rounded figure the display text
+ * is rounded from), so one rule covers every position without a per-position
+ * column map — QB's passing line and DST's team defense line differ, but both
+ * end the row the same way.
+ */
+export function parseProjectionsTable(html) {
+  const body = html.match(/<tbody>([\s\S]*?)<\/tbody>/);
+  if (!body) throw new Error('no projections table body found');
+  const rows = body[1].split('<tr class="mpb-player-').slice(1);
+  const players = [];
+  for (const r of rows) {
+    const fpid = Number((r.match(/^(\d+)/) || [])[1]) || null;
+    const name = (r.match(/fp-player-name="([^"]*)"/) || [])[1] || null;
+    const team = (r.match(/<\/a>\s*([A-Z]{2,3})\s*<\/td>/) || [])[1] || null;
+    const sortValues = [...r.matchAll(/data-sort-value="([-\d.]+)"/g)];
+    const fpts = sortValues.length ? Number(sortValues[sortValues.length - 1][1]) : null;
+    if (!fpid || fpts == null) continue;
+    players.push({ fpid, name, team_id: team, fpts });
+  }
+  return players;
+}
+
+/**
+ * Fetch one position's current-week projections for one scoring format.
+ *
+ * Logged out, the page renders only the top ~10 players/position behind a
+ * "create a free account" fence (verified on the raw response — a
+ * `is_premium_feature` registration block, not a truncated table). `FP_COOKIE`
+ * (a full `Cookie:` header from a logged-in fantasypros.com session) unlocks
+ * the full board when set;
+ * unset, this silently gets the top-10 slice, which `enrich.js` already
+ * treats as a partial file (whatever a player is missing falls back to the
+ * rankings board's implied points).
+ */
+export async function fetchProjections({ position, scoring = 'PPR', week } = {}) {
+  const url = projectionsUrl(position, scoring, { week });
+  const headers = config.fpCookie ? { Cookie: config.fpCookie } : {};
+  const html = await get(url, { asText: true, headers });
+  const players = parseProjectionsTable(html);
+  const updated = (html.match(/Consensus last updated <time datetime="([^"]+)"/) || [])[1] || null;
+  return { _source: url, _updatedAt: updated, players };
 }
 
 /* ------------------------------------------------------------ injury news */
@@ -153,8 +233,7 @@ const save = (dir, name, data) => {
 };
 
 /**
- * Writes into the SAME data/fp/<season>/ layout the API sync uses, so `enrich`
- * consumes either source without knowing which produced the files.
+ * Writes data/fp/<season>/{week-N,ros}/… — the layout `enrich` reads.
  */
 export async function scrapeSync({ season, week, positions = POSITIONS, scorings = null, newsPages = 4, log = console.log } = {}) {
   const { season: yr, week: wk } = resolveWeek({ season: season ?? config.season, week: week ?? config.week });
@@ -163,7 +242,7 @@ export async function scrapeSync({ season, week, positions = POSITIONS, scorings
   const weekDir = join(root, `week-${wk}`);
   const rosDir = join(root, 'ros');
 
-  log(`FantasyPros public-page scrape — season ${yr}, week ${wk} (no API key)`);
+  log(`FantasyPros public pages — season ${yr}, week ${wk}`);
   log(`  scoring formats: ${formats.join(', ')}`);
   log(`  positions:       ${positions.join(', ')}`);
 
@@ -201,13 +280,56 @@ export async function scrapeSync({ season, week, positions = POSITIONS, scorings
       const ts = Number(data.last_updated_ts) || 0;
       if (ts > newestTs) newestTs = ts;
       const pts = (data.players || []).filter((p) => p.r2p_pts != null).length;
-      log(`  ok   ${label.padEnd(20)} ${String(data.players?.length ?? 0).padStart(4)} players, ${pts} w/ projected pts`);
+      log(`  ok   ${label.padEnd(20)} ${String(data.players?.length ?? 0).padStart(4)} players, ${pts} w/ ranking-implied pts`);
       ok.push(label);
     } catch (err) {
       log(`  FAIL ${label} — ${err.message}`);
       failed.push({ label, error: err.message });
     }
   }, { concurrency: 3 });
+
+  // Separate product from rankings above (see the module docblock): the site's
+  // own projections model, current week only — no static full-season figure.
+  // Insensitive positions (QB/K/DST) are fetched once under a canonical PPR
+  // URL and the same figure applied to every requested format, exactly as the
+  // rankings job builder above does.
+  log(`\nweek ${wk} — projections`);
+  const projJobs = new Map();
+  for (const sc of formats) {
+    for (const pos of positions) {
+      const canonicalSc = isScoringSensitive(pos) ? sc : 'PPR';
+      const url = projectionsUrl(pos, canonicalSc, { week: wk });
+      const j = projJobs.get(url) || { pos, scoring: canonicalSc, formats: [], url };
+      j.formats.push(sc);
+      projJobs.set(url, j);
+    }
+  }
+  const projDedup = formats.length * positions.length - projJobs.size;
+  if (projDedup > 0) log(`  ${projJobs.size} distinct boards (${projDedup} scoring duplicates skipped for QB/K/DST)`);
+
+  const byPosition = new Map(positions.map((pos) => [pos, new Map()]));
+  await pool([...projJobs.values()], async ({ pos, scoring, formats: fmts }) => {
+    const label = `projections ${fmts.join('/')} ${pos} wk${wk}`;
+    try {
+      const data = await fetchProjections({ position: pos, scoring, week: wk });
+      const byId = byPosition.get(pos);
+      for (const p of data.players) {
+        const row = byId.get(p.fpid) || { fpid: p.fpid, name: p.name, team_id: p.team_id, stats: {} };
+        for (const sc of fmts) row.stats[STATS_KEY[sc]] = p.fpts;
+        byId.set(p.fpid, row);
+      }
+      log(`  ok   ${label.padEnd(24)} ${data.players.length} players`);
+      ok.push(label);
+    } catch (err) {
+      log(`  FAIL ${label} — ${err.message}`);
+      failed.push({ label, error: err.message });
+    }
+  }, { concurrency: 3 });
+  for (const [pos, byId] of byPosition) {
+    const players = [...byId.values()];
+    if (!players.length) continue;
+    save(join(weekDir, 'projections'), pos.toLowerCase(), { fetchedAt: new Date().toISOString(), source: 'projections-page', players });
+  }
 
   log('\ninjuries + news');
   try {

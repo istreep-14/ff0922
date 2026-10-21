@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The CLI entrypoint and its 64-command dispatch table.
+ * The CLI entrypoint and its command dispatch table (`help` lists them).
  *
  * Each command is one async method on `commands{}` named exactly what the user
  * types; the dispatch tail owns --help/--version, unknown commands and error
@@ -16,59 +16,37 @@ import { loadDictionary } from './players.js';
 import { scrape } from './scrape.js';
 import { exportCsv } from './export.js';
 import * as fp from './fpapi.js';
-import { fpSync, apiSupplement, scoringsInUse } from './fpsync.js';
-import { scrapeSync as fpScrapeSync, fetchRankings, fetchInjuryNews } from './scrapefp.js';
+import { scoringsInUse } from './fpapi.js';
+import { fpSync } from './fpsync.js';
 import { resolve as resolveWeek } from './week.js';
-import { enrich } from './enrich.js';
+import { enrich, runEnrich } from './enrich.js';
 import { loadState, isActive, setActive, setOnly, applyFilters } from './leaguestate.js';
-import * as vegas from './vegas.js';
 import { auditSources, formatAudit } from './sourceaudit.js';
-import { loadIdMap, buildIdMap } from './idmap.js';
-import { loadSleeper } from './sleeper.js';
+import { loadIdMap } from './idmap.js';
 import { buildDashboard, sourceAsOf } from './dashboard.js';
-import { CONS_SRC, DEFAULT_STALE_HOURS } from './consensus.js';
-import { report as freshnessReport, check, record, since } from './freshness.js';
-import { wwoSync } from './winwithodds.js';
-import { fdSync } from './firstdown.js';
-import { fanduelSync } from './fanduel.js';
+import { report as freshnessReport, record, since } from './freshness.js';
 import { buzzSync, fetchDay, recentDates } from './buzz.js';
 import { tradeSync } from './trademarket.js';
+import { ddPlayersSync, ddLeagueSync } from './dynastydaddy.js';
 import { trendSync, fetchAll as fetchTrending } from './sleepertrend.js';
 import { loadSignals } from './signals.js';
-import { runPipeline, printStatus, printProjectionAges } from './sync.js';
-import { projSync, projSyncAuto, readProjections, playerWeeks, weekReport, LAST_WEEK } from './sleeperproj.js';
-import { projSync as yahooProjSync, projSyncAuto as yahooProjSyncAuto, weekReport as yahooWeekReport, browserScript as yahooBrowserScript, ingestWeeks as yahooIngestWeeks } from './yahooproj.js';
-import { dsSync, dsSyncAuto, dsWeekReport, readDraftSharks, playerByKey } from './draftsharks.js';
+import { runPipeline, printStatus, pipelineMods, PRESETS } from './sync.js';
+import { dsSync, dsWeekReport } from './draftsharks.js';
+import { tail as runlogTail } from './runlog.js';
 import { writeJsonAtomic } from './jsonfile.js';
-import { scheduleSync, readSchedule, byeWeek, teamWeek, repairStore, emptyTeams, importScheduleWeeks, filePath as scheduleFilePath } from './schedule.js';
-import { shapeFor, shapeFromPoints, preferredShape, perWeekEstimates } from './weekshape.js';
-import { normPos, normTeam } from './teams.js';
+import { scheduleSync, readSchedule, repairStore, emptyTeams, importScheduleWeeks, filePath as scheduleFilePath } from './schedule.js';
 import { parseArgs, resolveLeague } from './args.js';
 import * as ov from './overrides.js';
-import { syncLeagueDetail } from './leaguedata.js';
+import { syncLeagueDetail, backfillLeagueDetail } from './leaguedata.js';
 import { matchupsSync } from './matchups.js';
+import { syncActuals } from './actuals.js';
+import { captureScript, ingestScores, readClipboard, bookmarklet } from './scoresingest.js';
+import { execFileSync } from 'node:child_process';
 
 const [, , cmd, ...rest] = process.argv;
 const { positional, flag, opt } = parseArgs(rest);
 
 const resolveLeagueArg = () => resolveLeague(loadLatest().leagues, positional);
-
-/** "2-5,8,10-12" -> [2,3,4,5,8,10,11,12], deduped and sorted. Used by yahoo:script --weeks. */
-function parseWeekSpec(spec) {
-  const out = new Set();
-  for (const part of String(spec).split(',').map((s) => s.trim()).filter(Boolean)) {
-    const range = part.match(/^(\d+)-(\d+)$/);
-    if (range) {
-      const [a, b] = [Number(range[1]), Number(range[2])];
-      for (let w = Math.min(a, b); w <= Math.max(a, b); w++) out.add(w);
-    } else if (/^\d+$/.test(part)) {
-      out.add(Number(part));
-    } else {
-      throw new Error(`Invalid week spec "${part}" in "${spec}" — expected a number or a range like 2-5.`);
-    }
-  }
-  return [...out].sort((a, b) => a - b);
-}
 
 function loadLatest() {
   const p = join(DATA, 'latest.json');
@@ -191,127 +169,20 @@ const commands = {
     }
   },
 
+  /** Everything FantasyPros: public pages, then the two API-only files when FP_API_KEY is set. */
   async 'fp:sync'() {
-    const positions = opt('positions')?.split(',') || fp.POSITIONS;
-    const scorings = opt('scoring')?.split(',') || null;
-    const args = { season: opt('season'), week: opt('week'), positions, scorings };
-    const source = opt('source') || 'hybrid';
-
-    if (source === 'api') return void (await fpSync(args));
-    if (source === 'scrape') return void (await fpScrapeSync(args));
-
-    // hybrid (default): scrape the bulk, spend a few API calls on the rest.
-    await fpScrapeSync(args);
-    if (!config.apiKey) {
-      console.log('\n(no FP_API_KEY — skipping players/external-ids and points-scored)');
-      return;
-    }
-    console.log();
-    try {
-      await apiSupplement(args);
-    } catch (err) {
-      if (!(err instanceof fp.ApiKeyRejectedError || err instanceof fp.MissingApiKeyError)) throw err;
-      console.log(`  ${err.message.split('\n')[0]}`);
-    }
-  },
-
-  async 'fp:scrape'() {
-    await fpScrapeSync({
-      season: opt('season'), week: opt('week'),
-      positions: opt('positions')?.split(',') || undefined,
-      scorings: opt('scoring')?.split(',') || null,
-      newsPages: Number(opt('news-pages') || 4),
-    });
-  },
-
-  async 'scrape:rankings'() {
-    const d = await fetchRankings({ position: opt('position') || 'RB', scoring: opt('scoring') || 'PPR', ros: flag('ros') });
-    console.log(`${d.position_id || opt('position')} ${d.scoring} ${d.ranking_type_name} week ${d.week} — ${d.players.length} players (${d.total_experts || '?'} experts)\n`);
-    console.log('  RK  PLAYER                     TM   OPP        PTS  GRADE  SPREAD');
-    for (const p of d.players.slice(0, Number(opt('limit') || 30))) {
-      console.log(
-        `  ${String(p.rank_ecr).padStart(3)} ${(p.player_name || '').slice(0, 25).padEnd(26)} ${(p.player_team_id || '').padEnd(4)} ` +
-        `${(p.player_opponent || '').padEnd(9)} ${String(p.r2p_pts ?? '-').padStart(5)}  ${(p.start_sit_grade || '-').padEnd(5)}  ${p.rank_min}-${p.rank_max}`,
-      );
-    }
-  },
-
-  async 'scrape:news'() {
-    const items = await fetchInjuryNews({ pages: Number(opt('pages') || 2), position: opt('position'), team: opt('team') });
-    console.log(`${items.length} items\n`);
-    for (const i of items.slice(0, Number(opt('limit') || 30))) {
-      console.log(`  ${(i.date || '').padEnd(26)} ${(i.position || '').padEnd(4)} ${(i.team || '').padEnd(4)} ${i.headline}`);
-    }
-  },
-
-  async 'fp:rankings'() {
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const ros = flag('ros');
-    const data = await fp.consensusRankings({
-      season, position: opt('position') || 'ALL', scoring: opt('scoring') || 'PPR',
-      week: ros ? undefined : week, type: ros ? 'ROS' : undefined,
-    });
-    console.log(`${data.position_id} ${data.scoring} ${ros ? 'ROS' : `week ${week}`} — ${data.players?.length ?? 0} players\n`);
-    for (const p of (data.players || []).slice(0, Number(opt('limit') || 40))) {
-      console.log(`  ${String(p.rank_ecr).padStart(4)}  ${(p.player_name || '').padEnd(26)} ${(p.player_team_id || '').padEnd(4)} ${(p.player_position_id || '').padEnd(4)} tier ${p.tier ?? '-'}`);
-    }
-  },
-
-  async 'fp:projections'() {
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const ros = flag('ros');
-    const pos = opt('position') || 'RB';
-    const data = await fp.projections({ season, position: pos, week: ros ? undefined : week, ros: ros || undefined });
-    console.log(`${pos} projections — ${ros ? 'rest of season' : `week ${week}`} — ${data.players?.length ?? 0} players\n`);
-    const key = { PPR: 'points_ppr', HALF: 'points_half', STD: 'points' }[(opt('scoring') || 'PPR').toUpperCase()];
-    const rows = (data.players || []).map((p) => ({ name: p.name, team: p.team_id, pts: (Array.isArray(p.stats) ? p.stats[0] : p.stats)?.[key] }))
-      .sort((a, b) => (b.pts ?? 0) - (a.pts ?? 0));
-    for (const r of rows.slice(0, Number(opt('limit') || 40))) {
-      console.log(`  ${String(r.pts ?? '-').padStart(7)}  ${(r.name || '').padEnd(26)} ${r.team || ''}`);
-    }
-  },
-
-  async 'fp:injuries'() {
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const data = await fp.injuries({ year: season, week });
-    const rows = data.injuries || data.players || [];
-    console.log(`injuries — season ${season} week ${week} — ${rows.length}\n`);
-    for (const i of rows.slice(0, Number(opt('limit') || 60))) {
-      console.log(`  ${(i.status || i.injury_type || '?').padEnd(14)} ${(i.name || '').padEnd(26)} ${i.injury_type || ''} ${i.injury_update_date || ''}`);
-    }
-  },
-
-  async 'fp:news'() {
-    const data = await fp.news({ limit: Number(opt('limit') || 25), category: opt('category') });
-    const rows = data.news || data.items || [];
-    console.log(`news — ${rows.length} items\n`);
-    for (const n of rows) console.log(`  ${(n.created || n.updated || '').slice(0, 16)}  ${n.title || n.headline || ''}`);
+    await fpSync({ season: opt('season'), week: opt('week'), scorings: opt('scoring')?.split(',') || null });
   },
 
   async enrich() {
-    const { season } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const idMap = await loadIdMap({ season });
-    const m = enrich({ season: opt('season') ?? config.season, week: opt('week') ?? config.week, bookmaker: opt('bookmaker') || 'Average', idMap });
-    const all = m.leagues.flatMap((l) => l.teams.flatMap((t) => t.players));
-    const withProj = all.filter((p) => p.fp?.weekPoints != null).length;
-    const withRank = all.filter((p) => p.fp?.weekRank != null).length;
-    const hurt = all.filter((p) => p.fp?.injury?.status).length;
-    const withVegas = all.filter((p) => p.fp?.vegas?.points != null).length;
-    const withThumb = all.filter((p) => p.fp?.thumb).length;
-    console.log(`Enriched ${all.length} roster slots for season ${m.enrichedSeason} week ${m.enrichedWeek}`);
-    if (!m.fpDataPresent) console.log('  (no data/fp/ yet — run `fp:sync` once the API key is active)');
-    console.log(`  week projections: ${withProj}`);
-    console.log(`  week ranks:       ${withRank}`);
-    console.log(`  injury flags:     ${hurt}`);
-    console.log(`  vegas projections:${String(withVegas).padStart(5)} (${m.bookmaker})`);
-    console.log(`  headshots:        ${withThumb}`);
-    console.log(`  -> data/enriched.json`);
+    await runEnrich({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
+    console.log('  -> data/enriched.json');
   },
 
   async lineup() {
     const { season } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
     const idMap = await loadIdMap({ season });
-    const m = enrich({ season: opt('season') ?? config.season, week: opt('week') ?? config.week, bookmaker: opt('bookmaker') || 'Average', idMap });
+    const m = enrich({ season: opt('season') ?? config.season, week: opt('week') ?? config.week, idMap });
     const q = (positional[0] || '').toLowerCase();
     const leagues = q ? m.leagues.filter((l) => l.nickname?.toLowerCase().includes(q)) : m.leagues;
     if (!leagues.length) throw new Error(`No league matched "${positional[0]}"`);
@@ -324,34 +195,19 @@ const commands = {
       }
       shown++;
       console.log(`\n=== ${l.nickname} (${l.host}, ${l.scoring}) — ${mine.name}, week ${m.enrichedWeek} ===`);
-      console.log('  POS  PLAYER                      TM    FP WK   VEGAS    DIFF   ROS PTS   WK RK  STATUS');
+      console.log('  POS  PLAYER                      TM    FP WK   DS WK   ROS PTS   WK RK  STATUS');
       const rows = [...mine.players].sort((a, b) => (b.fp?.weekPoints ?? -1) - (a.fp?.weekPoints ?? -1));
       for (const p of rows) {
         const f = p.fp || {};
-        const d = f.vegasVsFp;
         console.log(
           `  ${String(p.position || '--').padEnd(4)} ${(p.name || '').slice(0, 26).padEnd(27)} ${(p.team || '').padEnd(4)} ` +
-          `${String(f.weekPoints ?? '-').padStart(6)} ${String(f.vegas?.points ?? '-').padStart(7)} ` +
-          `${(d == null ? '-' : (d > 0 ? '+' : '') + d).padStart(7)} ${String(f.rosPoints ?? '-').padStart(9)} ` +
-          `${String(f.weekRank ?? '-').padStart(6)}  ${f.injury?.status || f.vegas?.injuryStatus || ''}`,
+          `${String(f.weekPoints ?? '-').padStart(6)} ${String(f.draftsharks?.week ?? '-').padStart(7)} ` +
+          `${String(f.rosPoints ?? '-').padStart(9)} ` +
+          `${String(f.weekRank ?? '-').padStart(6)}  ${f.injury?.status || ''}`,
         );
       }
     }
     if (shown && !m.fpDataPresent) console.log('\n  (projections/ranks blank — run `fp:sync` once the API key is active)');
-  },
-
-  // ------------------------------------------------------------- VegasEdge
-
-  async 'wwo:sync'() {
-    await wwoSync({ season: opt('season'), week: opt('week') });
-  },
-
-  async 'fd:sync'() {
-    await fdSync({ season: opt('season'), week: opt('week') });
-  },
-
-  async 'fanduel:sync'() {
-    await fanduelSync({ season: opt('season'), week: opt('week') });
   },
 
   // ------------------------------------------------------------ league edits
@@ -572,29 +428,8 @@ const commands = {
    * unconditional escape hatch; this is the one to run repeatedly.
    */
   async sync() {
-    const run = () => runPipeline({
-      scrape: async () => { await commands.scrape(); },
-      fp: async ({ season, week }) => { await fpScrapeSync({ season, week }); },
-      sleeperProj: async ({ season, week }) => { await projSyncAuto({ season, week }); },
-      draftsharks: async ({ season, week }) => { await dsSyncAuto({ season, week }); },
-      schedule: async ({ season, week }) => { await scheduleSync({ season, week }); },
-      audit: async ({ season, week }) => { formatAudit(await auditSources({ season, week })); },
-      vegas: async ({ season, week }) => { await vegas.vegasSync({ season, week, bookmakers: opt('bookmaker')?.split(',') || ['Average'] }); },
-      vegasDist: async ({ season, week }) => { await vegas.vegasDistSync({ season, week, scoring: opt('scoring') || 'PPR' }); },
-      wwo: async ({ season, week }) => { await wwoSync({ season, week }); },
-      firstdown: async ({ season, week }) => { await fdSync({ season, week }); },
-      fanduel: async ({ season, week }) => { await fanduelSync({ season, week }); },
-      trade: async ({ season, week }) => { await tradeSync({ season, week, scorings: opt('scoring')?.split(',') || null }); },
-      buzz: async ({ season, week }) => { await buzzSync({ season, week, days: opt('days') || 2 }); },
-      trend: async ({ season, week }) => { await trendSync({ season, week }); },
-      leaguedetail: async ({ season, week }) => {
-        const leagues = applyFilters(await resolveLeagues(), { all: flag('all') });
-        await syncLeagueDetail({ season, week, leagues });
-      },
-      matchups: async ({ season, week }) => { await matchupsSync({ season, week, leagues: loadLatest().leagues }); },
-      enrich: async () => { await commands.enrich(); },
-      dashboard: async () => { await commands.dashboard(); },
-    }, {
+    const mods = await pipelineMods({ all: flag('all'), scorings: opt('scoring')?.split(',') || null, days: opt('days') || 2 });
+    const run = () => runPipeline(mods, {
       force: flag('force'),
       only: opt('only'),
       skip: opt('skip'),
@@ -629,130 +464,30 @@ const commands = {
   /** How old every source is, and whether the site itself has moved. */
   async status() {
     printStatus();
-    // What each source's numbers for THIS week are as of, and whether the
-    // dashboard's consensus will still use them.
+    // What each source's numbers for THIS week are as of.
     const { season: yr, week: wk } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
     const asOf = sourceAsOf({
-      freshness: freshnessReport(), projectionAges: weekReport(yr),
-      dsAges: dsWeekReport(yr, opt('scoring') || 'PPR'), yahooAges: yahooWeekReport(yr), week: wk,
+      freshness: freshnessReport(), dsAges: dsWeekReport(yr, opt('scoring') || 'PPR'), week: wk,
     });
-    console.log(`\n  Week ${wk} numbers, as of — a source older than ${DEFAULT_STALE_HOURS}h is left out of the consensus`);
-    for (const src of CONS_SRC) {
-      const at = asOf[src.k]?.asOf;
-      const hours = at ? (Date.now() - new Date(at).getTime()) / 3600000 : null;
-      console.log(`    ${src.k.padEnd(4)} ${String(hours == null ? 'unknown' : since(at)).padStart(8)}  ${hours != null && hours > DEFAULT_STALE_HOURS ? 'LEFT OUT (stale)' : 'in'}`);
-    }
-    if (flag('weeks')) {
-      const { season } = resolveWeek({ season: opt('season') ?? config.season });
-      console.log('');
-      printProjectionAges(season, weekReport(season));
-      const dsRows = dsWeekReport(season, opt('scoring') || 'PPR');
-      if (dsRows.length) {
-        console.log('');
-        printProjectionAges(season, dsRows, console.log, 'Draft Sharks');
-      }
+    console.log(`\n  Week ${wk} numbers, as of:`);
+    for (const k of ['fp', 'ds']) {
+      const at = asOf[k]?.asOf;
+      console.log(`    ${k.padEnd(4)} ${at ? since(at) : 'unknown'}`);
     }
   },
 
-  // ------------------------------------------- Sleeper weekly projections
+  // ------------------------------------------------------- Draft Sharks
 
-  /**
-   * Sleeper's projections for every week of the season, per player.
-   *
-   * Default behaviour matches the pipeline: the live week always, the rest of
-   * the season only when it is missing or the nightly batch has run since.
-   * `--full` forces all eighteen weeks, `--week N` just one.
-   */
-  async 'sleeper:proj'() {
-    const args = { season: opt('season'), week: opt('week') };
-    if (flag('full')) return void (await projSync({ ...args, force: flag('force') }));
-    if (opt('week')) return void (await projSync({ ...args, weeks: [Number(opt('week'))], force: flag('force') }));
-    await projSyncAuto(args);
-  },
-
-  /**
-   * Yahoo Fantasy's per-week projections for this league (own scoring
-   * settings apply — see src/yahooproj.js). Same shape as sleeper:proj:
-   * `--full` forces all eighteen weeks, `--week N` just one, default is the
-   * live-week-always / rest-of-season-when-stale pipeline behaviour.
-   */
-  async 'yahoo:sync'() {
-    const args = { season: opt('season'), week: opt('week') };
-    if (flag('full')) return void (await yahooProjSync({ ...args, weeks: null }));
-    if (opt('week')) return void (await yahooProjSync({ ...args, weeks: [Number(opt('week'))] }));
-    await yahooProjSyncAuto(args);
-  },
-
-  /** Per-week player counts for the stored Yahoo projection set. */
-  async 'yahoo:ages'() {
-    const { season } = resolveWeek({ season: opt('season') ?? config.season });
-    for (const w of yahooWeekReport(season)) {
-      console.log(`  wk${String(w.week).padStart(2)}  ${String(w.players).padStart(4)} players  fetched ${w.fetchedAt}`);
-    }
-  },
-
-  /**
-   * Prints the browser-console fallback for when yahoo:sync gets blocked
-   * (HTTP 999) — see the "WHEN THE SERVER-SIDE FETCH GETS BLOCKED" section
-   * in src/yahooproj.js. Paste it into DevTools console on the logged-in
-   * football.fantasysports.yahoo.com players page; it copies a JSON payload
-   * (one or many weeks) to the clipboard for `yahoo:ingest` to pick up.
-   *
-   * `--week N` for one week (default: the live week), `--week-range 2-5` or
-   * `--week-range 2,3,7` for several in one paste, `--full` for the whole
-   * season — though see the caution in browserScript's doc comment about
-   * running that many requests in one sitting. (`--weeks` is already a
-   * boolean flag elsewhere in this CLI — deliberately not reused here.)
-   */
-  async 'yahoo:script'() {
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const weeks = flag('full')
-      ? Array.from({ length: LAST_WEEK }, (_, i) => i + 1)
-      : (opt('week-range') ? parseWeekSpec(opt('week-range')) : [opt('week') ? Number(opt('week')) : Math.max(1, week)]);
-    const script = yahooBrowserScript({ season, weeks });
-    if (process.platform === 'darwin') {
-      try {
-        const { execSync } = await import('node:child_process');
-        execSync('pbcopy', { input: script });
-        console.log(`Copied to clipboard — paste into DevTools console on the Yahoo players page (season ${season}, weeks [${weeks.join(', ')}]).`);
-      } catch {
-        console.log(script);
-      }
-    } else {
-      console.log(script);
-    }
-  },
-
-  /**
-   * Reads whatever yahoo:script's browser snippet put on the clipboard (or,
-   * failing that, a downloaded file) and merges every week it covers into
-   * data/yahoo/<season>/projections.json — same shape yahoo:sync writes.
-   * `--file` points at a specific file instead of the clipboard/default.
-   */
-  async 'yahoo:ingest'() {
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    await yahooIngestWeeks({ season, week: opt('week') ? Number(opt('week')) : week, file: opt('file') || null });
-  },
-
+  /** Current week + ROS. */
   async 'ds:sync'() {
-    const args = { season: opt('season'), week: opt('week'), scoring: opt('scoring') };
-    if (flag('full')) return void (await dsSync({ ...args, weeks: null }));
-    if (opt('week')) return void (await dsSync({ ...args, weeks: [Number(opt('week'))] }));
-    await dsSyncAuto(args);
+    await dsSync({ season: opt('season'), week: opt('week'), scorings: opt('scoring')?.split(',') || null });
   },
 
   async 'schedule:sync'() {
     const args = { season: opt('season'), week: opt('week') };
     if (opt('week')) return void (await scheduleSync({ ...args, weeks: [Number(opt('week'))] }));
-    // The schedule barely moves in-season, and ESPN's response is flaky enough
-    // that re-pulling it on every `all` only multiplies the chances of a run of
-    // empty replies. Fresh is fresh: skip unless --force.
-    const d = check('schedule', { force: flag('force') });
-    if (d.skip) {
-      console.log(`  fresh schedule — ${d.reason}`);
-      return;
-    }
-    await scheduleSync(args);
+    // Only weeks not yet stored are fetched; --force re-pulls all of them.
+    await scheduleSync({ ...args, full: flag('force') });
   },
 
   /**
@@ -779,109 +514,12 @@ const commands = {
     console.log(`  imported ${folded.length} week(s) — ${Object.keys(store.teams).length} teams -> ${scheduleFilePath(yr)}`);
   },
 
-  /** Per-week recompute times for the stored projection set. */
-  async 'proj:ages'() {
-    const { season } = resolveWeek({ season: opt('season') ?? config.season });
-    printProjectionAges(season, weekReport(season));
-  },
-
-  /**
-   * One player's week-by-week curve, and every rest-of-season total on him
-   * spread across it.
-   *
-   * This is the view the whole weekly-shape machinery exists for: three of the
-   * five projection sources publish a season total and nothing weekly, and
-   * this is where those totals become a number you can put in a lineup.
-   */
-  async proj() {
-    const q = positional.join(' ').toLowerCase();
-    if (!q) throw new Error('Usage: proj <player name> [--scoring PPR] [--from N]');
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const store = readProjections(season);
-    if (!store) throw new Error(`No Sleeper projections for ${season} — run \`sleeper:proj\` first.`);
-
-    const model = existsSync(join(DATA, 'enriched.json'))
-      ? JSON.parse(readFileSync(join(DATA, 'enriched.json'), 'utf8'))
-      : null;
-    const rostered = model
-      ? model.leagues.flatMap((l) => l.teams.flatMap((t) => t.players.map((p) => ({ p, league: l, team: t }))))
-      : [];
-    const hit = rostered.find(({ p }) => (p.name || '').toLowerCase().includes(q));
-
-    // Fall back to the projection set itself, so an unrostered free agent works.
-    let sleeperId = hit?.p?.fp?.sleeperId ?? null;
-    let label = hit?.p?.name ?? null;
-    if (!sleeperId) {
-      const entryId = Object.entries(store.players).find(([, v]) => (v.n || '').toLowerCase().includes(q));
-      if (!entryId) throw new Error(`No player matched "${q}".`);
-      [sleeperId] = entryId;
-      label = entryId[1].n;
-    }
-
-    const scoring = (opt('scoring') || hit?.league?.scoring || 'PPR').toUpperCase();
-    const from = Number(opt('from') || week) || 1;
-    const teamAbbr = normTeam(hit?.p?.team || store.players[sleeperId]?.t);
-    const nfl = readSchedule(season);
-    const bye = byeWeek(nfl, teamAbbr);
-    const byeWeeks = bye != null ? [bye] : [];
-    const weeks = playerWeeks(store, sleeperId);
-    const sleeperShape = shapeFor(weeks, { fromWeek: from, scoring, byeWeeks: byeWeeks.length ? byeWeeks : null });
-
-    const dsStore = readDraftSharks(season, scoring);
-    const dsRec = playerByKey(dsStore, label, store.players[sleeperId]?.p)
-      || playerByKey(dsStore, label, hit?.p?.position)
-      || playerByKey(dsStore, label, normPos(store.players[sleeperId]?.p));
-    const dsPoints = {};
-    for (const [w, c] of Object.entries(dsRec?.w || {})) {
-      if (c?.proj != null) dsPoints[w] = c.proj;
-    }
-    const dsShape = shapeFromPoints(dsPoints, { fromWeek: from, byeWeeks, source: 'draftsharks' });
-    const shape = preferredShape(dsShape, sleeperShape);
-    if (!shape) throw new Error(`${label} has no weekly projections for weeks ${from}–${LAST_WEEK}.`);
-
-    const f = hit?.p?.fp || {};
-    const totals = { fp: f.rosPoints, wwo: f.wwo?.rosDerived, fd: f.fd?.rosDerived, fanduel: f.fanduel?.rosDerived };
-    const named = Object.entries(totals).filter(([, v]) => v != null);
-    const scKey = scoring === 'HALF' ? 'half' : (scoring === 'STD' ? 'std' : 'ppr');
-
-    console.log(`\n${label}  (${store.players[sleeperId]?.p || '?'} ${teamAbbr || ''}, sleeper ${sleeperId})`);
-    if (hit) console.log(`  ${hit.league.nickname} · ${hit.team.name}${hit.team.isMine ? '  <-- you' : ''}`);
-    console.log(`  ${scoring} scoring, weeks ${from}–${shape.throughWeek}, ${shape.played} games${shape.byes.length ? ` (bye wk ${shape.byes.join(', ')})` : ''}`);
-    console.log(`  curve: ${shape.source}${shape.source === 'draftsharks' ? ' (moves with news)' : ' (Sleeper fallback)'}`);
-    if (sleeperShape) console.log(`  Sleeper remaining total: ${sleeperShape.total}`);
-    if (dsShape) console.log(`  Draft Sharks remaining total (sum of weeklies): ${dsShape.total}`);
-    console.log('  Rest-of-season totals from every source that publishes one:');
-    if (!named.length) console.log('    (none — run `enrich` for a rostered player to see these)');
-    for (const [k, v] of named) console.log(`    ${k.padEnd(9)} ${String(v).padStart(7)}`);
-
-    console.log('\n  WK  OPP    SLEEPER  DRAFTSH   SHARE' + named.map(([k]) => `  ${k.toUpperCase().padStart(7)}`).join('') + '   BLENDED');
-    for (let w = from; w <= shape.throughWeek; w++) {
-      const cell = weeks?.[w] || weeks?.[String(w)];
-      const sched = teamWeek(nfl, teamAbbr, w);
-      const dsCell = dsRec?.w?.[w] || dsRec?.w?.[String(w)];
-      const slPts = cell?.[scKey];
-      const dsPts = dsCell?.proj;
-      const byeThis = sched?.bye === true || bye === w;
-      const opp = byeThis ? 'BYE' : (sched?.home ? sched.opp : (sched?.opp ? `@${sched.opp}` : (cell?.opp || dsCell?.opp || '—')));
-      const est = perWeekEstimates(totals, shape, w);
-      const share = shape.share[w] ?? shape.share[String(w)] ?? 0;
-      console.log(
-        `  ${String(w).padStart(2)}  ${String(opp).padEnd(5)} ${String(slPts ?? '—').padStart(8)} ${String(dsPts ?? '—').padStart(8)}` +
-        `  ${(share * 100).toFixed(1).padStart(5)}%` +
-        named.map(([k]) => `  ${String(est?.sources?.[k] ?? '—').padStart(7)}`).join('') +
-        `   ${String(est?.blended ?? '—').padStart(7)}`,
-      );
-    }
-    console.log('\n  SLEEPER / DRAFTSH are the numbers those sites published for that week.');
-    console.log('  SHARE is this week\'s slice of the preferred remaining curve (Draft Sharks when');
-    console.log('  it has enough weeks, Sleeper otherwise). Other columns are that source\'s OWN');
-    console.log('  season total on that calendar — a redistribution, not a projection.');
-    if (f.weekPoints != null) console.log(`\n  For comparison, FantasyPros' published week-${week} projection: ${f.weekPoints}`);
-    if (f.draftsharks?.week != null) console.log(`  Draft Sharks' published week-${week} projection: ${f.draftsharks.week}`);
-    if (f.sleeper?.week != null) console.log(`  Sleeper's published week-${week} projection: ${f.sleeper.week}`);
-  },
-
   // ------------------------------------------------------- demand signals
+
+  /** Fantasy points for every player, each week — not limited to matchup lineups. */
+  async 'actuals:sync'() {
+    await syncActuals({ season: opt('season'), week: opt('week') });
+  },
 
   /** Every matchup in every league, live — and the season points ledger. */
   async 'matchups:sync'() {
@@ -911,9 +549,81 @@ const commands = {
     console.log(`\n  weeks stored: ${storedWeeks(season).join(', ') || 'none'}`);
   },
 
+  /**
+   * Fill in every past week's Sleeper league detail — the source that isn't
+   * limited to the current week, unlike `matchups:sync`. Run once and every
+   * finished week gets real standings-quality scores instead of whatever
+   * `matchups:sync` happened to catch before it rolled over.
+   */
+  async 'leaguedetail:backfill'() {
+    const { season, week } = resolveWeek({ season: opt('season'), week: opt('week') });
+    const leagues = applyFilters(await resolveLeagues(), { all: flag('all') });
+    await backfillLeagueDetail({ season, throughWeek: week, leagues, force: flag('force') });
+  },
+
+  /**
+   * DevTools snippet for ESPN / Yahoo / Dynasty Daddy. MyPlaybook cannot
+   * answer for a week that has rolled over; this runs as same-origin JS in
+   * the logged-in tab and copies JSON for `scores:ingest`.
+   */
+  async 'scores:script'() {
+    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
+    const opts = { season, throughWeek: week, leagues: loadLatest().leagues };
+    const href = bookmarklet(opts);
+    try {
+      execFileSync('pbcopy', { input: href });
+      console.log('Bookmarklet copied. Bookmarks → New bookmark → paste into the URL field.');
+      console.log('Click it on a logged-in ESPN or Yahoo league page. If `npm run serve` is up it posts automatically; otherwise paste on Sync or run `node src/cli.js scores:ingest`.');
+    } catch {
+      console.log(href);
+    }
+    if (flag('console')) console.log('\n' + captureScript(opts));
+  },
+
+  /**
+   * Fold a captured dump into data/scores/. Clipboard first, then --file.
+   * Does not touch the current week (`matchups:sync` owns the live board).
+   */
+  async 'scores:ingest'() {
+    const file = opt('file') || positional[0];
+    let raw = '';
+    if (file) {
+      if (!existsSync(file)) throw new Error(`cannot read ${file}`);
+      raw = readFileSync(file, 'utf8');
+    } else {
+      raw = readClipboard();
+    }
+    if (!raw.trim()) {
+      throw new Error('Usage: scores:ingest [--file path] — paste scores:script output on the clipboard, or pass a JSON dump');
+    }
+    let dump;
+    try { dump = JSON.parse(raw); } catch (err) {
+      throw new Error(`not valid JSON: ${err.message}`);
+    }
+    const { season, week } = resolveWeek({ season: opt('season') ?? dump?.season ?? dump?.meta?.season, week: opt('week') ?? config.week });
+    ingestScores({
+      dump,
+      leagues: loadLatest().leagues,
+      season,
+      currentWeek: week,
+      force: flag('force'),
+      includeSchedule: flag('schedule'),
+    });
+  },
+
   /** FantasyPros' trade market values (+ ten-day series) -> data/fp/<season>/trade/. */
   async 'trade:sync'() {
     await tradeSync({ season: opt('season'), week: opt('week'), scorings: opt('scoring')?.split(',') || null });
+  },
+
+  /** Dynasty Daddy's player rows: ids, ADP and three sites' ROS ranks, in one request. */
+  async 'dd:players'() {
+    await ddPlayersSync({ season: opt('season'), week: opt('week') });
+  },
+
+  /** Dynasty Daddy's copy of each Sleeper / ESPN league: the full schedule and potential points. */
+  async 'dd:league'() {
+    await ddLeagueSync({ season: opt('season'), week: opt('week'), leagues: loadLatest().leagues });
   },
 
   async 'buzz:sync'() {
@@ -982,16 +692,18 @@ const commands = {
     if (g.note) console.log(`  note          ${g.note}`);
   },
 
-  async 'vegas:check'() {
-    const info = vegas.tokenInfo();
-    if (!info) return void console.log('VEGAS_TOKEN not set or unparseable.');
-    console.log(`account:  ${info.email}`);
-    console.log(`expires:  ${info.expiresAt.toISOString()} (${info.expired ? 'EXPIRED' : 'valid'})`);
-    try {
-      const r = await vegas.checkToken();
-      console.log(`request:  OK — QB board returned ${r.sample} players`);
-    } catch (err) {
-      console.log(`request:  ${err.message.split('\n')[0]}`);
+  /** The permanent run log — the same lines the dashboard's Log page shows. */
+  async log() {
+    const all = runlogTail({ limit: 3000 });
+    if (!all.length) return void console.log('Nothing logged yet — every sync writes to data/runlog.jsonl.');
+    const rows = all
+      .filter((r) => !flag('errors') || r.level === 'error' || r.level === 'warn')
+      .filter((r) => !opt('src') || r.src === opt('src'))
+      .slice(-Number(opt('limit') || 60));
+    if (!rows.length) return void console.log(`No matching line among the last ${all.length}.`);
+    for (const r of rows) {
+      const t = new Date(r.t).toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      console.log(`${t}  ${r.src.padEnd(12)} ${r.msg}`);
     }
   },
 
@@ -1001,64 +713,6 @@ const commands = {
     const a = await auditSources({ season, week, scoring: String(opt('scoring') || 'PPR').toUpperCase() });
     formatAudit(a);
     if (!a.ok) process.exitCode = 1;
-  },
-
-  async 'vegas:sync'() {
-    const books = opt('bookmaker')?.split(',') || ['Average'];
-    await vegas.vegasSync({ season: opt('season'), week: opt('week'), bookmakers: books });
-  },
-
-  async 'vegas:dist'() {
-    await vegas.vegasDistSync({
-      season: opt('season'), week: opt('week'),
-      scoring: opt('scoring') || 'PPR', bookmaker: opt('bookmaker') || 'Average', limit: opt('limit'),
-    });
-  },
-
-  async 'vegas:rankings'() {
-    const rows = await vegas.fetchBoard({ board: opt('position')?.toLowerCase() || 'flex', bookmaker: opt('bookmaker') || 'Average' });
-    rows.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
-    console.log(`${rows.length} players — ${opt('bookmaker') || 'Average'}\n`);
-    console.log('   PTS  PLAYER                     POS TM    RUYD   REYD   REC  TD%   VOLATILITY');
-    for (const p of rows.slice(0, Number(opt('limit') || 30))) {
-      console.log(
-        `  ${String(p.points ?? '-').padStart(5)}  ${(p.name || '').slice(0, 25).padEnd(26)} ${(p.position || '').padEnd(3)} ${(p.team || '').padEnd(4)} ` +
-        `${String(Math.round(p.rushingYds ?? 0)).padStart(5)} ${String(Math.round(p.receivingYds ?? 0)).padStart(6)} ` +
-        `${String((p.receptions ?? 0).toFixed(1)).padStart(5)} ${String(((p.tdProb ?? 0) * 100).toFixed(0) + '%').padStart(5)}  ${p.volatility || ''}`,
-      );
-    }
-  },
-
-  /** Side-by-side Vegas vs FantasyPros for the whole board. */
-  async compare() {
-    const { season, week } = resolveWeek({ season: opt('season') ?? config.season, week: opt('week') ?? config.week });
-    const idMap = await loadIdMap({ season });
-    const m = enrich({ season, week, bookmaker: opt('bookmaker') || 'Average', idMap });
-    const partial = flag('include-partial');
-    const rows = m.leagues.flatMap((l) => l.teams.flatMap((t) => t.players))
-      .filter((p) => p.fp?.vegas?.points != null && p.fp?.weekPoints != null)
-      .filter((p) => partial || p.fp.vegas.complete);
-    const seen = new Map();
-    for (const p of rows) if (!seen.has(p.fpId)) seen.set(p.fpId, p);
-    let list = [...seen.values()];
-    const pos = opt('position');
-    if (pos) list = list.filter((p) => String(p.position).toUpperCase() === pos.toUpperCase());
-    const sortKey = flag('by-diff') ? ((p) => Math.abs(p.fp.vegasVsFp ?? 0)) : ((p) => p.fp.vegas.points ?? 0);
-    list.sort((a, b) => sortKey(b) - sortKey(a));
-    console.log(`Vegas (${m.bookmaker}) vs FantasyPros — week ${m.enrichedWeek}, ${list.length} rostered players`);
-    console.log(partial
-      ? '  including partially-priced players (points may be TD-probability only)\n'
-      : '  fully-priced players only; --include-partial to show the rest\n');
-    console.log('  PLAYER                     POS TM    VEGAS    FP    DIFF  FP RK  VOLATILITY');
-    for (const p of list.slice(0, Number(opt('limit') || 40))) {
-      const d = p.fp.vegasVsFp;
-      const flagStr = p.fp.vegas.complete ? '' : ` partial(${p.fp.vegas.missingProps.length})`;
-      console.log(
-        `  ${(p.name || '').slice(0, 25).padEnd(26)} ${(p.position || '').padEnd(3)} ${(p.team || '').padEnd(4)} ` +
-        `${String(p.fp.vegas.points).padStart(6)} ${String(p.fp.weekPoints).padStart(6)} ` +
-        `${(d == null ? '-' : (d > 0 ? '+' : '') + d).padStart(7)} ${String(p.fp.weekRank ?? '-').padStart(6)}  ${p.fp.vegas.volatility || ''}${flagStr}`,
-      );
-    }
   },
 
   async dashboard() {
@@ -1081,7 +735,7 @@ const commands = {
   },
 
   async export() {
-    // Prefer the enriched model so the CSVs carry projections/vegas/ids too.
+    // Prefer the enriched model so the CSVs carry projections/ids too.
     const enrichedPath = join(DATA, 'enriched.json');
     const model = existsSync(enrichedPath) ? JSON.parse(readFileSync(enrichedPath, 'utf8')) : loadLatest();
     if (!existsSync(enrichedPath)) console.log('(no data/enriched.json — run `enrich` first for projection columns)');
@@ -1113,54 +767,20 @@ const commands = {
   export                      write leagues/rosters/transactions CSVs
   endpoints                   show the discovered API surface
 
- FantasyPros public API v2 (needs FP_API_KEY):
-  fp:check                    validate the API key, show resolved season/week
-  fp:sync                     pull players/news/injuries + week & ROS rankings
-                              and projections + points -> data/fp/
-       [--week N] [--season Y] [--positions QB,RB] [--scoring PPR,HALF]
-  fp:rankings  [--position RB] [--scoring PPR] [--week N] [--ros]
-  fp:projections [--position RB] [--scoring PPR] [--week N] [--ros]
-  fp:injuries  [--week N]
-  fp:news      [--limit N] [--category injury|recap|transaction|rumor|breaking]
-       fp:sync --source hybrid|scrape|api   (default hybrid: scrape the bulk,
-       spend ~3 API calls on players/external-ids + points scored)
-
- Public-page scraping (NO API key needed):
-  fp:scrape                   same dataset from public pages -> data/fp/
-       [--week N] [--scoring PPR,HALF] [--positions QB,RB] [--news-pages N]
-  scrape:rankings [--position RB] [--scoring PPR] [--ros] [--limit N]
-  scrape:news     [--pages N] [--position RB] [--team SF]
-
- VegasEdgeFantasy (needs VEGAS_TOKEN):
-  vegas:check                 validate the session cookie, show expiry
-  vegas:sync [--bookmaker A,B] pull QB/RB/WR/TE boards -> data/vegas/
-  vegas:dist [--scoring PPR]  per-player floor/ceiling/boom/bust distributions
-  vegas:rankings [--position flex|qb|rb|wr|te] [--bookmaker X] [--limit N]
+ Projections + rankings — current week and rest of season, nothing else:
+  fp:sync                     FantasyPros: week + ROS rankings, week projections,
+                              news, injuries from the public pages; then players/
+                              external ids + points scored from the API when
+                              FP_API_KEY is set  -> data/fp/
+       [--week N] [--season Y] [--scoring PPR,HALF]
+  fp:check                    validate FP_API_KEY, show resolved season/week
+  ds:sync                     Draft Sharks: week + ROS -> data/draftsharks/
+  sync --only projections     both of the above, then the joins
 
  Verification:
   audit [--week N] [--scoring PPR|HALF|STD]
                               check every stored source's scale (vs FantasyPros),
                               week label and age; exit 1 if any fails
-
- WinWithOdds (no auth):
-  wwo:sync                    weekly proj/floor/ceiling/actuals + season-long
-
- First Down Studio (no auth):
-  fd:sync                     weekly + season projections, joined by Sleeper id
-
- FanDuel Research / numberFire (no auth):
-  fanduel:sync                weekly standard + PPR + rest-of-season
-
- Yahoo Fantasy weekly projections (needs YAHOO_COOKIE — the whole Cookie:
- header from a logged-in football.fantasysports.yahoo.com request):
-  yahoo:sync [--week N | --full]      server-side fetch -> data/yahoo/
-  yahoo:ages                          per-week player counts stored
-       Can get blocked (HTTP 999, Yahoo's bot-mitigation) — if so, use:
-  yahoo:script [--week N | --week-range 2-5 | --full]
-                              prints/copies a DevTools console snippet;
-                              paste it on the logged-in players page
-  yahoo:ingest [--file path]  merges what yahoo:script captured (clipboard
-                              first, then a file) — then run enrich+dashboard
 
 LEAGUE EDITS — your corrections, in data/league-overrides.json
   league [name]               show a league's overrides + team ids
@@ -1178,8 +798,8 @@ LEAGUE EDITS — your corrections, in data/league-overrides.json
 PIPELINE
   sync                        every source, skipping whatever is still fresh
   sync --force                ignore freshness, fetch everything
-  sync --only buzz,trend      run just these steps
-  sync --skip vegas-dist      run everything but these
+  sync --only fp,draftsharks  run just these steps (or a preset: ${Object.keys(PRESETS).join(', ')})
+  sync --skip draftsharks     run everything but these
   sync --max-age 30           override the per-source staleness limit (minutes)
   sync --dry-run              show what would run, fetch nothing
   sync --watch N              keep going, a pass every N minutes. Each pass
@@ -1187,36 +807,42 @@ PIPELINE
                               how often we CHECK, not how often we fetch
   status                      per-source age, the site's own update time, and
                               whether the site moved between our last two pulls
-  status --weeks              + per-week recompute times for Sleeper projections
+  log [--limit N] [--errors] [--src fp]
+                              the permanent run log (data/runlog.jsonl) — every
+                              line every sync printed, CLI or dashboard
 
-WEEK-BY-WEEK PROJECTIONS — two independent per-week sources, plus the NFL schedule
-  sleeper:proj                live week always; rest of season when it is stale
-       [--full]               force all 18 weeks
-       [--week N]             that week only
-  ds:sync                     Draft Sharks weekly rankings (HTMX load-table)
-       [--full]               all 18 weeks + ROS
-       [--week N]             that week + ROS
-  schedule:sync               NFL opponents + byes from ESPN, weeks 1–18
+SCHEDULE
+  schedule:sync [--force]     NFL opponents + byes from ESPN: weeks not yet stored (--force: all 1–18)
   schedule:import <file.json>  manual fallback for weeks ESPN answers empty —
                                fold a games-per-week JSON into the schedule
-  proj <player> [--scoring PPR] [--from N]
-                              a player's week-by-week curve, and every source's
-                              rest-of-season total spread across it
-  proj:ages                   when Sleeper last recomputed each week
 
 LEAGUE-WIDE SCORES — works on ESPN and Yahoo, not just Sleeper
   matchups:sync               every matchup in every league -> data/scores/
   matchups [league]           this week's board, printed
+  leaguedetail:backfill       Sleeper leagues only — fill in every past week's
+                               real scores (Sleeper answers for any week;
+                               matchups:sync only ever gets the current one)
+  scores:script               bookmarklet that copies ESPN/Yahoo past weeks
+                               (click it on the logged-in league page). --console
+                               also prints the DevTools snippet
+  scores:ingest [--file path] fold that capture into data/scores/ (clipboard
+                               if no file). Or paste on the Sync page. Skips
+                               the current week. --schedule keeps future pairings
+  actuals:sync                every player's fantasy points, each week, from
+                               Sleeper stats -> data/actuals/ (PPR, half, standard).
+                               Used wherever a matchup lineup has no score.
 
 DEMAND SIGNALS — who the rest of fantasy football is adding, right now
   trade:sync [--scoring PPR,HALF,STD]        FantasyPros trade market values -> data/fp/<season>/trade/
+  dd:players                                 Dynasty Daddy player data: ids, ADP, ESPN/FanDuel/FantasyGuys
+                                             ROS ranks -> data/dynastydaddy/<season>/players.json
+  dd:league                                  Dynasty Daddy's Sleeper/ESPN league load: full
+                                             schedule + potential points -> data/dynastydaddy/<season>/leagues/
   buzz:sync [--days N] [--date YYYY-MM-DD]   Yahoo BuzzIndex -> data/buzz/
   buzz  [--date YYYY-MM-DD] [--limit N]      one day's board, printed
   trend:sync                                 Sleeper trending -> data/trend/
   trend [--velocity] [--limit N]             live adds, or adds acceleration
   signal <player name> [--position RB]       both boards for one player
-  compare [--position RB] [--by-diff] [--bookmaker X]
-                              Vegas vs FantasyPros side by side
 
  Dashboard:
   dashboard                   build dist/dashboard.html (league switcher + pages)

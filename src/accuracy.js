@@ -3,10 +3,8 @@ import { join } from 'node:path';
 import { FPDIR } from './config.js';
 import { nameKey } from './sleeper.js';
 import { normPos } from './teams.js';
-import { readProjections, playerWeeks, SCORING_KEY } from './sleeperproj.js';
-import {
-  pointsIndex, vegasIndex, wwoIndex, firstdownIndex, fanduelIndex, draftsharksIndex, yahooIndex,
-} from './enrich.js';
+import { pointsIndex, draftsharksIndex } from './enrich.js';
+import { loadActualsIndex, formatPoints } from './actuals.js';
 import { SOURCE_ORDER } from './sourcetables.js';
 
 /**
@@ -25,8 +23,9 @@ import { SOURCE_ORDER } from './sourcetables.js';
  * of the week-1 numbers do (correlations of 0.5–0.7, near-zero bias), which is
  * why they are treated as real projections. See the `note` in the result.
  *
- * Actuals are the FantasyPros API's per-week points, so they exist only for the
- * ~490 players that API returns, and only when FP_API_KEY has synced them.
+ * Actuals are Sleeper's published fantasy points for that week (every player
+ * who played), with the FantasyPros API's per-week figure filling a week the
+ * stat file does not have.
  *
  * Each source is scored on the players IT covers (a broad source is not
  * penalised for a narrow one's easy universe) and also on the subset every
@@ -68,30 +67,18 @@ function fpWeekBoard(season, week, scoring) {
 
 /**
  * Per source, fpId -> that source's projection for one week. Same joins the
- * Sources tables use (name+position, or Sleeper id) so the two agree on who is
- * who.
+ * Sources tables use (name+position) so the two agree on who is who.
  */
-function weekProjections({ season, week, scoring, pool, sleeperProj, ds, yahoo }) {
+function weekProjections({ season, week, scoring, pool, ds }) {
   const byName = (idx, r) => idx.get(nameKey(r.n, r.p)) || idx.get(nameKey(r.n, normPos(r.p))) || null;
   const cell = (weeks, w) => weeks?.[w] ?? weeks?.[String(w)] ?? null;
   const fp = fpWeekBoard(season, week, scoring);
-  const vegas = vegasIndex(season, week, 'Average', scoring);
-  const wwo = wwoIndex(season, week);
-  const fd = firstdownIndex(season, week, scoring);
-  const fdl = fanduelIndex(season, week, scoring);
-  const key = SCORING_KEY[scoring] || 'ppr';
 
   const out = Object.fromEntries(SOURCE_ORDER.map((s) => [s, new Map()]));
   for (const r of pool) {
     const put = (src, v) => { if (v != null && Number.isFinite(Number(v))) out[src].set(r.i, Number(v)); };
     put('fp', fp.get(r.i));
-    put('sleeper', cell(r.s ? playerWeeks(sleeperProj, r.s) : null, week)?.[key]);
     put('draftsharks', cell(byName(ds, r)?.weeks, week)?.proj);
-    put('vegas', r.s ? vegas.get(String(r.s))?.points : null);
-    put('wwo', byName(wwo, r)?.proj);
-    put('firstdown', r.s ? fd.get(String(r.s))?.proj : null);
-    put('fanduel', byName(fdl, r)?.proj);
-    put('yahoo', cell(byName(yahoo, r)?.weeks, week)?.pts);
   }
   return out;
 }
@@ -99,6 +86,12 @@ function weekProjections({ season, week, scoring, pool, sleeperProj, ds, yahoo }
 /**
  * One scoring format's backtest across every completed week (1 .. week-1).
  * Returns null when no week has finished or no actuals are stored.
+ *
+ * Draft Sharks is only fetched for the current week going forward (see
+ * draftsharks.js), so a past week's board here is whatever was captured
+ * WHILE it was the live week — the sync never deletes it, only stops
+ * refreshing it once the week has passed. That is exactly the archive this
+ * backtest needs; nothing here re-fetches anything.
  */
 export function buildAccuracy({ season, week, scoring, pool }) {
   const played = [];
@@ -106,19 +99,29 @@ export function buildAccuracy({ season, week, scoring, pool }) {
   if (!played.length) return null;
 
   const points = pointsIndex(join(FPDIR, String(season)), scoring);
-  const sleeperProj = readProjections(season);
+  const weekly = loadActualsIndex(season);
+  const sleeperOf = new Map((pool || []).filter((r) => r.s).map((r) => [Number(r.i), String(r.s)]));
   const ds = draftsharksIndex(season, scoring);
-  const yahoo = yahooIndex(season);
+  const actualAt = (id, w) => {
+    const sid = sleeperOf.get(Number(id));
+    const byWeek = sid ? weekly.get(sid) : null;
+    const cell = byWeek?.[w] ?? byWeek?.[String(w)];
+    const fromStats = formatPoints(cell, scoring);
+    if (fromStats != null) return fromStats;
+    const fp = points.get(Number(id));
+    const v = fp?.weeks?.[w] ?? fp?.weeks?.[String(w)];
+    return v == null || v === '' ? null : Number(v);
+  };
 
   // source -> [[projection, actual, key]] pooled over the played weeks
   const pairs = Object.fromEntries(SOURCE_ORDER.map((s) => [s, []]));
   const weeksWithActuals = [];
   for (const w of played) {
-    const proj = weekProjections({ season, week: w, scoring, pool, sleeperProj, ds, yahoo });
+    const proj = weekProjections({ season, week: w, scoring, pool, ds });
     let any = false;
     for (const src of SOURCE_ORDER) {
       for (const [id, v] of proj[src]) {
-        const actual = points.get(Number(id))?.weeks?.[w] ?? points.get(Number(id))?.weeks?.[String(w)];
+        const actual = actualAt(id, w);
         if (actual == null) continue;
         pairs[src].push([v, Number(actual), `${w}:${id}`]);
         any = true;
@@ -143,6 +146,6 @@ export function buildAccuracy({ season, week, scoring, pool }) {
     weeks: weeksWithActuals,
     sources,
     common,
-    note: 'Compared against the last snapshot each source’s sync stored for the week, not a kickoff-time archive — a played week may have been pulled after some games started. Actuals come from the FantasyPros API, so only players it returns are scored.',
+    note: 'Compared against the last snapshot each source’s sync stored for the week, not a kickoff-time archive — a played week may have been pulled after some games started. Actuals are Sleeper’s published points for that week, for every player who played.',
   };
 }

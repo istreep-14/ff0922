@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeWeek, repairStore, MIN_GAMES_TRUSTED } from '../src/schedule.js';
+import { mergeWeek, repairStore, missingWeeks, MIN_GAMES_TRUSTED } from '../src/schedule.js';
 
 const TEAMS = ['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAC','KC','LAC','LAR','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS'];
 const emptyStore = () => ({ weeks: {}, teams: Object.fromEntries(TEAMS.map((t) => [t, { bye: null, weeks: {} }])) });
@@ -64,4 +64,13 @@ test('a short week is not used to infer byes', () => {
 
 test('the trust threshold sits at the smallest real week', () => {
   assert.equal(MIN_GAMES_TRUSTED, 13);
+});
+
+test('only weeks with no trusted copy are fetched: a stored week is never re-asked', () => {
+  const weeks = Object.fromEntries(Array.from({ length: 15 }, (_, i) => [i + 1, { games: 16 }]));
+  weeks[6] = { games: 3 };
+  assert.deepEqual(missingWeeks({ weeks }), [6, 16, 17, 18]);
+  for (let w = 1; w <= 18; w++) weeks[w] = { games: 14 };
+  assert.deepEqual(missingWeeks({ weeks }), []);
+  assert.equal(missingWeeks(null).length, 18);
 });

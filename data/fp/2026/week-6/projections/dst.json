@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-10-15T08:53:03.001Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 8020,
+      "name": "Baltimore Ravens",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.916
+      }
+    },
+    {
+      "fpid": 8150,
+      "name": "Kansas City Chiefs",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.498
+      }
+    },
+    {
+      "fpid": 8180,
+      "name": "New England Patriots",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.436
+      }
+    },
+    {
+      "fpid": 8240,
+      "name": "Pittsburgh Steelers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 7.37
+      }
+    },
+    {
+      "fpid": 8130,
+      "name": "Indianapolis Colts",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.858
+      }
+    },
+    {
+      "fpid": 8260,
+      "name": "Seattle Seahawks",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.403
+      }
+    },
+    {
+      "fpid": 8140,
+      "name": "Jacksonville Jaguars",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.364
+      }
+    },
+    {
+      "fpid": 8090,
+      "name": "Denver Broncos",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.198
+      }
+    },
+    {
+      "fpid": 8190,
+      "name": "New Orleans Saints",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.184
+      }
+    },
+    {
+      "fpid": 8040,
+      "name": "Carolina Panthers",
+      "team_id": null,
+      "stats": {
+        "points_ppr": 6.172
+      }
+    }
+  ]
+}

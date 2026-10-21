@@ -1,0 +1,86 @@
+{
+  "fetchedAt": "2026-09-29T22:46:01.064Z",
+  "source": "projections-page",
+  "players": [
+    {
+      "fpid": 22968,
+      "name": "Jahmyr Gibbs",
+      "team_id": "DET",
+      "stats": {
+        "points_ppr": 25.042
+      }
+    },
+    {
+      "fpid": 23133,
+      "name": "Bijan Robinson",
+      "team_id": "ATL",
+      "stats": {
+        "points_ppr": 21.806
+      }
+    },
+    {
+      "fpid": 19217,
+      "name": "Jonathan Taylor",
+      "team_id": "IND",
+      "stats": {
+        "points_ppr": 21.438
+      }
+    },
+    {
+      "fpid": 15514,
+      "name": "Derrick Henry",
+      "team_id": "BAL",
+      "stats": {
+        "points_ppr": 19.236
+      }
+    },
+    {
+      "fpid": 16393,
+      "name": "Christian McCaffrey",
+      "team_id": "SF",
+      "stats": {
+        "points_ppr": 19.047
+      }
+    },
+    {
+      "fpid": 23021,
+      "name": "Kenneth Walker III",
+      "team_id": "KC",
+      "stats": {
+        "points_ppr": 18.886
+      }
+    },
+    {
+      "fpid": 25324,
+      "name": "Chase Brown",
+      "team_id": "CIN",
+      "stats": {
+        "points_ppr": 17.06
+      }
+    },
+    {
+      "fpid": 22958,
+      "name": "James Cook III",
+      "team_id": "BUF",
+      "stats": {
+        "points_ppr": 16.438
+      }
+    },
+    {
+      "fpid": 25989,
+      "name": "Ashton Jeanty",
+      "team_id": "LV",
+      "stats": {
+        "points_ppr": 16.377
+      }
+    },
+    {
+      "fpid": 25403,
+      "name": "Jeremiyah Love",
+      "team_id": "ARI",
+      "stats": {
+        "points_ppr": 15.887
+      }
+    }
+  ]
+}

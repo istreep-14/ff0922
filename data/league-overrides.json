@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-19T19:32:55.323Z",
+  "updatedAt": "2026-10-21T05:00:43.113Z",
   "leagues": {
     "nfl~8bd69940-f400-46f3-a9f6-a5975a5b9b87": {
       "nickname": null,
@@ -81,34 +81,54 @@
       "primaryTeamId": null,
       "teams": {
         "1": {
-          "division": "East"
+          "division": "East",
+          "nickname": "Zach Krause",
+          "abbreviation": "ZK"
         },
         "2": {
-          "division": "East"
+          "division": "East",
+          "abbreviation": "MARK",
+          "nickname": "Mark Vitelli"
         },
         "3": {
-          "division": "East"
+          "division": "East",
+          "nickname": "Tyler Paquette",
+          "abbreviation": "TYLER"
         },
         "4": {
-          "division": "West"
+          "division": "West",
+          "nickname": "Anthony Hansen",
+          "abbreviation": "AJ"
         },
         "5": {
-          "division": "East"
+          "division": "East",
+          "nickname": "Andrew Burkhardt",
+          "abbreviation": "BURK"
         },
         "6": {
-          "division": "West"
+          "division": "West",
+          "nickname": "Naseem Abdel",
+          "abbreviation": "NAS"
         },
         "7": {
-          "division": "West"
+          "division": "West",
+          "nickname": "Connor McShea",
+          "abbreviation": "CON"
         },
         "8": {
-          "division": "East"
+          "division": "East",
+          "nickname": "David Smith",
+          "abbreviation": "DAVID"
         },
         "9": {
-          "division": "West"
+          "division": "West",
+          "nickname": "Bryce Streeper",
+          "abbreviation": "BRYCE"
         },
         "10": {
-          "division": "West"
+          "division": "West",
+          "nickname": "Ian Streeper",
+          "abbreviation": "IAN"
         }
       },
       "divisions": [

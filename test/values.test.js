@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { esc } from '../src/export.js';
 import { parseEnv } from '../src/config.js';
 import { sleeperPoints } from '../src/leaguedata.js';
-import { slimWeek } from '../src/sleeperproj.js';
 
 /**
  * Value-level defects: the ones that produce a plausible wrong number rather
@@ -91,61 +90,4 @@ test('missing Sleeper points read as zero rather than NaN', () => {
   assert.equal(sleeperPoints(undefined, undefined), 0);
   assert.equal(sleeperPoints(100, null), 100);
   assert.equal(sleeperPoints(null, 25), 0.25);
-});
-
-// ------------------------------------------ Sleeper projection row slimming
-
-const row = (id, pts, lastModified, extra = {}) => ({
-  player_id: id,
-  stats: pts == null ? {} : { pts_ppr: pts, pts_half_ppr: pts - 1, pts_std: pts - 2 },
-  last_modified: lastModified,
-  player: { first_name: 'A', last_name: String(id), position: 'RB', injury_status: null },
-  team: 'DET',
-  opponent: 'NO',
-  date: '2026-09-13',
-  ...extra,
-});
-
-test('an empty stat block is dropped, not read as a projection of zero', () => {
-  // Every player in the league comes back on every week's board.
-  const out = slimWeek([row('1', 10, 1000), row('2', null, 2000)], 4);
-  assert.equal(out.players.length, 1);
-  assert.equal(out.players[0].sleeperId, '1');
-});
-
-test('the newest row timestamp becomes the week\'s source time', () => {
-  const out = slimWeek([row('1', 10, 1000), row('2', 20, 5000), row('3', 30, 3000)], 4);
-  assert.equal(out.sourceAt, new Date(5000).toISOString());
-  assert.equal(out.week, 4);
-  assert.equal(out.date, '2026-09-13');
-});
-
-test('no timestamps at all means no source time, not our own', () => {
-  // Reporting our clock as the site's is the conflation freshness.js exists
-  // to prevent.
-  const out = slimWeek([row('1', 10, undefined)], 4);
-  assert.equal(out.sourceAt, null);
-});
-
-test('all three scoring formats are kept', () => {
-  const [p] = slimWeek([row('1', 10, 1000)], 4).players;
-  assert.equal(p.ppr, 10);
-  assert.equal(p.half, 9);
-  assert.equal(p.std, 8);
-  assert.equal(p.opponent, 'NO');
-  assert.equal(p.name, 'A 1');
-});
-
-test('a garbage body is empty rather than a throw', () => {
-  // These are scrapers pointed at sites that change without notice.
-  for (const body of [null, undefined, {}, 'nope', 42]) {
-    const out = slimWeek(body, 1);
-    assert.deepEqual(out.players, []);
-    assert.equal(out.sourceAt, null);
-  }
-});
-
-test('a row that is not an object is skipped', () => {
-  const out = slimWeek([null, 'x', row('1', 10, 1000)], 1);
-  assert.equal(out.players.length, 1);
 });
