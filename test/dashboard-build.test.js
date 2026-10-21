@@ -153,8 +153,11 @@ test('My Team shows League Value beside its ROS inputs, and each window its own 
   assert.doesNotMatch(lv, /lvValues\(/);
   const cols = fnBody('teamColumns');
   assert.equal((cols.match(/\.\.\.lvCols\(L\(\)\)/g) || []).length, 3, 'Overview, Rest of season and Trade value');
-  // RB7 this week under the week's points, RB12 rest of season under the ROS points.
-  assert.match(fnBody('consPtsCell'), /stackCell\(fmt\(c&&c\.v\), c&&c\.pr \|\| null/);
+  // The agreed points and their position rank are two columns, named for the
+  // window ("Week" / "Wk rank", "ROS" / "ROS rank"); My Team keeps the pair.
+  assert.match(fnBody('consPtsCell'), /stackCell\(fmt\(c&&c\.v\), null/);
+  assert.match(fnBody('columnsFor'), /key:'consrk', label:rkLab/);
+  assert.match(cols, /const CONS=\['cons','consrk'\]/);
 });
 
 test('lean tables: one line per row, on the player tables', () => {
@@ -178,21 +181,107 @@ test('lean tables: one line per row, on the player tables', () => {
   assert.doesNotMatch(fnBody('overviewParts'), /table2\(|[^.\w]table\(\[/, 'the Overview side panels do not hand-build tables');
 });
 
-test('League Players centers data columns and keeps position with the agreed rank', () => {
+test('League Players: an owner column of badges, a leading rank, and rows tinted by owner', () => {
   const fnBody = (name) => {
     const a = template.indexOf(`function ${name}(`);
     assert.ok(a >= 0, `${name} exists`);
     return template.slice(a, template.indexOf('\nfunction ', a + 1));
   };
-  assert.match(fnBody('leaguePlayersTable'), /tableClass:'lplayers'/);
-  assert.match(fnBody('leaguePlayerColumns'), /leagueConsPtsCell\(p,hz\(\)\)/);
-  assert.match(fnBody('leagueConsPtsCell'), /posChip\(rank\[1\],'mini'\)/);
-  assert.match(template, /table\.dg\.lplayers th:nth-child\(n\+4\),table\.dg\.lplayers td:nth-child\(n\+4\)\{text-align:center\}/);
-  assert.match(template, /table\.dg\.lplayers \.subt \.pos\.mini\{display:none\}/);
-  assert.match(template, /\.lp-rank\{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex:none;width:max-content\}/);
-  assert.match(template, /\.teambadge\{padding:0;border-radius:0;background:transparent!important\}/);
-  assert.match(template, /\.teambadge\.other\{color:var\(--ink-2\)\}/);
-  assert.match(template, /table\.lean td\{border-bottom-color:color-mix\(in srgb,var\(--line\) 82%,transparent\)\}/);
+  const cols = fnBody('leaguePlayerColumns');
+  assert.match(cols, /label:'#', r:1, rank:true/);
+  assert.match(cols, /key:'roster', label:'Owner', r:1, cell:rosterBadgeCell/);
+  assert.match(fnBody('leaguePlayersTable'), /rowClass:ownerRowClass/);
+  assert.match(fnBody('rosterBadgeCell'), /ownerBadge\(o\)/);
+  assert.match(fnBody('ownerOf'), /fxOwner\(/);
+  // Values and the Waiver Wire draw the same badge, not a team name in text.
+  assert.match(fnBody('pageValues'), /ownerBadge\(valOwner\(p\)\)/);
+  assert.match(template, /rowClass:r=> ownerRowClass\(r\.p\)/);
+  assert.doesNotMatch(template, /teambadge/, 'the old pill is gone');
+});
+
+test('one header row: a column group rides in the label, never a band row above it', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  for (const name of ['grid', 'table2']) {
+    assert.doesNotMatch(fnBody(name), /'bands'|th\.band|colSpan=n/, `${name} draws no band row`);
+    assert.match(fnBody(name), /headCell\(c/, `${name} heads through headCell`);
+  }
+  assert.doesNotMatch(template, /function projBands\(/);
+  // Two "Pts" columns still say whose: FP pts, DS pts.
+  const short = template.match(/const BAND_SHORT = (\{[^}]*\})/);
+  const map = Function(`return ${short[1]}`)();
+  assert.equal(map.FantasyPros, 'FP');
+  assert.equal(map['Draft Sharks'], 'DS');
+  // A single-row header is never clipped: widths are floors, not fixed layout.
+  assert.match(template, /table\.fixed\{table-layout:auto\}/);
+  assert.doesNotMatch(template, /table-layout:fixed/);
+  // Sortable headers show both arrows dim; the sorted one the accent.
+  assert.match(fnBody('sortIcon'), /var\(--sort-on\)/);
+});
+
+test('the table system: dark tokens by default, light as the same tokens, and no bold', () => {
+  const root = template.slice(template.indexOf(':root{'), template.indexOf('}', template.indexOf(':root{')));
+  for (const hex of ['#12161F', '#29304A', '#222A3E', '#424B69', '#3A4360', '#E6E9EF', '#EEF1F6', '#FACD39']) {
+    assert.ok(root.includes(hex), `dark default carries ${hex}`);
+  }
+  const light = template.slice(template.indexOf(':root[data-theme="light"]{'));
+  for (const hex of ['#DFE4EC', '#FFFFFF', '#F3F5F9', '#D6DCE5', '#E2E7EE', '#262B33', '#1F242C', '#525A67']) {
+    assert.ok(light.slice(0, light.indexOf('}')).includes(hex), `light carries ${hex}`);
+  }
+  // Light is chosen, never inferred: the toggle treats "no theme" as dark.
+  assert.match(template, /const isDark = cur!=='light';/);
+  assert.doesNotMatch(template, /font-weight:\s*[78]00|fontWeight='[78]00'/, 'weights 400/500/600 only');
+  assert.match(template, /Poppins:wght@400;500;600&/);
+  // Density: 32 / 38 / 48px rows, switched in place.
+  assert.match(template, /table\.compact\{--row-h:32px\} table\.comfy\{--row-h:48px\}/);
+  assert.match(template, /--row-h:38px/);
+  // No zebra, no vertical column rules.
+  assert.match(template, /td\.bandsep,\.tsep\{border-left:0\}/);
+  assert.doesNotMatch(template, /tr\.benchrow td\{background/);
+});
+
+test('the player identity is one line: badge, headshot with logo, name, team, status', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  const id = fnBody('playerIdentity');
+  const row = id.slice(id.indexOf("el('div','pid')"));
+  const order = ['posChip(p.p)', "avatarFor(p,{logo:true})", 'plink(p)', "el('span','tm',p.t)", 'who.append(tag)'];
+  let at = -1;
+  for (const k of order) { const i = row.indexOf(k); assert.ok(i > at, `${k} comes next`); at = i; }
+  // The lineup leads with the slot badge and keeps the POS - TEAM line.
+  assert.match(id, /posChip\(o\.slot,'slot'\)/);
+  assert.match(id, /\[p\.p,p\.t\]\.filter\(Boolean\)\.join\(' - '\)/);
+  assert.match(fnBody('avatarFor'), /imgEl\(teamLogo\(p\.t\),'lg'\)/);
+  assert.match(fnBody('statusTag'), /'BYE'/);
+});
+
+test('row states: shaded cells are rounded, rows expand into a tray, sections are labels', () => {
+  const fnBody = (name) => {
+    const a = template.indexOf(`function ${name}(`);
+    assert.ok(a >= 0, `${name} exists`);
+    return template.slice(a, template.indexOf('\nfunction ', a + 1));
+  };
+  // A heated cell's shade moves onto a rounded wrapper (full-bleed fills shipped before).
+  assert.match(fnBody('shadeCell'), /el\('span','hc h'/);
+  assert.doesNotMatch(template, /td\.h[ud][123]\{background/);
+  // Every table builder marks player rows expandable.
+  assert.match(fnBody('grid'), /expandable\(tr\)/);
+  assert.match(fnBody('table2'), /expandable\(r\)/);
+  assert.match(fnBody('playerTray'), /agreed\(p,false\)/);
+  assert.match(fnBody('playerTray'), /agreed\(p,true\)/);
+  // A frozen cell keeps the row's tint (it painted over yours / FA before).
+  assert.match(template, /table\.dg \.stk\{position:sticky;z-index:1;background:linear-gradient\(var\(--cell-bg/);
+  // Bench and reserve are section labels in the lineup, not filled bands.
+  const lu = fnBody('lineupTableView');
+  assert.match(lu, /section\('Bench'\)/);
+  assert.match(lu, /section\('Injured reserve'\)/);
+  assert.match(template, /table tbody tr\.sec>td,table tbody tr\.grouphdr>td,table tbody tr\.cutrow>td\{height:20px;/);
 });
 
 test('the player tables’ main number is the agreed one, not one site’s', () => {
@@ -244,7 +333,7 @@ test('grid() draws kind+get columns when cell is absent, and sorts by get', () =
     return template.slice(a, template.indexOf('\nfunction ', a + 1));
   };
   const draw = fnBody('dgCell');
-  assert.match(draw, /c\.cell\) return c\.cell\(r\)/);
+  assert.match(draw, /c\.cell\) return shadeCell\(c\.cell\(r\)\)/);
   assert.match(draw, /c\.kind\) return cell\(c\.kind,\s*c\.get/);
   assert.match(fnBody('grid'), /!c\.sort && c\.get/);
   assert.match(fnBody('grid'), /dgCell\(c,r\)/);

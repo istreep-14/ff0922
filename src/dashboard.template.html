@@ -5,56 +5,66 @@
 <title>Gridiron Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
 <style>
 :root{
-  /* Type and palette follow FantasyPros': Poppins throughout, near-black ink,
-     a navy chrome, one saturated blue for "this is the thing", cool greys. */
-  --font:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --ground:#F3F5F9; --surface:#FFFFFF; --surface-2:#EEF1F6; --line:#E2E7EE; --line-strong:#CBD3DE;
-  --ink:#16191D; --ink-2:#4A5361; --muted:#6B7686;
-  --market:#9A6410; --market-soft:#F7EBD3;
-  --consensus:#0769DE; --consensus-soft:#E4EEFC;
-  --good:#127A52; --good-soft:#DAF0E6; --warn:#96600B; --bad:#B5382E; --bad-soft:#F9E2DF;
-  --gold:#FACD39;
-  --shadow:0 1px 2px rgba(8,29,63,.06),0 4px 14px rgba(8,29,63,.06);
+  /* The table system (docs/components.md §3.9): dark is the default theme and
+     light is the same tokens re-valued, so nothing below names a hex for one
+     theme only. Poppins at 400/500/600 throughout; there is no bold. */
+  --font:"Poppins",Arial,Helvetica,sans-serif;
+  --ground:#12161F; --surface:#29304A; --surface-2:#222A3E; --line:#3A4360; --line-strong:#424B69;
+  --ink:#E6E9EF; --ink-2:#B9C0CC; --muted:#8F98AA;
+  /* names, the secondary line (team, sub-line), the header bar and its ink */
+  --ink-name:#EEF1F6; --ink-3:#A9B1BF; --th-bg:#222A3E; --th-ink:#B9C0CC;
+  --market:#E0A445; --market-soft:#3A2C14;
+  --consensus:#5AA2FF; --consensus-soft:#122A4E;
+  --good:#5FC095; --good-soft:#15302690; --warn:#D9A038; --bad:#E2786D; --bad-soft:#37211F;
+  --gold:#FACD39; --gold-ink:#16191D;
+  --shadow:0 1px 3px rgba(0,0,0,.35);
+  /* row states */
+  --row-hover:#353E5A; --row-sel:#2C3656; --row-sel-edge:#4E9AEB; --row-you:#2F3446;
+  --row-exp:#323B58; --row-tray:#232A40; --row-fa:rgba(126,226,184,.045); --row-wv:rgba(250,205,57,.05);
+  --link-hover:#7FB2EE; --sort-on:#FACD39;
+  /* owner badge: someone else's team, a free agent, on waivers */
+  --ob-bg:#3A4360; --ob-ink:#CFD4DC; --ob-fa-bg:rgba(126,226,184,.16); --ob-fa-ink:#7EE2B8;
+  --ob-wv-bg:rgba(250,205,57,.18); --ob-wv-ink:#F3D67A;
+  /* status tags: BYE yellow, OUT/IR coral */
+  --st-bye:#FACD39; --st-out:#FD9891; --st-ink:#16191D;
+  /* shaded value cells, strong-up to strong-down */
+  --heat-u2:#1F5A50; --heat-u1:#1C3F43; --heat-d1:#3E2B38; --heat-d2:#5E3239;
   /* the two rails: a dark chrome, unchanged by the light/dark page theme */
-  --rail-bg:#081D3F; --rail-bg-2:#0B2650; --rail-ink:#B9C6DC; --rail-ink-hi:#FFFFFF; --rail-line:rgba(255,255,255,.10);
+  --rail-bg:#050E20; --rail-bg-2:#0A1A36; --rail-ink:#B9C6DC; --rail-ink-hi:#FFFFFF; --rail-line:rgba(255,255,255,.10);
   --rail1:76px; --rail2:208px; --rail:calc(var(--rail1) + var(--rail2));
   /* FantasyPros' player-position palette: pastel fills carrying dark navy ink,
      so a badge stays legible without going neon. Flex/superflex are ours. */
   --p-qb:#C8A1FF; --p-rb:#83DCEF; --p-wr:#85DE9E; --p-te:#FF8AA2;
-  --p-k:#FDB97C; --p-dst:#BDC3CD; --p-flex:#7FD1D8; --p-sf:#FFB3D1; --p-bn:#EBEEF4;
+  --p-k:#FDB97C; --p-dst:#BDC3CD; --p-flex:#7FD1D8; --p-sf:#FFB3D1; --p-bn:#EBEEF4; --p-ir:#FD9891;
   --pos-ink:#13284A;
   /* position chip text: the hue pulled toward the page ink, so a pastel stays legible on its own wash */
-  --pos-tx-base:#000; --pos-tx-mix:50%;
+  --pos-tx-base:#fff; --pos-tx-mix:85%;
   /* One scale for corners and control heights, so a button, a select, a chip
      and a search box sitting on the same row line up instead of each page
      having picked its own. */
-  --r-sm:7px; --r:12px; --r-lg:14px; --ctl-h:32px;
-  --row-hover:color-mix(in srgb,var(--consensus) 5%,var(--surface));
+  --r-sm:7px; --r:10px; --r-lg:14px; --ctl-h:32px;
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --ground:#0A1322; --surface:#101B30; --surface-2:#172440; --line:#1F2E4A; --line-strong:#33466B;
-    --ink:#E8EEF7; --ink-2:#B4C0D3; --muted:#8B9BB5;
-    --market:#E0A445; --market-soft:#3A2C14;
-    --consensus:#5AA2FF; --consensus-soft:#122A4E;
-    --good:#5FC095; --good-soft:#15302690; --warn:#D9A038; --bad:#E2786D; --bad-soft:#37211F;
-    --rail-bg:#050E20; --rail-bg-2:#0A1A36;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);
-    --pos-tx-base:#fff; --pos-tx-mix:85%;
-  }
-}
-:root[data-theme="dark"]{
-  --ground:#0A1322; --surface:#101B30; --surface-2:#172440; --line:#1F2E4A; --line-strong:#33466B;
-  --ink:#E8EEF7; --ink-2:#B4C0D3; --muted:#8B9BB5;
-  --market:#E0A445; --market-soft:#3A2C14;
-  --consensus:#5AA2FF; --consensus-soft:#122A4E;
-  --good:#5FC095; --good-soft:#15302690; --warn:#D9A038; --bad:#E2786D; --bad-soft:#37211F;
-  --rail-bg:#050E20; --rail-bg-2:#0A1A36;
-  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);
-  --pos-tx-base:#fff; --pos-tx-mix:85%;
+:root[data-theme="light"]{
+  --ground:#DFE4EC; --surface:#FFFFFF; --surface-2:#F3F5F9; --line:#E2E7EE; --line-strong:#D6DCE5;
+  --ink:#262B33; --ink-2:#525A67; --muted:#868B95;
+  --ink-name:#1F242C; --ink-3:#868B95; --th-bg:#F3F5F9; --th-ink:#525A67;
+  --market:#9A6410; --market-soft:#F7EBD3;
+  --consensus:#0769DE; --consensus-soft:#E4EEFC;
+  --good:#127A52; --good-soft:#DAF0E6; --warn:#96600B; --bad:#B5382E; --bad-soft:#F9E2DF;
+  --shadow:0 1px 3px rgba(22,25,29,.10);
+  --row-hover:#F3F5F9; --row-sel:#EEF5FD; --row-sel-edge:#0769DE; --row-you:#FDF9EC;
+  --row-exp:#F3F5F9; --row-tray:#F9FAFC; --row-fa:#F6FBF8; --row-wv:#FFFAEE;
+  --link-hover:#025AB6; --sort-on:#0769DE;
+  --ob-bg:#EBEEF4; --ob-ink:#525A67; --ob-fa-bg:#D4F1E5; --ob-fa-ink:#1C8157;
+  --ob-wv-bg:#F7EDCE; --ob-wv-ink:#7A5C00;
+  --st-bye:#F6E5AB;
+  --heat-u2:#C4EBDB; --heat-u1:#E3F5EE; --heat-d1:#FBE8E6; --heat-d2:#F5CFCA;
+  --rail-bg:#081D3F; --rail-bg-2:#0B2650;
+  --p-flex:#A9E6EE;
+  --pos-tx-base:#000; --pos-tx-mix:50%;
 }
 /* ---------- type ----------
    One scale, borrowed from the command palette and the player card: a 13px
@@ -72,11 +82,14 @@
   --fs-xl:20px;    /* card numbers */
   --fs-2xl:22px;   /* page titles, headline numbers */
   --track:.08em;   /* every uppercase label */
+  --fs-th:12px;    /* table headers */
+  --fs-num:12px;   /* numbers and ranks in a table */
+  --fs-name:14px;  /* a player's name in a table */
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font);font-size:var(--fs-base);line-height:1.5;-webkit-font-smoothing:antialiased}
 td,th,.stat .v,.num{font-variant-numeric:tabular-nums}
-h1,h2,h3{font-family:var(--font);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h1,h2,h3{font-family:var(--font);font-weight:600;letter-spacing:-.01em;text-wrap:balance;margin:0}
 h1{font-size:var(--fs-2xl);line-height:1.15}
 h2{font-size:var(--fs-xl);line-height:1.2}
 h3{line-height:1.3;color:var(--muted)}
@@ -88,13 +101,10 @@ h3,
 .rsw-cap,
 label.lbl,
 .stat .k,
-th,
-.grouphdr td,
 .muband,
 .pm-kpi .k,
 .tmstat .k,
 .tneeds .lbl,
-tbody tr.cutrow td,
 .fgroup .ftitle,
 .cp-sec,
 .eyebrow{font-size:var(--fs-label);font-weight:600;text-transform:uppercase;letter-spacing:var(--track);line-height:1.3}
@@ -113,7 +123,7 @@ tbody tr.cutrow td,
 .rail1{width:var(--rail1);flex:none;background:var(--rail-bg);display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;overflow-y:auto}
 .rail2{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;padding-block:16px;padding-inline:12px;overflow-y:auto;border-right:1px solid var(--line)}
 .brandmark{display:flex;flex-direction:column;align-items:center;gap:3px;margin-bottom:10px;line-height:1}
-.brandmark b{font-size:var(--fs-xl);font-weight:700;letter-spacing:.02em;color:var(--rail-ink-hi)}
+.brandmark b{font-size:var(--fs-xl);font-weight:600;letter-spacing:.02em;color:var(--rail-ink-hi)}
 .brandmark span{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold)}
 .gtile{all:unset;box-sizing:border-box;cursor:pointer;position:relative;width:60px;aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--rail-ink);font-size:var(--fs-2xs);font-weight:500;letter-spacing:.02em;transition:background .12s,color .12s}
 .gtile svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -204,7 +214,7 @@ select:focus-visible{outline:2px solid var(--consensus);outline-offset:1px}
 .stat .v{font-size:var(--fs-2xl)}
 /* Headline numbers, wherever they sit: the stat strip, the player card, the
    trade market, a team's standing on All Leagues. */
-.stat .v,.pm-kpi .v,.tmstat .v,.lgrank b{font-weight:700;line-height:1.15;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.stat .v,.pm-kpi .v,.tmstat .v,.lgrank b{font-weight:600;line-height:1.15;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 .stat .s{font-size:var(--fs-xs);color:var(--muted)}
 .v.market{color:var(--market)} .v.consensus{color:var(--consensus)}
 
@@ -213,115 +223,152 @@ select:focus-visible{outline:2px solid var(--consensus);outline-offset:1px}
 .panel>header h3{margin:0;color:var(--ink)}
 .panel>header .note{font-size:var(--fs-xs)}
 .panel>header .spacer{flex:1}
-/* A panel around a width-pinned table hugs it; past the page width it scrolls. */
-.panel:has(>.scroll>table.fixed[style*="width"]){width:fit-content;max-width:100%}
 .pbody{padding:14px 16px}
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start}
 
 .scroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
-table{border-collapse:collapse;width:100%;font-size:var(--fs-base)}
-/* Projection tables set every source column to the SAME fixed width, so five
-   sources read as one scale instead of five differently-sized ones. Fixed
-   layout is what makes the colgroup binding rather than advisory. */
-table.fixed{table-layout:fixed}
+table{border-collapse:separate;border-spacing:0;width:auto;font-size:var(--fs-num);--row-h:38px}
+/* A column is sized to its content (docs/components.md §3.9): a column's
+   width `w` is its floor, never a clip, so a one-row header such as
+   "League value" is never cut. Frozen columns pin theirs (see grid). */
+table.fixed{table-layout:auto}
 .srcth{display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1}
 .srcth img{width:13px;height:13px;object-fit:contain;border-radius:3px}
-.srcth b{font-size:var(--fs-2xs);font-weight:700;letter-spacing:.06em;color:var(--ink-2)}
+.srcth b{font-size:var(--fs-2xs);font-weight:600;letter-spacing:.06em;color:var(--ink-2)}
 th.r .srcth{align-items:flex-end}
-/* Table chrome, one look for every table: an unfilled header on the panel's
-   own surface with a single strong rule under it, hairline row rules, and
-   column groups named by a spanner — a centred label over a short rule that
-   stops shy of the next group, so groups read apart without a vertical line
-   through every row. The header was a grey block with a blue bar over every
-   group, and each table builder had grown its own variant of it. */
-th{color:var(--muted);text-align:left;vertical-align:bottom;
-  padding:7px 8px 6px;border-bottom:1px solid var(--line-strong);white-space:nowrap;background:var(--surface)}
-th.band{position:relative;text-align:center;vertical-align:middle;color:var(--ink-2);font-weight:700;
-  padding:0 10px 3px;border-bottom:0;box-shadow:none}
-th.band::after{content:'';position:absolute;left:8px;right:8px;bottom:0;height:2px;border-radius:2px;background:var(--line-strong)}
-td.bandsep,.tsep{border-left:1px solid var(--line)}
-/* Only the last header row carries the rule; a band row's blank cells would otherwise draw a stray one. */
-thead tr:not(:last-child) th{border-bottom:0}
-td{padding:4px 8px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
-/* Frozen headers. A table that fits scrolls with the page as before; a taller
-   one scrolls inside its panel with both header rows pinned. The band row is
-   a fixed 24px so the label row knows where to stick. Borders do not travel
-   with a sticky cell under border-collapse, so the rule under the header is a
-   shadow. */
+/* ---------- the table system (docs/components.md §3.9) ----------
+   One look for every table, from the approved boards: a card that hugs its
+   columns, ONE header row on a filled header bar (12px/500, sentence case),
+   hairline row rules and nothing else — no vertical column lines, no zebra,
+   no grouped two-row header. Numbers and ranks are 12px/500 tabular and
+   centred; text and the player are left. Row height is the density's
+   (--row-h) and the cell is padded 0 8px, so a column is as wide as its data. */
+th{height:34px;padding:0 8px;font-size:var(--fs-th);font-weight:500;color:var(--th-ink);background:var(--th-bg);
+  text-align:left;vertical-align:middle;white-space:nowrap;border-bottom:1px solid var(--line-strong)}
+td{height:var(--row-h);padding:0 8px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle;
+  font-size:var(--fs-num);font-weight:500;color:var(--ink)}
+td.bandsep,.tsep{border-left:0}
+table.compact{--row-h:32px} table.comfy{--row-h:48px} table.roomy{--row-h:64px}
+tbody tr:last-child>td{border-bottom:0}
+td.r,th.r{text-align:center}
+td.r .stack{align-items:center}
+th.r .sorth{justify-content:center;width:100%}
+/* A row's states, strongest last: hover, then yours / free agent / waivers,
+   then selected and expanded. The state is a variable every cell paints,
+   so a frozen cell (which must stay opaque) layers it over the card. */
+td{background:var(--cell-bg,transparent)}
+table tbody tr:hover{--cell-bg:var(--row-hover)}
+table tbody tr.mine,table tbody tr.you{--cell-bg:var(--row-you)}
+table tbody tr.fa{--cell-bg:var(--row-fa)}
+table tbody tr.wv{--cell-bg:var(--row-wv)}
+table tbody tr.mine:hover,table tbody tr.you:hover,table tbody tr.fa:hover,table tbody tr.wv:hover{--cell-bg:var(--row-hover)}
+table tbody tr.sel{--cell-bg:var(--row-sel)}
+table tbody tr.sel>td:first-child{box-shadow:inset 3px 0 0 var(--row-sel-edge)}
+table tbody tr.exp{--cell-bg:var(--row-exp)}
+table tbody tr.exp>td{border-bottom:0}
+table tbody tr.tray,table tbody tr.tray:hover{--cell-bg:var(--row-tray)}
+table tbody tr.tray>td{height:auto;padding:12px 16px 14px 64px;text-align:left;white-space:normal}
+table tbody tr:hover .plink{color:var(--link-hover)}
+tr[data-xp]{cursor:pointer}
+/* the detail tray under an expanded row */
+.tray-in{display:flex;gap:32px;align-items:flex-end;flex-wrap:wrap}
+.tk{display:flex;flex-direction:column;gap:2px}
+.tk b{font-size:var(--fs-2xs);font-weight:500;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.tk span{font-size:var(--fs-sm);font-weight:500;color:var(--ink-name)}
+.tk .tkdim{color:var(--muted);font-weight:400}
+.wbars{display:inline-flex;align-items:flex-end;gap:2px;height:18px}
+.wbars i{display:block;width:5px;border-radius:1px;background:var(--row-sel-edge)}
+/* Section dividers (Bench, Injured reserve, a playoff cut): a small muted
+   label over a thin rule, never a filled band. */
+table tbody tr.sec>td,table tbody tr.grouphdr>td,table tbody tr.cutrow>td{height:20px;font-size:var(--fs-2xs);font-weight:500;
+  letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 0 0 16px;border-top:1px solid var(--line);border-bottom:0}
+table tbody tr.grouphdr>td .slotcell{gap:8px}
+table tbody tr.totrow>td{border-top:1px solid var(--line-strong);font-weight:500}
+table tbody tr.sec,table tbody tr.grouphdr,table tbody tr.cutrow,table tbody tr.totrow{--cell-bg:transparent}
+/* sortable headers: dim up/down arrows; the sorted column's arrow is the accent */
+.sorth{display:inline-flex;align-items:center;gap:5px}
+.sorth svg{flex:none;opacity:.5}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover,th.sorted{color:var(--ink-name)}
+th.sorted .sorth svg{opacity:1}
+th.sortable:focus-visible{outline:2px solid var(--consensus);outline-offset:-2px}
+.sorth .info{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;
+  border:1px solid var(--muted);color:var(--muted);font-size:9px;font-weight:600;line-height:1;cursor:help}
+/* Frozen headers. A table that fits scrolls with the page; a taller one
+   scrolls inside its card with the header pinned. */
 .scroll:has(>table.fixed){max-height:max(360px,calc(100vh - 150px));overflow:auto}
+table.fixed thead th{position:sticky;top:0;z-index:2}
 /* DataGrid (docs/components.md §3.1): the same frozen header for any width,
-   identity column(s) frozen on the left always, and three row heights. */
-.dg-bar{display:flex;align-items:center;gap:10px;padding:6px 14px 2px}
+   identity column(s) frozen on the left always. */
+.dg-bar{display:flex;align-items:center;gap:6px;padding:10px 14px 8px;flex-wrap:wrap}
 .dg-bar .spacer{flex:1}
-.seg.sm{height:26px} .seg.sm button{padding:0 9px;font-size:var(--fs-xs)}
+.dg-bar .pcount{margin-right:10px}
 .scroll.dg-scroll{max-height:max(420px,calc(100vh - 170px));overflow:auto}
-table.dg thead th{position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--line-strong)}
-table.dg thead tr.bands th{height:26px;padding-block:0 3px;box-shadow:none}
-table.dg thead tr.bands+tr.heads th{top:26px}
-table.dg .stk{position:sticky;z-index:1;background:var(--surface)}
-table.dg tbody tr:hover>td.stk{background:var(--row-hover)}
-table.dg thead .stk{z-index:3}
-table.dg .stk-last{box-shadow:inset -1px 0 0 var(--line)}
-table.dg thead .stk-last{box-shadow:inset -1px -1px 0 var(--line-strong)}
-table.dg thead tr.bands .stk-last{box-shadow:none}
-table.dg tr.totrow .stk{background:var(--surface-2)}
-table.dg.compact td{height:38px;padding-block:2px}
-table.dg.comfortable td{height:46px;padding-block:4px}
-table.dg.roomy td{height:64px;padding-block:6px}
+table.dg thead th{position:sticky;top:0;z-index:2}
+table.dg .stk{position:sticky;z-index:1;background:linear-gradient(var(--cell-bg,transparent),var(--cell-bg,transparent)),var(--surface)}
+table.dg thead .stk{z-index:3;background:var(--th-bg)}
 table.dg tr.cutrow td{height:auto}
 table.dg.roomy td .av{width:36px;height:36px}
 .dg-more{margin:12px 14px}
-/* A grid whose columns all have widths still spans its panel: the spare room
-   goes to one empty trailing cell per row (sizeCols gives the table a
-   min-width, not a width), so the header rule and row rules run to the panel
-   edge instead of stopping in the middle of it, and no data column is
-   stretched to fill. */
-table.dg.fixed{width:100%}
-table.dg.fixed tr::after{content:'';display:table-cell;border-bottom:1px solid var(--line)}
-table.dg.fixed thead tr::after{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:0;box-shadow:inset 0 -1px 0 var(--line-strong)}
-table.dg.fixed thead tr:last-child::after{border-bottom:1px solid var(--line-strong)}
-table.dg.fixed thead tr.bands::after{box-shadow:none}
-table.dg.fixed thead tr.bands+tr.heads::after{top:26px}
-table.dg.fixed tbody tr:last-child::after{border-bottom:0}
-table.dg.fixed tbody tr.inplay::after{background:color-mix(in srgb,var(--good-soft) 45%,transparent)}
-table.dg.fixed tbody tr:hover::after{background:var(--row-hover)}
-table.dg.fixed tbody tr.mine::after{background:var(--consensus-soft)}
-table.dg.fixed tbody tr.totrow::after,table.dg.fixed tbody tr.grouphdr::after{background:var(--surface-2)}
-table.dg.fixed tbody tr.totrow::after{border-top:1px solid var(--line-strong)}
-table.dg.fixed tbody tr.cutrow::after{background:var(--surface-2);border-block:1px solid var(--line-strong)}
-table.fixed thead th{position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--line-strong)}
-table.fixed thead tr:first-child:not(:only-child) th{height:26px;padding-block:0 3px;box-shadow:none}
-table.fixed thead tr:nth-child(2) th{top:26px}
-/* Lean table (docs/components.md §3.2): one line per row, like a printed
-   cheat sheet. No column rules; the player is "Name  RB - BAL" on one line
-   (or "Name (BAL)" where the table is already one position), and a number's
-   rank sits beside it, not under it. CSS only, so every cell builder and
-   every page stays the same. */
-table.lean td{border-bottom-color:color-mix(in srgb,var(--line) 82%,transparent)}
-table.lean:not(.dg) td,table.dg.lean.comfortable td{height:40px;padding-block:3px}
-table.lean .tsep{border-left:0}
-table.lean tr.grouphdr td,table.lean tr.totrow td{height:auto;padding-block:6px}
-table.lean td .av{width:24px;height:24px}
-table.lean .nm,table.lean .prow .who{flex-direction:row;align-items:baseline;gap:7px}
-table.lean .subt{margin-top:0}
-table.lean .subt .tmlogo{display:none}
-table.lean:not(.nopos) .subt .pos.mini+.tmlogo+.tm::before{content:'\2013\00a0'}
-table.lean.nopos .subt .pos.mini{display:none}
-table.lean.nopos .subt .tm::before{content:'('} table.lean.nopos .subt .tm::after{content:')'}
-table.lean .stack{flex-direction:row-reverse;align-items:baseline;justify-content:flex-start;gap:6px}
+/* The density switch: Compact / Default / Comfy (32 / 38 / 48px rows). */
+.seg.dens{height:auto;gap:2px;padding:3px;border-radius:99px;background:var(--ground);border:1px solid var(--line-strong)}
+.seg.dens button{height:24px;padding:0 12px;border:0;border-radius:99px;background:transparent;font-size:var(--fs-xs);font-weight:500;color:var(--ink-3)}
+.seg.dens button+button{border-left:0}
+.seg.dens button:hover{background:transparent;color:var(--ink-name)}
+.seg.dens button[aria-pressed="true"]{background:var(--row-hover);color:var(--ink-name);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+/* A card around a table hugs it; past the page width the table scrolls inside it. */
+.panel:has(>.scroll>table),.panel:has(>div>.dg-wrap),.panel:has(>.dg-wrap){width:fit-content;max-width:100%}
+.panel:has(>.scroll>table)>header,.panel:has(.dg-wrap)>header{background:var(--surface)}
+td .av{width:28px;height:28px}
+/* Lean (docs/components.md §3.2): one line per row. A number's rank sits
+   beside it in the secondary ink ("178.3  RB 9"), and the kickoff a lean row
+   drops from the opponent cell stays on its hover. */
+table.lean .stack{flex-direction:row-reverse;align-items:baseline;justify-content:center;gap:6px}
+table.lean .stack .ss{font-size:var(--fs-num);font-weight:500;color:var(--ink-3)}
 table.lean .oppwrap>.ss{display:none}
-table.dg.lplayers th:nth-child(n+4),table.dg.lplayers td:nth-child(n+4){text-align:center}
-table.dg.lplayers td:nth-child(n+4) .stack{align-items:center}
-table.dg.lplayers td:nth-child(n+4) .oppwrap{align-items:center}
-table.dg.lplayers .subt .pos.mini{display:none}
-table.dg.lplayers .subt{color:var(--muted);font-size:var(--fs-xs)}
-table.dg.lplayers .subt .tm{color:var(--muted)}
-.lp-rank{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex:none;width:max-content}
-.lp-rank .pos.mini{width:24px;height:16px;font-size:9px}
+/* The opponent: centred and muted, like the board's. */
+td.opp{color:var(--ink-2)}
+td.opp .oppwrap,td.opp .oppline{align-items:center;justify-content:center}
+/* A table of one position does not repeat the badge on every row. */
+table.nopos .pid>.pos{display:none}
 /* In the Overview's side column the name gives way first, rather than push the numbers off the panel. */
 .teamrail table.lean td:first-child{max-width:0;width:100%}
-td .av{width:28px;height:28px}
-tbody tr:last-child td{border-bottom:0}
+/* ---------- the player identity (one line) ----------
+   position badge → 28px headshot with the NFL logo on its corner → name →
+   NFL team → status tag. A roster leads with the lineup slot instead and
+   keeps a "POS - TEAM" line under the name; the all-players grid leads with
+   a muted overall rank in its own column. */
+.pid{display:flex;align-items:center;gap:8px;min-width:0;padding-left:4px}
+.pid .av{width:28px;height:28px;margin-left:2px}
+.pid .avf{background:var(--line-strong)}
+.av .lg{position:absolute;left:-4px;bottom:-2px;width:13px;height:13px;object-fit:contain;filter:drop-shadow(0 0 1.5px rgba(0,0,0,.7))}
+:root[data-theme="light"] .av .lg{filter:drop-shadow(0 0 1.5px rgba(0,0,0,.2))}
+.pid .who{display:flex;align-items:baseline;gap:6px;min-width:0;margin-left:2px}
+.pid .who2{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.pid .l1{display:flex;align-items:center;gap:6px;min-width:0}
+.pid .plink{font-size:var(--fs-name);font-weight:500;color:var(--ink-name);line-height:1.2}
+.pid .plink:hover{text-decoration:none}
+.pid .tm{flex:none;font-size:var(--fs-xs);font-weight:500;color:var(--ink-3);letter-spacing:.02em}
+.pid .sub{font-size:11.5px;line-height:1.3;color:var(--ink-3);font-weight:400;letter-spacing:.02em}
+.pid.roster{gap:10px}
+.pid .dim{opacity:.5}
+.st{flex:none;align-self:center;display:inline-flex;align-items:center;height:16px;padding:0 5px;border-radius:4px;
+  font-size:var(--fs-2xs);font-weight:600;letter-spacing:.02em;line-height:1;color:var(--st-ink);background:var(--st-bye)}
+.st.out{background:var(--st-out)}
+.st.q{background:var(--ob-wv-bg);color:var(--ob-wv-ink)}
+.ork{font-size:var(--fs-num);font-weight:500;color:var(--muted)}
+/* who has him: a 20px badge — team initials, YOU, FA, or W with the day he clears */
+.ob{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:20px;padding:0 5px;border-radius:5px;
+  font-size:var(--fs-2xs);font-weight:600;letter-spacing:.03em;line-height:1;background:var(--ob-bg);color:var(--ob-ink);white-space:nowrap}
+.ob.you{background:var(--gold);color:var(--gold-ink)}
+.ob.fa{background:var(--ob-fa-bg);color:var(--ob-fa-ink)}
+.ob.wv{background:var(--ob-wv-bg);color:var(--ob-wv-ink)}
+.obw{display:inline-flex;align-items:center;gap:4px}
+.obw small{font-size:10.5px;color:var(--muted)}
+/* Shaded value cells: a rounded cell inside the column, never a full-bleed fill. */
+.hc{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:24px;padding:0 8px;border-radius:6px}
+.hc.hu1{background:var(--heat-u1)} .hc.hu2,.hc.hu3{background:var(--heat-u2)}
+.hc.hd1{background:var(--heat-d1)} .hc.hd2,.hc.hd3{background:var(--heat-d2)}
 td.r,th.r{text-align:right}
 .pl{display:flex;align-items:center;gap:8px;min-width:0}
 /* Same lesson as the avatar: a name block is a shape, not a context. */
@@ -360,16 +407,13 @@ table.fixed td .prow, table.fixed td .pl{padding-block:0}
 .stack{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
 .oppwrap{display:flex;flex-direction:column;gap:1px;line-height:1.15}
 .oppline{display:flex;align-items:baseline;gap:6px}
-.oppname{font-size:var(--fs-xs);font-weight:500}
+.oppname{font-size:var(--fs-num);font-weight:500}
 .sosval{font-size:var(--fs-xs);font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted)}
 .sosval.good{color:var(--good)}
 .sosval.bad{color:var(--bad)}
-table.fixed td{padding:3px 8px}
-table.fixed th{padding-inline:8px;overflow:hidden;text-overflow:ellipsis}
 /* Fixed layout sizes from the colgroup, but a nowrap header still sets a
    minimum the table honours; letting band labels clip keeps a long one from
    widening the table past its container. */
-table.fixed th.band{overflow:hidden;text-overflow:ellipsis}
 .stack .sv{font-variant-numeric:tabular-nums;font-size:var(--fs-base);font-weight:400}
 .stack .ss{font-size:var(--fs-2xs);color:var(--muted);font-variant-numeric:tabular-nums}
 .stack .sv.big{font-size:var(--fs-base);font-weight:500}
@@ -381,19 +425,16 @@ td.t-key .stack .sv,td.t-key .scored:not(.zero){font-weight:600;color:var(--ink)
 td.t-aux,td.t-aux .stack .sv,td.t-aux .rng .rt{color:var(--ink-2)}
 td.t-aux .rng.wide .rt{color:var(--market)}
 td.t-aux .delta{font-weight:400}
-/* Position chips: a wash of the position hue, text in a deeper shade of it,
-   and a faint border. Solid pastel fills competed with the numbers for attention. */
-.pos{--c:var(--p-flex);display:inline-flex;align-items:center;justify-content:center;text-align:center;
-  font-size:var(--fs-2xs);font-weight:700;letter-spacing:.02em;border-radius:6px;overflow:hidden;
-  width:30px;height:20px;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
-.pos[data-p]{background:color-mix(in srgb,var(--c) 22%,transparent);color:color-mix(in srgb,var(--c) var(--pos-tx-mix),var(--pos-tx-base));
-  border-color:color-mix(in srgb,var(--c) 45%,transparent)}
-.pos[data-p="BN"]{background:var(--surface-2);color:var(--muted);border-color:var(--line)}
+/* Position badges: the position's pastel, solid, with navy ink — small enough
+   to lead a name without out-shouting it. A lineup slot is the larger one. */
+.pos{--c:var(--p-bn);display:inline-flex;align-items:center;justify-content:center;text-align:center;flex:none;
+  font-size:var(--fs-2xs);font-weight:600;letter-spacing:0;line-height:1;border-radius:5px;overflow:hidden;
+  min-width:24px;height:18px;padding:0 4px;background:var(--c);color:var(--pos-ink);border:0}
 .pos[data-p="QB"]{--c:var(--p-qb)} .pos[data-p="RB"]{--c:var(--p-rb)} .pos[data-p="WR"]{--c:var(--p-wr)}
 .pos[data-p="TE"]{--c:var(--p-te)} .pos[data-p="K"]{--c:var(--p-k)} .pos[data-p="DST"]{--c:var(--p-dst)}
 .pos[data-p="DEF"]{--c:var(--p-dst)} .pos[data-p="FLEX"]{--c:var(--p-flex)}
-.pos[data-p="SF"]{--c:var(--p-sf)} .pos[data-p="BN"]{--c:var(--p-bn)}
-.slot{width:36px;height:20px;font-size:var(--fs-2xs);border-radius:5px;flex:none}
+.pos[data-p="SF"]{--c:var(--p-sf)} .pos[data-p="BN"]{--c:var(--p-bn)} .pos[data-p="IR"]{--c:var(--p-ir)}
+.slot{min-width:28px;height:23px;padding:0 5px;font-size:var(--fs-xs);border-radius:6px;flex:none}
 .slotcell{display:flex;align-items:center;gap:6px}
 /* team logo · TEAM · position, all at one weight below the name */
 .subt{display:flex;align-items:center;gap:4px;line-height:1;margin-top:1px}
@@ -405,11 +446,11 @@ td.t-aux .delta{font-weight:400}
 /* Inline position label (e.g. in transaction rows). The palette is pastel now,
    so it is a small filled chip — pastel text on white would not read. */
 .pos.mini{width:auto;min-width:20px;height:13px;padding-inline:3px;font-size:8.5px;border-radius:3px;letter-spacing:.04em}
-.subt .pill{font-size:9px;padding:1px 5px;font-weight:700}
+.subt .pill{font-size:9px;padding:1px 5px;font-weight:600}
 /* The line under a name is reference, not headline. As a filled chip and a
    full-colour logo it out-shouted the name above it, so here the position is
    just its hue as text and the team mark is greyed until the row is pointed at. */
-.subt .pos.mini{background:none;border:0;padding:0;min-width:0;height:auto;margin-right:2px;font-size:var(--fs-2xs);font-weight:600}
+.subt .pos.mini{background:none;border:0;padding:0;min-width:0;height:auto;margin-right:2px;font-size:var(--fs-2xs);font-weight:600;color:var(--c)}
 .subt .tmlogo{width:11px;height:11px;filter:grayscale(1);opacity:.5}
 [data-pid]:hover .subt .tmlogo,tr:hover .subt .tmlogo{filter:none;opacity:.9}
 .subt .tm{font-weight:400}
@@ -425,12 +466,9 @@ td.t-aux .delta{font-weight:400}
 .seg button+button{border-left:1px solid var(--line-strong)}
 .seg button[aria-pressed="true"]{background:var(--consensus-soft);color:var(--consensus);font-weight:600}
 .seg button:focus-visible{outline:2px solid var(--consensus);outline-offset:-2px}
-.grouphdr td{background:var(--surface-2);color:var(--ink-2);padding:7px 10px}
-.totrow td{border-top:1px solid var(--line-strong);font-weight:500;background:var(--surface-2)}
 /* A starter on bye is a lineup mistake. Only the slot is flagged: the row's
    rest-of-season, trade and buzz numbers are unaffected by one week off. */
-table.roster tr.byestart td:first-child{box-shadow:inset 3px 0 0 var(--bad)}
-table.roster tr.byestart .oppname{color:var(--bad);font-weight:700}
+table.roster tr.byestart .oppname{color:var(--bad);font-weight:600}
 /* Overview: the roster hugs its table and the side panels take the rest of
    the row; without room for them they wrap underneath at full width. */
 .teamgrid{display:flex;flex-wrap:wrap;gap:14px 16px;align-items:flex-start}
@@ -468,7 +506,7 @@ table.roster tr.byestart .oppname{color:var(--bad);font-weight:700}
 .muteam.b .musc{text-align:left}
 .musc .p1{font-family:var(--font);font-size:26px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
 .musc .p2{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums}
-.muvs{font-size:var(--fs-xs);color:var(--muted);letter-spacing:.12em;font-weight:700;text-align:center;white-space:nowrap}
+.muvs{font-size:var(--fs-xs);color:var(--muted);letter-spacing:.12em;font-weight:600;text-align:center;white-space:nowrap}
 .muband{color:var(--muted);
   padding:10px 0 6px;border-top:1px solid var(--line);margin-top:8px}
 .murow{display:grid;grid-template-columns:1fr 48px 1fr;gap:8px;align-items:stretch;margin-bottom:6px}
@@ -486,7 +524,7 @@ table.roster tr.byestart .oppname{color:var(--bad);font-weight:700}
 .munm .l2{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .muval{flex:none;text-align:right;min-width:54px}
 .muside.b .muval{text-align:left}
-.muval .pv{font-size:var(--fs-lg);font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.muval .pv{font-size:var(--fs-lg);font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
 .muval .pv.dim{color:var(--muted);font-weight:400}
 .muval .pj{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums}
 .mumid{display:flex;align-items:center;justify-content:center}
@@ -501,7 +539,6 @@ table.roster tr.byestart .oppname{color:var(--bad);font-weight:700}
   .musc .p1{font-size:24px}
   .muteam .tav{width:34px;height:34px}
 }
-tr.benchrow td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
 .wp{display:flex;flex-direction:column;gap:5px;min-width:150px}
 .wpbar{height:7px;border-radius:4px;overflow:hidden;display:flex;background:var(--surface-2);border:1px solid var(--line)}
 .wpbar i{display:block;height:100%}
@@ -550,7 +587,7 @@ tr.benchrow td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
 .tmbtn:focus-visible{outline:2px solid var(--consensus);outline-offset:2px}
 .tmsec{display:flex;flex-direction:column;gap:12px}
 .tmsec>header{display:flex;align-items:center;gap:10px}
-.tmsec h2{font-size:var(--fs-lg);font-weight:700;letter-spacing:-.01em;margin:0;text-transform:none;color:var(--ink)}
+.tmsec h2{font-size:var(--fs-lg);font-weight:600;letter-spacing:-.01em;margin:0;text-transform:none;color:var(--ink)}
 .tmsec .spacer{flex:1}
 .tmwin{font-size:var(--fs-sm);font-weight:600;color:var(--consensus);border:1px solid var(--consensus);border-radius:var(--r-sm);padding:3px 10px}
 .tmplot{position:relative;border:1px solid var(--line);border-radius:var(--r);padding:12px 10px 4px;background:var(--surface)}
@@ -563,7 +600,7 @@ tr.benchrow td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
 .tmtip{position:absolute;pointer-events:none;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:10px;
   box-shadow:var(--shadow);padding:6px 11px;transform:translate(-50%,calc(-100% - 14px));line-height:1.25;white-space:nowrap}
 .tmtip small{display:block;font-size:var(--fs-xs);font-weight:500;color:var(--muted)}
-.tmtip b{font-size:var(--fs-md);font-weight:700;font-variant-numeric:tabular-nums}
+.tmtip b{font-size:var(--fs-md);font-weight:600;font-variant-numeric:tabular-nums}
 .tmnav{display:flex;gap:6px}
 .tmnav button{font:inherit;width:30px;height:30px;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface);
   color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
@@ -583,7 +620,7 @@ tr.benchrow td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
 .tmcard .info .nm1{font-size:var(--fs-lg);font-weight:500;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tmcard .info .pt{display:flex;align-items:center;gap:7px;font-size:var(--fs-base);color:var(--ink-2);font-weight:500}
 .tmcard .info .mv{font-size:var(--fs-sm);color:var(--ink-2);line-height:1.35;white-space:nowrap}
-.tmcard .info .mv b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.tmcard .info .mv b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 .tmcard .areaspark{flex:none;margin-left:8px}
 /* ---- player modal ------------------------------------------------------
    One dialog for every player on every page: identity and the headline numbers
@@ -594,7 +631,7 @@ tr.benchrow td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
 .pm-head{display:flex;align-items:center;gap:14px;padding:16px 20px 14px}
 .pm-head .av{width:58px;height:58px}
 .pm-id{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
-.pm-title{margin:0;font-size:var(--fs-2xl);font-weight:700;line-height:1.2;letter-spacing:-.01em;text-transform:none;color:var(--ink)}
+.pm-title{margin:0;font-size:var(--fs-2xl);font-weight:600;line-height:1.2;letter-spacing:-.01em;text-transform:none;color:var(--ink)}
 .pm-id .subt{gap:6px}
 .pm-id .subt .tm{font-size:var(--fs-sm)}
 .pm-status{font-size:var(--fs-sm);color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -670,12 +707,10 @@ tr.curwk td{background:var(--consensus-soft)}
 .tierchip.prt5{background:var(--bad-soft);color:var(--bad)}
 .sbar.prt0,.sbar.prt1{--c:var(--good)}
 /* Value tables: a cell's shade is how far its source sits from League Value — up is higher on him */
-td.hu1{background:color-mix(in srgb,var(--good) 10%,transparent)} td.hu2{background:color-mix(in srgb,var(--good) 20%,transparent)} td.hu3{background:color-mix(in srgb,var(--good) 32%,transparent)}
-td.hd1{background:color-mix(in srgb,var(--bad) 10%,transparent)} td.hd2{background:color-mix(in srgb,var(--bad) 20%,transparent)} td.hd3{background:color-mix(in srgb,var(--bad) 32%,transparent)}
-td.lvcol{background:var(--consensus-soft)} td.lvcol .sv{font-weight:700;color:var(--consensus)}
+td.lvcol .sv{font-weight:600;color:var(--consensus)}
 .heatkey{padding:10px 14px;font-size:var(--fs-xs);color:var(--muted)}
 .heatkey span{display:inline-block;padding:1px 8px;border-radius:99px;margin-right:6px;color:var(--ink)}
-.heatkey .hu2{background:color-mix(in srgb,var(--good) 20%,transparent)} .heatkey .hd2{background:color-mix(in srgb,var(--bad) 20%,transparent)} .sbar.prt2{--c:var(--consensus)} .sbar.prt3{--c:var(--market)} .sbar.prt5{--c:var(--bad)}
+.heatkey .hu2{background:var(--heat-u2)} .heatkey .hd2{background:var(--heat-d2)} .sbar.prt2{--c:var(--consensus)} .sbar.prt3{--c:var(--market)} .sbar.prt5{--c:var(--bad)}
 .posrank{display:flex;flex-direction:column;gap:9px}
 .prk{display:grid;grid-template-columns:64px 1fr 64px;align-items:center;gap:12px}
 .prk.strong{padding-bottom:9px;border-bottom:1px solid var(--line)}
@@ -707,7 +742,7 @@ td.lvcol{background:var(--consensus-soft)} td.lvcol .sv{font-weight:700;color:va
 .bar{position:relative;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;min-width:54px}
 .bar i{position:absolute;inset-block:0;left:0;background:var(--consensus);border-radius:3px}
 .bar i.mk{background:var(--market)}
-.grade{font-family:var(--font);font-weight:700;font-size:var(--fs-md)}
+.grade{font-family:var(--font);font-weight:600;font-size:var(--fs-md)}
 .note{color:var(--muted);font-size:var(--fs-sm);margin:0}
 .note.warn{color:var(--warn)}
 .empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:var(--fs-base);display:flex;flex-direction:column;gap:6px;align-items:center}
@@ -720,7 +755,7 @@ td.lvcol{background:var(--consensus-soft)} td.lvcol .sv{font-weight:700;color:va
 .sbrow:last-of-type{border-bottom:0}
 .sbn{flex:1;min-width:0;font-size:var(--fs-base);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sbp{font-size:var(--fs-md);font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-2);min-width:56px;text-align:right}
-.sbp.lead{color:var(--ink);font-weight:700}
+.sbp.lead{color:var(--ink);font-weight:600}
 .sbj{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums;min-width:42px;text-align:right}
 .sbbye{color:var(--muted);font-size:var(--fs-sm);justify-content:center}
 .sbfoot{display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--surface-2);font-size:var(--fs-xs);color:var(--muted)}
@@ -728,9 +763,9 @@ td.lvcol{background:var(--consensus-soft)} td.lvcol .sv{font-weight:700;color:va
 .tav{width:30px;height:30px;border-radius:8px;flex:none;overflow:hidden;display:block;
   background:var(--surface-2);border:1px solid var(--line)}
 .tav img{width:100%;height:100%;object-fit:contain;display:block}
-tr.mine .tav{border-color:var(--consensus)}
+tr.mine .tav{border-color:var(--gold)}
 .seedno{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;
-  font-weight:700;font-size:var(--fs-sm);background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+  font-weight:600;font-size:var(--fs-sm);background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
 .seedno.in{background:var(--good-soft);color:var(--good);border-color:var(--good)}
 /* The playoff seed only earns its own mark when it disagrees with the standing. */
 .seedalt{display:block;font-size:9px;color:var(--muted);letter-spacing:.04em;margin-top:2px}
@@ -741,33 +776,13 @@ tr.mine .tav{border-color:var(--consensus)}
 .wkcell.real{font-weight:600}
 .wkcell.bye{color:var(--muted);font-weight:400}
 td.wknow{background:var(--surface-2)}
-th.sortable .sorth{display:inline-flex;align-items:center;gap:3px}
-th.sortable:hover{color:var(--ink)}
-th .arrow{font-size:8px;opacity:.7;margin-left:3px}
-th.sortable{cursor:pointer;user-select:none}
-th.sortable:focus-visible{outline:2px solid var(--consensus);outline-offset:-2px}
-th.sorted{color:var(--consensus)}
 table.stand td{padding-block:4px}
 /* In vs out of the playoffs is a row FILL, not only a divider: sorting by
    points or by division breaks rank order, and a line drawn at a fixed index
    would then sit in the wrong place while still looking authoritative. */
-tbody tr.inplay td{background:color-mix(in srgb,var(--good-soft) 45%,transparent)}
-tbody tr.outplay td{background:transparent;color:var(--ink-2)}
+table tbody tr.inplay:not(.mine):not(:hover){--cell-bg:color-mix(in srgb,var(--good-soft) 45%,transparent)}
+tbody tr.outplay td{color:var(--ink-2)}
 tbody tr.outplay .tav{opacity:.65}
-tbody tr.cutrow td{background:var(--surface-2);border-block:1px solid var(--line-strong);
-  padding:3px 12px;color:var(--muted)}
-tbody tr.cutrow:hover td{background:var(--surface-2)}
-/* Your own row has to win against the playoff fill behind it. */
-tbody tr.mine td{background:var(--consensus-soft)!important}
-tbody tr.mine td:first-child{box-shadow:inset 3px 0 0 var(--consensus)}
-tbody tr.mine b{color:var(--consensus);font-weight:700}
-tbody tr:hover>td{background:var(--row-hover)}
-tbody tr.mine:hover td{background:var(--consensus-soft)!important}
-/* sortable headers */
-.sorth{display:inline-flex;align-items:center;gap:4px}
-th.r .sorth{justify-content:flex-end;width:100%}
-table.fixed .sorth{max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.sorth .arrow{font-size:8px;color:var(--consensus)}
 .stack .sv.prov{color:var(--ink-2)}
 .stack .sv.prov::after{content:'*';color:var(--market);font-size:var(--fs-xs);vertical-align:super}
 .num.odds{font-weight:600}
@@ -777,7 +792,7 @@ table.fixed .sorth{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .lgcell .nm{display:flex;flex-direction:column;gap:1px;min-width:0}
 .lgcell .nm b{font-size:var(--fs-md);font-weight:600}
 .hostdot{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:var(--fs-sm);flex:none;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+  font-weight:600;font-size:var(--fs-sm);flex:none;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
 .hostdot.espn{background:#C8102E22;color:#E2786D;border-color:#C8102E55}
 .hostdot.yahoo{background:#6001D222;color:#A78BFA;border-color:#6001D255}
 .hostdot.sleeper{background:#00CEB822;color:#3FBFA8;border-color:#00CEB855}
@@ -802,12 +817,12 @@ td input[type=checkbox],td input[type=radio]{width:16px;height:16px;accent-color
 /* transaction rows: each side of a move is a stack of player chips */
 .mvside{display:flex;flex-direction:column;gap:3px;min-width:0}
 .mvp{display:flex;align-items:center;gap:5px;min-width:0}
-.mvsign{font-weight:700;font-size:var(--fs-sm);width:9px;flex:none;text-align:center}
+.mvsign{font-weight:600;font-size:var(--fs-sm);width:9px;flex:none;text-align:center}
 .mvsign.add{color:var(--good)} .mvsign.drop{color:var(--bad)}
 .mvn{font-size:var(--fs-base);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 td .ss{font-size:var(--fs-xs);color:var(--muted)}
 .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.mine{box-shadow:inset 3px 0 0 var(--consensus)}
+:not(tr).mine{box-shadow:inset 3px 0 0 var(--consensus)}
 /* ---- players page (Sleeper-style browser) ---- */
 .pfilter{display:flex;flex-direction:column;gap:8px;padding:9px 12px}
 .prowbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
@@ -816,12 +831,11 @@ td .ss{font-size:var(--fs-xs);color:var(--muted)}
 .psearch::-webkit-search-cancel-button{-webkit-appearance:none}
 .fgroup{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .fgroup .ftitle{color:var(--muted);margin-right:3px}
-.fchip{font-family:inherit;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);
-  font-size:var(--fs-sm);height:26px;padding:0 11px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
-.fchip:hover{border-color:var(--line-strong);background:var(--surface-2)}
-.fchip.on{border-color:var(--consensus);color:var(--consensus);background:var(--consensus-soft);font-weight:600}
-/* A position chip active in its own slot colour; the variable is set inline. */
-.fchip.on[data-p]{border-color:var(--p);color:var(--ink);background:color-mix(in srgb,var(--p) 38%,transparent)}
+.fchip{font-family:inherit;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
+  font-size:var(--fs-num);font-weight:500;height:28px;padding:0 12px;border-radius:99px;display:inline-flex;align-items:center;gap:5px}
+.fchip:hover{background:var(--row-hover)}
+/* The active filter is the accent, whatever it filters. */
+.fchip.on,.fchip.on[data-p]{border-color:var(--gold);color:var(--gold-ink);background:var(--gold);font-weight:600}
 .fchip .tml{width:13px;height:13px;object-fit:contain;flex:none}
 .iconbtn.watchon{border-color:var(--warn);color:var(--warn);font-weight:600}
 .star{all:unset;cursor:pointer;font-size:var(--fs-lg);line-height:1;color:var(--line-strong);width:26px;height:26px;
@@ -831,22 +845,6 @@ td .ss{font-size:var(--fs-xs);color:var(--muted)}
 td.watch{width:34px;padding-inline:3px;text-align:center}
 .pcount{font-size:var(--fs-xs);color:var(--muted);font-variant-numeric:tabular-nums}
 .pcount.total{color:var(--ink-2);font-weight:600}
-/* who rosters a player: crest + abbreviation in one pill. Three flat colours,
-   not one per team — your team, anyone else's, and a free agent — so "whose"
-   reads at a glance instead of needing a legend. */
-.rteam{display:flex;align-items:center;gap:7px;min-width:0}
-.teambadge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px 2px 3px;border-radius:99px;
-  font-size:var(--fs-label);font-weight:700;letter-spacing:.03em;line-height:1.6;white-space:nowrap;max-width:100%;text-transform:uppercase}
-.teambadge{padding:0;border-radius:0;background:transparent!important}
-.teambadge{font-weight:600;letter-spacing:0}
-.teambadge.other{color:var(--ink-2)}
-.teambadge.fa,.teambadge.wv{padding:0}
-.teambadge .tblogo{width:16px;height:16px;border-radius:50%;object-fit:cover;flex:none;background:var(--surface)}
-.teambadge.other{color:var(--consensus);background:var(--consensus-soft)}
-.teambadge.mine{color:var(--good);background:var(--good-soft)}
-.teambadge.fa{color:var(--muted);background:var(--surface-2);padding:2px 10px}
-.teambadge.wv{color:var(--warn);background:var(--market-soft);padding:2px 10px}
-.teambadge.other{color:var(--ink-2)}
 td.noteclip{max-width:340px}
 .sheetnote{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px;color:var(--ink-2);font-size:var(--fs-sm)}
 .srcth .stalemark{color:var(--bad);font-style:normal;font-size:8px;margin-left:3px}
@@ -862,7 +860,7 @@ td.wrapcell .ss{white-space:normal}
 
 /* the FantasyPros start/sit grade as a filled chip: a verdict, not a quantity */
 .gradebadge{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:20px;padding-inline:5px;
-  border-radius:5px;font-size:var(--fs-xs);font-weight:700;letter-spacing:.02em;font-variant-numeric:normal}
+  border-radius:5px;font-size:var(--fs-xs);font-weight:600;letter-spacing:.02em;font-variant-numeric:normal}
 .gradebadge.good{color:var(--good);background:var(--good-soft)}
 .gradebadge.info{color:var(--consensus);background:var(--consensus-soft)}
 .gradebadge.mid{color:var(--ink-2);background:var(--surface-2)}
@@ -875,7 +873,7 @@ td.wrapcell .ss{white-space:normal}
 .gline:last-child{border-bottom:0}
 .gline b{color:var(--ink-2);font-weight:600}
 .gline span{color:var(--ink);min-width:0}
-.bestcell{color:var(--good);font-weight:700}
+.bestcell{color:var(--good);font-weight:600}
 .wtable{width:auto;min-width:100%}
 .wtable th.pcol{border-left:1px solid var(--line);text-align:left;padding-block:8px}
 .wtable td{padding:4px 8px}
@@ -940,7 +938,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs-x
 .cp-ic .hostdot{margin:0}
 .cp-tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
 .cp-t{font-size:var(--fs-base);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cp-t mark{background:none;color:inherit;font-weight:700;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--consensus) 55%,transparent);text-underline-offset:2px}
+.cp-t mark{background:none;color:inherit;font-weight:600;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--consensus) 55%,transparent);text-underline-offset:2px}
 .cp-s{font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cp-k{font-size:var(--fs-xs);color:var(--muted);flex:none}
 .cp-empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:var(--fs-base)}
@@ -1034,7 +1032,6 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs-x
 .v.good{color:var(--good)}
 .lgrow{cursor:pointer}
 .lgrow td{padding-block:9px}
-.lgrow:hover td{background:var(--surface-2)}
 .lgrow td:first-child{box-shadow:inset 3px 0 0 var(--st,transparent)}
 .lgrow.st-in{--st:var(--good)} .lgrow.st-bubble{--st:var(--warn)} .lgrow.st-out{--st:var(--bad)}
 .lgrow.off{opacity:.6}
@@ -1066,7 +1063,7 @@ kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs-x
 .lgwk:hover .wkline .num{color:var(--consensus)}
 .wkline{display:flex;align-items:center;gap:8px}
 .wkline .num{font-weight:600}
-.wkres{width:20px;height:20px;border-radius:6px;display:inline-grid;place-items:center;font-size:var(--fs-2xs);font-weight:700}
+.wkres{width:20px;height:20px;border-radius:6px;display:inline-grid;place-items:center;font-size:var(--fs-2xs);font-weight:600}
 .wkres.w{background:var(--good-soft);color:var(--good)} .wkres.l{background:var(--bad-soft);color:var(--bad)} .wkres.p{background:var(--surface-2);color:var(--muted)}
 .lgwk .ss{margin-top:3px;max-width:230px;overflow:hidden;text-overflow:ellipsis}
 .lgrow td.r .pill{margin-right:8px}
@@ -1149,7 +1146,7 @@ const savedTheme = store.get('gd.theme', null);
 if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 function toggleTheme(){
   const cur = document.documentElement.getAttribute('data-theme');
-  const isDark = cur ? cur==='dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = cur!=='light';
   const next = isDark ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   store.set('gd.theme', next);
@@ -1176,7 +1173,7 @@ function injPill(p){
   const s = String(p.inj).toUpperCase();
   if(s==='ACTIVE'||s==='HEALTHY') return null;
   const cls = (s==='OUT'||s==='IR'||s==='SUSPENDED'||s==='PUP') ? 'out' : 'q';
-  const sp = el('span','pill '+cls, INJ_ABBR[s] || s);
+  const sp = el('span','st '+cls, INJ_ABBR[s] || s);
   sp.title = [p.inj, p.injT].filter(Boolean).join(' — ');
   return sp;
 }
@@ -1201,9 +1198,11 @@ function slotKind(slot){
 }
 function posChip(pos, extraClass){
   const key=String(pos||'').toUpperCase();
-  const known=['QB','RB','WR','TE','K','DST','DEF','BN'];
+  const known=['QB','RB','WR','TE','K','DST','DEF','BN','IR'];
   const multi=key.includes('/');
-  const sp=el('span','pos'+(extraClass?' '+extraClass:''), multi ? slotLabel(key) : (pos||'—'));
+  // A flex slot reads FLX on its badge; a superflex keeps its initials (QWRT).
+  const text=multi ? (slotKind(key)==='FLEX'? 'FLX' : slotLabel(key)) : (key==='FLEX'? 'FLX' : (pos||'—'));
+  const sp=el('span','pos'+(extraClass?' '+extraClass:''), text);
   sp.setAttribute('data-p', known.includes(key) ? key : (multi ? slotKind(key) : (key||'FLEX')));
   if(multi) sp.title=key;
   return sp;
@@ -1235,18 +1234,38 @@ function imgEl(src, cls){
  * and the badge has to sit outside its clip: frame (.av) > clipped face (.avf) >
  * image, with the badge a sibling of the face.
  */
-function avatarFor(p){
+function avatarFor(p, o){
   const box=el('span','av');
   const face=el('span','avf');
   const pos = String(p.p||'').toUpperCase();
-  if((pos==='DST'||pos==='DEF') && p.t){
+  const dst=(pos==='DST'||pos==='DEF') && p.t;
+  if(dst){
     box.classList.add('logo');
     face.append(imgEl(teamLogo(p.t)));
   } else {
     face.append(imgEl(p.s ? 'https://sleepercdn.com/content/nfl/players/thumb/'+p.s+'.jpg' : null));
   }
   box.append(face);
+  // In a table the NFL team rides on the headshot's corner (a defense IS its logo).
+  if(o && o.logo && !dst && p.t){ const lg=imgEl(teamLogo(p.t),'lg'); lg.alt=p.t; box.append(lg); }
   return box;
+}
+
+/**
+ * The one status tag after a name: an injury designation (OUT/IR coral, Q/D
+ * amber), else BYE when his team is off this week. Nothing for a healthy
+ * player — a tag on every row would carry no information.
+ */
+function statusTag(p){
+  const s=String(p.inj||'').toUpperCase();
+  if(s && s!=='ACTIVE' && s!=='HEALTHY'){
+    const out=(s==='OUT'||s==='IR'||s==='SUSPENDED'||s==='PUP');
+    const t=el('span','st '+(out?'out':'q'), INJ_ABBR[s] || s);
+    t.title=[p.inj, p.injT].filter(Boolean).join(' \u2014 ');
+    return t;
+  }
+  if(p.t && DATA.week && isBye(p, DATA.week)){ const t=el('span','st','BYE'); t.title='On bye in week '+DATA.week; return t; }
+  return null;
 }
 
 /**
@@ -1271,29 +1290,36 @@ function subLine(p){
 }
 
 /**
- * A player, the one way (docs/components.md §3.6): headshot, name, and the
- * position · team line under it. Two layouts while the page migrates: `row`
- * (tables and lists) and `roster` (a slot badge leading, as Sleeper lays a
- * lineup out). The name opens the player's card.
+ * A player, the one way (docs/components.md §3.6): one line — position badge,
+ * 28px headshot with the NFL logo on its corner, name, NFL team, status tag.
+ * `roster` leads with the lineup slot instead and keeps a "POS - TEAM" line
+ * under the name, as a lineup reads. The name opens the player's card.
  */
 function playerIdentity(p, o={}){
+  const tag=statusTag(p);
   if(o.layout==='roster'){
-    const w=el('div','prow'); w.dataset.pid=p.i;
+    const w=el('div','pid roster'); w.dataset.pid=p.i;
     if(o.slot!==undefined && o.slot!==null) w.append(posChip(o.slot,'slot'));
-    w.append(avatarFor(p));
-    const who=el('div','who');
-    who.append(el('div','pn'));
-    who.lastChild.append(plink(p));
-    who.append(subLine(p));
+    // A starter who cannot play is a lineup hole: his row says so before anything else does.
+    const out=o.slot && !isBench(o.slot) && tag;
+    const av=avatarFor(p,{logo:true}); if(out) av.classList.add('dim');
+    w.append(av);
+    const who=el('div','who2');
+    const l1=el('span','l1'); const nm=plink(p); if(out) nm.classList.add('dim');
+    l1.append(nm); if(tag) l1.append(tag);
+    who.append(l1);
+    who.append(el('span','sub',[p.p,p.t].filter(Boolean).join(' - ')));
     w.append(who);
     return w;
   }
-  const w=el('div','pl'); w.dataset.pid=p.i;
-  w.append(avatarFor(p));
-  const nm=el('div','nm');
-  nm.append(plink(p));
-  nm.append(subLine(p));
-  w.append(nm);
+  const w=el('div','pid'); w.dataset.pid=p.i;
+  if(p.p) w.append(posChip(p.p));
+  w.append(avatarFor(p,{logo:true}));
+  const who=el('span','who');
+  who.append(plink(p));
+  if(p.t) who.append(el('span','tm',p.t));
+  if(tag) who.append(tag);
+  w.append(who);
   return w;
 }
 
@@ -1344,12 +1370,12 @@ function cell(kind, v, o={}){
   } else if(o.stack){
     td=el('td','r'+(o.sep?' tsep':''));
     const d=el('div','stack');
-    d.append(Object.assign(el('div','sv'+(o.big?' big':'')),{textContent:o.text!==undefined? o.text : fxNum(v,o.d)}));
-    if(o.sub!=null && o.sub!=='') d.append(Object.assign(el('div','ss'),{textContent:o.sub}));
+    d.append(Object.assign(el('div','sv'+(o.big?' big':'')),{textContent:o.text!==undefined? fxRankText(o.text) : fxNum(v,o.d)}));
+    if(o.sub!=null && o.sub!=='') d.append(Object.assign(el('div','ss'),{textContent:fxRankText(o.sub)}));
     td.append(d);
   } else {
     td=el('td','r num'+(o.sep?' tsep':''));
-    td.textContent = o.text!==undefined? o.text : fxNum(v,o.d);
+    td.textContent = o.text!==undefined? fxRankText(o.text) : fxNum(v,o.d);
   }
   if(o.title) td.title=o.title;
   if(o.sort!=null) td.dataset.v=String(o.sort);
@@ -1378,38 +1404,65 @@ function stackCell(value, sub, opts){ return cell('num', null, {stack:true, text
  * page scrolls inside its panel instead. A DataGrid pins its MIN width
  * (`fill`): its CSS hands the spare room to an empty trailing cell instead.
  */
-function sizeCols(t, widths, fill){
+function sizeCols(t, widths){
   const cg=el('colgroup');
   widths.forEach(w=>{ const co=el('col'); if(w) co.style.width=w+'px'; cg.append(co); });
   t.append(cg);
-  if(widths.length && widths.every(w=>w>0)) t.style[fill? 'minWidth' : 'width']=widths.reduce((a,b)=>a+b,0)+'px';
 }
-function table2(bands, cols, rows, o){
+function table2(cols, rows, o){
   const wrap=el('div','scroll');
   const fixed=cols.some(c=>c.w);
   const t=el('table',[fixed?'fixed':'', o&&o.cls||''].join(' ').trim()||null);
   if(fixed) sizeCols(t, cols.map(c=>c.w));
   const thead=el('thead');
-  if(bands && bands.length){
-    const br=el('tr');
-    bands.forEach(b=>{
-      const th=el('th',(b.label?'band':''),b.label||'');
-      th.colSpan=b.span; if(b.label) th.title=b.label; br.append(th);
-    });
-    thead.append(br);
-  }
   const hr=el('tr');
-  cols.forEach(c=>{
-    const th=el('th',(c.r?'r':'')+(c.sep?' tsep':''), c.node?null:c.label);
-    if(c.node) th.append(c.node);
-    if(c.title) th.title=c.title;
-    hr.append(th);
-  });
+  cols.forEach(c=> hr.append(headCell(c)));
   thead.append(hr);
   t.append(thead);
-  const tb=el('tbody'); rows.forEach(r=>tb.append(r)); t.append(tb);
+  const tb=el('tbody'); rows.forEach(r=>{ expandable(r); tb.append(r); }); t.append(tb);
   makeSortable(t, tableKey(cols));
-  wrap.append(t); return wrap;
+  wrap.append(t);
+  if(!(o&&o.id)){ t.classList.add('default'); return wrap; }
+  // With an id the table gets the toolbar: a note on its order and the density switch.
+  const box=el('div','dg-wrap'), bar=el('div','dg-bar');
+  bar.append(el('span','spacer'));
+  if(o.note) bar.append(el('span','pcount',o.note));
+  bar.append(densitySwitch(t, o.id, 'default'));
+  box.append(bar, wrap);
+  return box;
+}
+
+/**
+ * One header row (docs/components.md §3.9). A column inside a group used to
+ * sit under a band row; the group now rides in its own label — "FP pts",
+ * "DS floor" — so two "Pts" columns still say whose they are. `head` sets
+ * the label outright; `info` adds the (i) whose hover explains the column.
+ */
+const BAND_SHORT = {'FantasyPros':'FP', 'Draft Sharks':'DS', 'Trade market':'Trade', 'Trade value':'Trade', 'League':'League', 'ROS':'ROS'};
+function headLabel(c){
+  if(c.head!=null) return c.head;
+  const lab=c.label||'';
+  const b=c.band? (BAND_SHORT[c.band] || '') : '';
+  if(!b || !lab || lab.toLowerCase().startsWith(b.toLowerCase())) return lab;
+  return b+' '+(/^[A-Z][a-z]/.test(lab)? lab[0].toLowerCase()+lab.slice(1) : lab);
+}
+/** Up/down arrows: both dim on a sortable column, the live direction in the accent on the sorted one. */
+function sortIcon(dir){
+  const up=dir==='asc'? 'fill="var(--sort-on)"' : 'fill="currentColor"'+(dir? ' opacity=".3"' : '');
+  const dn=dir==='desc'? 'fill="var(--sort-on)"' : 'fill="currentColor"'+(dir? ' opacity=".3"' : '');
+  const sp=el('span','arrow');
+  sp.innerHTML='<svg width="7" height="10" viewBox="0 0 7 10" aria-hidden="true"><path d="M3.5 0 7 4H0z" '+up+'/><path d="M3.5 10 0 6h7z" '+dn+'/></svg>';
+  return sp;
+}
+function headCell(c, o={}){
+  const th=el('th',(c.r?'r':'')+(o.sortable?' sortable':'')+(o.dir?' sorted':''));
+  const w=el('span','sorth');
+  if(c.node) w.append(c.node); else w.append(document.createTextNode(headLabel(c)));
+  if(c.info){ const i=el('span','info','i'); i.title=c.info; w.append(i); }
+  if(o.sortable) w.append(sortIcon(o.dir||null));
+  th.append(w);
+  if(c.title) th.title=c.title;
+  return th;
 }
 /* ---------- lineup construction ---------- */
 const SLOT_ELIG = {
@@ -1511,10 +1564,10 @@ function makeSortable(t, memoKey){
   };
   const apply=()=>{
     ths.forEach((th,ci)=>{
-      const arrow=th.querySelector(':scope > .arrow');
+      const arrow=th.querySelector('.arrow');
       if(!arrow) return;
       const on=state.col===ci;
-      arrow.textContent= on? (state.dir>0? '\u25B2' : '\u25BC') : '';
+      arrow.replaceWith(sortIcon(on? (state.dir>0? 'asc' : 'desc') : null));
       th.classList.toggle('sorted',on);
       th.setAttribute('aria-sort', on? (state.dir>0?'ascending':'descending') : 'none');
     });
@@ -1541,7 +1594,7 @@ function makeSortable(t, memoKey){
     th.classList.add('sortable');
     th.tabIndex=0;
     th.setAttribute('aria-sort','none');
-    th.append(el('span','arrow'));
+    (th.querySelector('.sorth')||th).append(sortIcon(null));
     const pick=()=>{
       if(state.col!==ci){ state.col=ci; state.dir=firstDir[ci]; }
       else if(state.dir===firstDir[ci]) state.dir=-firstDir[ci];
@@ -1563,15 +1616,15 @@ function table(cols, rows){
   const wrap = el('div','scroll');
   const t = el('table');
   const thead = el('thead'); const tr = el('tr');
-  cols.forEach(c=>{ const th=el('th', c.r?'r':null, c.label); tr.append(th); });
+  cols.forEach(c=> tr.append(headCell(c)));
   thead.append(tr); t.append(thead);
   const tb = el('tbody');
   rows.forEach(r=> tb.append(r));
   t.append(tb); makeSortable(t, tableKey(cols)); wrap.append(t); return wrap;
 }
 /* ---------- DataGrid ----------
-   The one component for a large table (docs/components.md §3.1): sticky
-   header and band row, sticky identity column(s) always, a density the reader
+   The one component for a large table (docs/components.md §3.1, §3.9): one
+   sticky header row, sticky identity column(s) always, a density the reader
    picks and the page remembers, a count, the first `limit` rows with "Show
    all", and sorting that reads each column's declared value instead of the
    text in its cells.
@@ -1585,29 +1638,66 @@ function table(cols, rows){
    order).
 
    Options: id (remembers sort + density), rows, rowClass(row), limit (100;
-   null = all), density ('compact' | 'comfortable' | 'roomy'), stick (how many
+   null = all), density ('compact' | 'default' | 'comfy' | 'roomy'), stick (how many
    leading columns stay put; default 1), footer (rows pinned under the body),
    divider(row, i) (a full-width row to put before row i, e.g. a playoff cut),
    legend (node under the table), noun ('players'), empty ([title, detail]).
 
+   A column may also be `{rank:true}`: the row's place under the current
+   sort, muted (the all-players grids lead with it).
+
    `smallTable(o)` is the small Table (§3.2): the same columns and sorting, but
-   comfortable rows, every row shown, no count/density bar, no inner scroll
+   default rows, every row shown, no count/density bar, no inner scroll
    and nothing frozen unless asked (`stick`) — it is short enough to read
    whole, and a frozen "#" column only draws a line through it. */
-function smallTable(o){ return grid(Object.assign({limit:null, density:'comfortable', stick:0}, o, {small:true})); }
-const DG_DENSITY={compact:'Compact', comfortable:'Comfortable', roomy:'Roomy'};
+function smallTable(o){ return grid(Object.assign({limit:null, density:'default', stick:0}, o, {small:true})); }
+/* Row heights 32 / 38 / 48px (Trade Market's sparkline rows are roomy, 64px).
+   `comfortable` is the old name of the default, still in saved settings. */
+const DG_DENSITY={compact:'Compact', default:'Default', comfy:'Comfy', roomy:'Roomy'};
+const densityOf = v=> v==='comfortable'? 'default' : v;
+/**
+ * The density switch: it re-classes the table in place, so a table built
+ * from rows (a roster) changes height without being rebuilt. Remembered per
+ * table id.
+ */
+function densitySwitch(t, id, fallback){
+  const opts=['compact','default','comfy'].concat(fallback==='roomy'? ['roomy'] : []);
+  let cur=densityOf(store.get('gd.dg.'+id, fallback));
+  if(!DG_DENSITY[cur]) cur=fallback;
+  const set=v=>{ opts.forEach(d=> t.classList.remove(d)); t.classList.add(v); };
+  set(cur);
+  const seg=segmented(opts.map(d=>({label:DG_DENSITY[d], value:d})), cur, v=>{
+    store.set('gd.dg.'+id, v); set(v);
+    seg.querySelectorAll('button').forEach((b,i)=> b.setAttribute('aria-pressed', String(opts[i]===v)));
+  });
+  seg.classList.add('dens'); seg.setAttribute('role','group'); seg.setAttribute('aria-label','Row density');
+  return seg;
+}
 const dgState=new Map();
 function dgCell(c, r){
-  if(c.cell) return c.cell(r);
+  if(c.cell) return shadeCell(c.cell(r));
   if(c.kind) return cell(c.kind, c.get? c.get(r) : null, {d:c.d, title:c.title, sep:c.sep});
   return cell('blank');
+}
+/**
+ * A heated cell (fxHeatClass's hu1–3 / hd1–3) draws its shade as a rounded
+ * cell inside the column, not a full-bleed fill: the shade moves from the
+ * <td> onto a wrapper around its content.
+ */
+function shadeCell(td){
+  const m=td.className.match(/\bh([ud])([123])\b/);
+  if(!m) return td;
+  td.classList.remove('h'+m[1]+m[2]);
+  const w=el('span','hc h'+m[1]+m[2]);
+  while(td.firstChild) w.append(td.firstChild);
+  td.append(w);
+  return td;
 }
 function grid(o){
   const cols=o.cols.map(c=> (!c.sort && c.get)? Object.assign({}, c, {sort:c.get}) : c), id=o.id||tableKey(cols);
   const st=dgState.get(id) || {all:false, key:null, dir:null};
   dgState.set(id, st);
-  const fallback=o.density||'compact';
-  const density=!o.small && DG_DENSITY[store.get('gd.dg.'+id,'')]? store.get('gd.dg.'+id,'') : fallback;
+  const fallback=densityOf(o.density||'default');
   const controlled=!!o.onSort;
   const sortKey=controlled? (o.sort&&o.sort.key) : (st.key ?? (o.sort&&o.sort.key) ?? null);
   const sortDir=controlled? (o.sort&&o.sort.flip? 'asc' : 'desc') : (st.dir ?? (o.sort&&o.sort.dir) ?? null);
@@ -1630,14 +1720,13 @@ function grid(o){
   const total=rows.length;
   const shown= st.all || o.limit===null? rows : rows.slice(0, o.limit ?? 100);
 
-  if(!o.small){
-    const bar=el('div','dg-bar');
-    bar.append(el('span','pcount', shown.length<total? 'Showing '+shown.length+' of '+total+' '+(o.noun||'rows') : total+' '+(o.noun||'rows')));
+  const bar=o.small? null : el('div','dg-bar');
+  if(bar){
+    (o.chips||[]).forEach(c=> bar.append(c));
     bar.append(el('span','spacer'));
-    const dens=[...new Set(['compact', fallback==='compact'? 'comfortable' : fallback])];
-    const seg=segmented(dens.map(d=>({label:DG_DENSITY[d], value:d})), density, v=>{ store.set('gd.dg.'+id, v); rebuild(); });
-    seg.classList.add('sm'); seg.setAttribute('aria-label','Row density');
-    bar.append(seg);
+    const sorted=cols.find(c=>c.key && c.key===sortKey);
+    bar.append(el('span','pcount', (shown.length<total? 'Showing '+shown.length+' of '+total+' '+(o.noun||'rows') : total+' '+(o.noun||'rows'))
+      +(sorted? ' \u00b7 sorted by '+headLabel(sorted) : '')));
     wrap.append(bar);
   }
 
@@ -1648,35 +1737,22 @@ function grid(o){
 
   const sc=el('div', o.small? 'scroll' : 'scroll dg-scroll');
   const fixed=cols.every(c=>c.w);
-  const t=el('table','dg '+density+(fixed? ' fixed' : '')+(o.lean? ' lean' : '')+(o.nopos? ' nopos' : '')+(o.tableClass? ' '+o.tableClass : ''));
-  if(fixed) sizeCols(t, cols.map(c=>c.w), true);
+  const t=el('table','dg'+(fixed? ' fixed' : '')+(o.lean? ' lean' : '')+(o.nopos? ' nopos' : '')+(o.tableClass? ' '+o.tableClass : ''));
+  if(fixed) sizeCols(t, cols.map(c=>c.w));
+  if(bar) bar.append(densitySwitch(t, id, fallback)); else t.classList.add(fallback);
   const stick=o.stick ?? 1;
   // Sticky columns need their left offsets; with fixed widths they are known,
   // otherwise only the first column can stick (its offset is 0).
   const lefts=[]; let acc=0;
   cols.forEach((c,i)=>{ lefts.push(i<stick && (i===0 || fixed)? acc : null); acc+=c.w||0; });
-  const stk=(node,i)=>{ if(lefts[i]!=null){ node.classList.add('stk'); node.style.left=lefts[i]+'px'; if(i===stick-1 || lefts[i+1]==null) node.classList.add('stk-last'); } return node; };
+  // A frozen column pins its width, so the next one's offset is known.
+  const stk=(node,i)=>{ if(lefts[i]!=null){ node.classList.add('stk'); node.style.left=lefts[i]+'px'; if(cols[i].w) node.style.minWidth=node.style.maxWidth=cols[i].w+'px'; if(i===stick-1 || lefts[i+1]==null) node.classList.add('stk-last'); } return node; };
 
   const thead=el('thead');
-  if(cols.some(c=>c.band)){
-    const br=el('tr','bands');
-    for(let k=0; k<cols.length;){
-      let n=1; while(k+n<cols.length && (cols[k+n].band||'')===(cols[k].band||'')) n++;
-      const th=el('th', cols[k].band? 'band' : '', cols[k].band||'');
-      th.colSpan=n; if(cols[k].band) th.title=cols[k].band;
-      br.append(k===0? stk(th,0) : th);
-      k+=n;
-    }
-    thead.append(br);
-  }
   const hr=el('tr','heads');
   cols.forEach((c,i)=>{
     const sortable=!!c.key && (controlled || !!c.sort);
-    const th=el('th',(c.r?'r':'')+(c.sep?' tsep':'')+(sortable?' sortable':'')+(c.key&&c.key===sortKey?' sorted':''));
-    const w=el('span','sorth'); w.append(document.createTextNode(c.label||''));
-    if(c.key&&c.key===sortKey) w.append(el('span','arrow', sortDir==='asc'? '▲' : '▼'));
-    th.append(w);
-    if(c.title) th.title=c.title;
+    const th=headCell(c, {sortable, dir: c.key&&c.key===sortKey? sortDir : null});
     if(sortable){
       th.tabIndex=0;
       th.setAttribute('aria-sort', c.key===sortKey? (sortDir==='asc'?'ascending':'descending') : 'none');
@@ -1701,7 +1777,8 @@ function grid(o){
     const div=o.divider? o.divider(r, ri) : null;
     if(div){ div.cells[0] && (div.cells[0].colSpan=cols.length); tb.append(div); }
     const tr=el('tr', o.rowClass? o.rowClass(r)||null : null);
-    cols.forEach((c,i)=> tr.append(stk(dgCell(c,r),i)));
+    cols.forEach((c,i)=> tr.append(stk(c.rank? rankCell(ri) : dgCell(c,r),i)));
+    expandable(tr);
     tb.append(tr);
   });
   (o.footer||[]).forEach(tr=>{ Array.from(tr.cells).forEach((td,i)=>stk(td,i)); tb.append(tr); });
@@ -1715,6 +1792,52 @@ function grid(o){
   function rebuild(){ wrap.replaceWith(grid(o)); }
   return wrap;
 }
+/** The all-players grid leads with the row's overall rank under the current sort, muted. */
+function rankCell(i){ const td=el('td','r'); td.append(el('span','ork',String(i+1))); return td; }
+
+/**
+ * Row states (docs/components.md §3.9). A player row selects and opens a
+ * detail tray under it when clicked anywhere but the name (the name opens
+ * the player's card); a second click closes it. One open row per table.
+ */
+function expandable(tr){
+  const id=tr.querySelector('[data-pid]');
+  if(id) tr.dataset.xp=id.dataset.pid;
+  return tr;
+}
+function playerTray(p, span){
+  const tr=el('tr','tray'), td=el('td'); td.colSpan=span;
+  const box=el('div','tray-in');
+  const tk=(k,v,cls)=>{ const d=el('div','tk'); d.append(el('b',null,k)); if(v instanceof Node) d.append(v); else d.append(el('span',cls||null,v)); box.append(d); };
+  const w=agreed(p,false), r=agreed(p,true);
+  const opp=DATA.week? oppLabel(p, DATA.week) : '';
+  tk('This week', w? [fmt(w.v), fxRankText(w.pr), opp].filter(x=>x && x!=='—').join(' · ') : FX_BLANK);
+  tk('Rest of season', r? [fmt(r.v), fxRankText(r.pr)].filter(Boolean).join(' · ') : FX_BLANK);
+  tk('Rostered', p.own==null? FX_BLANK : Math.round(p.own)+'%');
+  const last=Math.max(0,(Number(DATA.week)||1)-1);
+  if(last){
+    const pts=Array.from({length:last},(_,k)=> weekActual(p,k+1));
+    const bars=el('span','wbars'); bars.setAttribute('aria-label', pts.map(v=>v==null? '–' : fmt(v)).join(' · '));
+    pts.forEach(v=>{ const i=el('i'); i.style.height=(v==null? 1 : Math.max(2, Math.min(18, Math.round(v/36*18))))+'px'; bars.append(i); });
+    tk('Weeks 1–'+last, bars);
+    tk(' ', pts.map(v=>v==null? '–' : fmt(v)).join(' · '), 'tkdim');
+  }
+  td.append(box); tr.append(td);
+  return tr;
+}
+document.addEventListener('click',e=>{
+  const tr=e.target.closest && e.target.closest('tr[data-xp]');
+  if(!tr || e.target.closest('[data-pid], button, a, input, select, label')) return;
+  const open=tr.classList.contains('exp');
+  const tb=tr.parentNode;
+  tb.querySelectorAll(':scope > tr.exp').forEach(x=>{ x.classList.remove('exp','sel'); if(x.nextSibling && x.nextSibling.classList.contains('tray')) x.nextSibling.remove(); });
+  if(open) return;
+  const p=playerById(Number(tr.dataset.xp));
+  if(!p) return;
+  tr.classList.add('exp','sel');
+  tr.after(playerTray(p, Array.from(tr.cells).reduce((n,c)=> n+(c.colSpan||1), 0)));
+});
+
 function panel(title, sub, body){
   const p = el('section','panel');
   const h = el('header');
@@ -2368,11 +2491,21 @@ function columnsFor(scope, o){
   const on=g=> o.groups? o.groups.includes(g) : colGroups.has(g);
 
   if(on('cons')){
-    cols.push({key:'cons', label:'Pts', w:88, r:1, sep:1, band:consBand, kind:'num',
-      title:'Agreed points and position rank: FantasyPros and Draft Sharks, one vote per site, ranked within position and priced off their own points curve',
+    // The agreed number and its position rank are two columns, named for the
+    // window ("Week" / "Wk rank", "ROS" / "ROS rank"), as the boards read.
+    const wkNow=h.kind==='week' && h.from===DATA.week;
+    const lab=h.kind==='ros'? 'ROS' : h.kind==='season'? 'Season' : wkNow? 'Week' : h.kind==='week'? 'Wk '+h.from : 'Pts';
+    const rkLab=h.kind==='ros'? 'ROS rank' : (h.kind==='week'? 'Wk rank' : 'Rank');
+    cols.push({key:'cons', label:lab, w:64, r:1, sep:1, band:consBand, kind:'num',
+      title:'Agreed points: FantasyPros and Draft Sharks, one vote per site, ranked within position and priced off their own points curve',
+      info:'Agreed points: FantasyPros and Draft Sharks, one vote each, priced off the sites\u2019 points curve',
       get:p=>{ const m=metric(p,'agreed',h); return m? m.v : null; },
       cell:p=> consPtsCell(p,h),
       total:list=> stackCell(fmt(sum(list,p=>{ const m=metric(p,'agreed',h); return m? m.v : 0; })),'',{sep:1,big:1})});
+    cols.push({key:'consrk', label:rkLab, w:72, r:1, band:consBand,
+      title:'His position rank on the agreed board for this window',
+      cell:p=>{ const m=metric(p,'agreed',h); const td=cell('num', null, {text:m&&m.pr? m.pr : FX_BLANK}); return td; },
+      total:()=> el('td','r')});
   }
 
   if(on('fp')){
@@ -2442,7 +2575,7 @@ function columnsFor(scope, o){
     const info=(c)=> cols.push(Object.assign({band:'Info', r:1}, c));
     // SOS rides in the opponent cell: it describes that opponent, and as its
     // own right-aligned column it sat a full column-width away from the name.
-    if(mode!=='ros') info({key:'opp', label: mode==='week'? 'Opp \u00b7 SOS' : 'Opp', w:96, r:0,
+    if(mode!=='ros') info({key:'opp', label: mode==='week'? 'Opp \u00b7 SOS' : 'Opp', w:96, r:1,
       title: mode==='week'? 'This week\u2019s opponent, with Draft Sharks\u2019 strength-of-schedule rating for the matchup \u2014 positive is easier, negative is tougher' : 'Opponent for the first week in this window',
       cell:p=> oppCell(p,h)});
     if(o.players && mode==='week') info({key:'trend', label:'Trend', w:56, title:'Change in the expert consensus rank since the last update', cell:trendCell});
@@ -2465,7 +2598,7 @@ function columnsFor(scope, o){
   // has a score.
   if(h.kind==='week' && !o.noActual){
     const wk=h.from;
-    cols.push({key:'pts', label:'PTS', w:66, r:1, sep:1, band:'Actual',
+    cols.push({key:'pts', label:'Scored', w:66, r:1, sep:1, band:'Actual',
       title:'Points scored in week '+wk+'. A player on a lineup in this league uses the league\u2019s own scoring once his game has started. Everyone else uses Sleeper\u2019s published points for this format.',
       cell:p=> scoredCell(p, wk),
       total:list=>{
@@ -2487,7 +2620,7 @@ function columnsFor(scope, o){
   });
   return cols;
 }
-const COL_TONE = {cons:'key', tm:'key', pts:'key', ecr:'aux', ecrrng:'aux', dsfloor:'aux', dsceil:'aux', own:'aux', tmd:'aux'};
+const COL_TONE = {cons:'key', tm:'key', pts:'key', consrk:'aux', ecr:'aux', ecrrng:'aux', dsfloor:'aux', dsceil:'aux', own:'aux', tmd:'aux'};
 
 /**
  * The demand side, as columns: what the rest of fantasy football is doing with
@@ -2518,7 +2651,7 @@ function buzzColumns(){
     c({key:'slDrops',  label:'SL \u2212', title:'Sleeper drops, last '+W[1]+'h', cell:sigNumCell(g=>g.d, rate)}),
     c({key:'yAdds',    label:'YH +',    title:'Yahoo adds across every Yahoo league, one day'+day, cell:sigNumCell(g=>g.ya, rate)}),
     c({key:'yDrops',   label:'YH \u2212', title:'Yahoo drops, one day'+day, cell:sigNumCell(g=>g.yd, rate)}),
-    c({key:'yNet',     label:'Net',     title:'Yahoo adds minus drops'+day, cell:sigNumCell(g=>g.yn, signed)}),
+    c({key:'yNet',     label:'Net',     title:'Yahoo adds minus drops'+day, cell:p=>{ const td=sigNumCell(g=>g.yn, signed)(p); const v=p.sig&&p.sig.yn; if(v!=null) td.className+=fxHeatClass(fxHeat(v,[1000,5000,20000])); return td; }}),
     c({key:'yStart',   label:'Start %', w:72, title:'Share of Yahoo leagues that started him'+day, cell:sigNumCell(g=>g.ys, v=>Math.round(v)+'%')}),
     c({key:'rostered', label:'YH %',    w:108, title:'Share of Yahoo leagues rostering him, and the change since the previous day', cell:p=>rosteredCell(p.sig)}),
   ];
@@ -2536,26 +2669,12 @@ function fpOwn(p,h){
 }
 function consPtsCell(p,h){
   const c=metric(p,'agreed',h);
-  // His position rank for the same window rides under the points: RB7 this
-  // week, RB12 rest of season. A season total has no published rank.
-  const td=stackCell(fmt(c&&c.v), c&&c.pr || null, {sep:1, big:1});
+  // His position rank for the same window is the next column ("Wk rank").
+  const td=stackCell(fmt(c&&c.v), null, {sep:1, big:1});
   const tip=consTip(p,h);
   if(tip) td.title=tip;
   return td;
 }
-function leagueConsPtsCell(p,h){
-  const c=metric(p,'agreed',h), td=stackCell(fmt(c&&c.v), '', {sep:1,big:1});
-  const rank=String(c&&c.pr||'').match(/^(QB|RB|WR|TE|K|DST|DEF)\s*(\d+)$/i);
-  if(rank){
-    const sub=el('div','ss lp-rank');
-    sub.append(posChip(rank[1],'mini'), el('span',null,rank[2]));
-    td.querySelector('.stack').append(sub);
-  }
-  const tip=consTip(p,h);
-  if(tip) td.title=tip;
-  return td;
-}
-
 /** The hover text on a source cell: what that number is, where it adds something. */
 function srcTip(p,k,h){
   const mode=hzMode(h);
@@ -2587,15 +2706,7 @@ function srcCell(p,k,h,first){
 
 /* The helpers below take an optional `cols` list: a page that owns its columns (a My Team tab)
    passes them; everything else gets the shared set for the scope. */
-function projBands(scope, cols){
-  const bands=[{label:'',span:1}];
-  (cols||columnsFor(scope)).forEach(c=>{
-    const last=bands[bands.length-1];
-    if(last.label===c.band && bands.length>1) last.span++; else bands.push({label:c.band||'',span:1});
-  });
-  return bands;
-}
-function projCols(scope, cols){ return [{label:'Player', w:290}].concat(cols||columnsFor(scope)); }
+function projCols(scope, cols){ return [{label:'Player', w:330}].concat(cols||columnsFor(scope)); }
 
 /** Points Sleeper (or FantasyPros) stored for this player in one week. */
 function weekActual(p, w){
@@ -2660,25 +2771,30 @@ function byeRow(tr, p, scope, starter){
 
 function lineupTableView(lu, scope, cols){
   const rows=[];
-  const add=(p,bench)=>{
-    const tr=el('tr'); if(bench) tr.className='benchrow';
+  const span=projCols(scope,cols).length;
+  const add=(p,slot)=>{
+    const tr=el('tr');
     if(!p.i && !p.n){
       const td=el('td');
-      const w=el('div','prow'); w.append(posChip(bench?'BN':p.slot,'slot')); w.append(el('span','note','empty'));
+      const w=el('div','pid roster'); w.append(posChip(slot,'slot')); w.append(el('span','note','empty'));
       td.append(w); tr.append(td);
-      const n=projCols(scope,cols).length-1;
-      for(let k=0;k<n;k++) tr.append(el('td','r','—'));
+      for(let k=0;k<span-1;k++) tr.append(el('td','r','\u2014'));
       rows.push(tr); return;
     }
-    tr.append(rosterCell(p, bench?'BN':p.slot));
+    tr.append(rosterCell(p, slot));
     projCells(tr,p,scope,cols);
-    byeRow(tr, p, scope, !bench);
+    byeRow(tr, p, scope, slot!=='BN' && slot!=='IR');
     rows.push(tr);
   };
-  lu.starters.forEach(p=>add(p,false));
+  const section=label=>{ const tr=el('tr','sec'), td=el('td',null,label); td.colSpan=span; tr.append(td); rows.push(tr); };
+  // Reserve is its own section: a host's IR slot, or a bench player on IR.
+  const onIR=p=> String(p.lslot||'').toUpperCase()==='IR' || String(p.inj||'').toUpperCase()==='IR';
+  lu.starters.forEach(p=>add(p,p.slot));
   rows.push(totalsRow(lu.starters, scope, 'Starters', cols));
-  lu.bench.forEach(p=>add(p,true));
-  return table2(projBands(scope,cols), projCols(scope,cols), rows, {cls:'roster lean'});
+  const bench=lu.bench.filter(p=>!onIR(p)), ir=lu.bench.filter(onIR);
+  if(bench.length){ section('Bench'); bench.forEach(p=>add(p,'BN')); }
+  if(ir.length){ section('Injured reserve'); ir.forEach(p=>add(p,'IR')); }
+  return table2(projCols(scope,cols), rows, {cls:'roster lean', id:'roster-lineup', note:'Sorted by lineup slot'});
 }
 
 function positionTableView(players, scope, cols){
@@ -2693,22 +2809,22 @@ function positionTableView(players, scope, cols){
   [...groups.entries()].forEach(([pos,list])=>{
     const hr=el('tr','grouphdr');
     const td=el('td'); td.colSpan=span;
-    const w=el('div','slotcell'); w.append(posChip(pos));
-    w.append(el('span',null,(list.length===1? '1 player' : list.length+' players')+' · '+fmt(scopeTotal(list,scope),1)+' pts'));
+    const w=el('div','slotcell');
+    w.append(el('span',null,pos+' \u00b7 '+(list.length===1? '1 player' : list.length+' players')+' \u00b7 '+fmt(scopeTotal(list,scope),1)+' pts'));
     td.append(w); hr.append(td); rows.push(hr);
     const hh=hzOf(scope);
     list.sort((a,b)=> ((metric(b,'agreed',hh)||{}).v??-1)-((metric(a,'agreed',hh)||{}).v??-1));
-    list.forEach(p=>{ const tr=el('tr'); tr.append(rosterCell(p,null)); projCells(tr,p,scope,cols); rows.push(tr); });
+    list.forEach(p=>{ const tr=el('tr'); tr.append(playerCell2(p)); projCells(tr,p,scope,cols); rows.push(tr); });
   });
-  return table2(projBands(scope,cols), projCols(scope,cols), rows, {cls:'roster lean nopos'});
+  return table2(projCols(scope,cols), rows, {cls:'roster lean nopos', id:'roster-pos'});
 }
 
 function rosterTable(players, scope){
   const sc=scope||hz();
   const rows=players.slice().sort(byPos).map(p=>{
-    const tr=el('tr'); tr.append(rosterCell(p,null)); projCells(tr,p,sc); return tr;
+    const tr=el('tr'); tr.append(playerCell2(p)); projCells(tr,p,sc); return tr;
   });
-  return table2(projBands(sc), projCols(sc), rows, {cls:'lean'});
+  return table2(projCols(sc), rows, {cls:'lean'});
 }
 
 function segmented(options, value, onPick){
@@ -2798,7 +2914,7 @@ function oppLabel(p, w){
 }
 /** Opponent, with kickoff day/time underneath as a small subtext line. */
 function oppCell(p,h){
-  const td=el('td','num');
+  const td=el('td','r num opp');
   const wrap=el('div','oppwrap');
   const line=el('div','oppline');
   line.append(Object.assign(el('span','oppname'),{textContent:oppLabel(p,h.from)}));
@@ -3016,7 +3132,7 @@ function lvCols(l){
 /** The columns of each tab. Each is built for a fixed scope: this week, or rest of season. */
 function teamColumns(tab){
   const wk=parseHz('w-'+DATA.week), ros=parseHz('ros');
-  const CONS=['cons'];
+  const CONS=['cons','consrk'];
   switch(tab){
     case 'overview': {
       // Both windows at once: what he does this week, and what he is worth from
@@ -3026,7 +3142,7 @@ function teamColumns(tab){
       // Proj/Score (not two columns both headed "Pts") so the projection and
       // what he actually scored never read as the same claim.
       const oppCols = pickCols(columnsFor(wk,{groups:['info']}), ['opp'], 'This week · wk '+DATA.week);
-      const thisWeek = pickCols(columnsFor(wk,{groups:['cons']}), ['cons','pts'], 'This week · wk '+DATA.week);
+      const thisWeek = pickCols(columnsFor(wk,{groups:['cons']}), ['cons','consrk','pts'], 'This week · wk '+DATA.week);
       thisWeek.forEach(c=>{ c.sep=0; });
       const projCol=thisWeek.find(c=>c.key==='cons'); if(projCol) projCol.label='Proj';
       const scoreCol=thisWeek.find(c=>c.key==='pts'); if(scoreCol) scoreCol.label='Score';
@@ -3045,11 +3161,11 @@ function teamColumns(tab){
       return {scope:ros, cols:[...columnsFor(ros,{groups:['cons']}), ...lvCols(L()), ...columnsFor(ros,{groups:['info']})]};
     // One narrow column under its own band: "This week" clipped to "THIS …".
     case 'trade':
-      return [...pickCols(columnsFor(wk,{groups:['cons']}), ['cons'], 'Wk '+DATA.week).map(c=>Object.assign(c,{label:'Proj'})),
+      return [...pickCols(columnsFor(wk,{groups:['cons']}), ['cons'], 'Wk '+DATA.week).map(c=>Object.assign(c,{label:'Week'})),
               ...lvCols(L()),
               ...columnsFor(wk,{groups:['mkt'], noActual:true})];
     case 'buzz':
-      return [...pickCols(columnsFor(wk,{groups:['cons']}), ['cons'], 'Wk '+DATA.week).map(c=>Object.assign(c,{label:'Proj'})),
+      return [...pickCols(columnsFor(wk,{groups:['cons']}), ['cons'], 'Wk '+DATA.week).map(c=>Object.assign(c,{label:'Week'})),
               ...columnsFor(wk,{groups:['buzz'], noActual:true})];
   }
   return [];
@@ -4002,7 +4118,7 @@ function weekCell(r){
   v.textContent = k.pre && k.pts==null? '—' : pts2(k.pts);
   if(!k.bye && !k.pre){
     v.style.color = k.tie? 'var(--ink-2)' : (k.win? 'var(--good)' : 'var(--bad)');
-    if(k.final) v.style.fontWeight='700';
+    if(k.final) v.style.fontWeight='600';
   }
   d.append(v);
   const proj = k.proj==null? null : pts2(k.proj);
@@ -4369,6 +4485,8 @@ PLAYER_SORTS.tm    = {label:'Trade value', of:p=> p.tm&&p.tm.v!=null? p.tm.v : -
 PLAYER_SORTS.tmd   = {label:'Trade value change', of:p=> tmChange(p)??-Infinity, dir:-1};
 PLAYER_SORTS.tms   = PLAYER_SORTS.tmd;
 PLAYER_SORTS['s-ds']={label:'Draft Sharks', of:p=> (metric(p,'ds')||{}).v??-1, dir:-1};
+PLAYER_SORTS.consrk= PLAYER_SORTS.conspos;
+PLAYER_SORTS.roster= {label:'Owner', of:p=>{ const o=ownerOf(p); return ({you:'0',team:'1',wv:'2',fa:'3'})[o.cls]+o.text; }, text:true};
 
 function byPlayers(a,b){
   const s=PLAYER_SORTS[playerSort]||PLAYER_SORTS.cons;
@@ -4447,37 +4565,33 @@ function rosterIndex(l){
 }
 
 /**
- * Who has him, for every league in one cell. A rostered player shows the team
- * that has him (crest + abbreviation, yours highlighted); anyone else shows FA,
- * or - when a claim period is configured and he was dropped inside it - that he
- * is on waivers and when he clears. This used to be two columns, and the second
- * (Status) said "free agent" for players who were on a roster.
+ * Who has him, for every league in one cell: the owner badge
+ * (docs/components.md §3.9) — the rostering team's abbreviation (YOU on
+ * yours), FA, or W with the day he clears waivers — full name on hover. The
+ * row itself is tinted by the same answer (`ownerRowClass`).
  */
+function waiverClaim(p){
+  const c=CLOCK && CLOCK.configured && !CLOCK.none? CLOCK.byPlayer.get(p.i) : null;
+  return c && c.onWaivers? c : null;
+}
+function ownerOf(p){
+  const claim=waiverClaim(p);
+  return fxOwner(ROSTER.get(p.i)||null, claim? {clearsDay: claim.clearsAt.toLocaleDateString([], {weekday:'short'})} : null);
+}
+const ownerRowClass = p=> ownerOf(p).row || null;
+function ownerBadge(o){ const b=el('span','ob'+(o.cls==='team'? '' : ' '+o.cls), o.text); b.title=o.title; return b; }
 function rosterBadgeCell(p){
-  const td=el('td');
-  const w=el('div','rteam');
-  const r=ROSTER.get(p.i);
-  if(r){
-    const b=el('span','teambadge '+(r.mine?'mine':'other'));
-    b.title=r.name+(r.mine?' \u2014 your team':'');
-    if(r.logo) b.append(imgEl(r.logo,'tblogo'));
-    b.append(document.createTextNode(r.abbr));
-    w.append(b); td.append(w); return td;
+  const td=el('td','r');
+  const o=ownerOf(p), r=ROSTER.get(p.i), claim=!r && waiverClaim(p);
+  const b=ownerBadge(o);
+  if(claim){
+    b.title='On waivers \u2014 dropped '+claim.droppedAt.toLocaleString()+(claim.droppedBy? ' by '+claim.droppedBy : '')+'; clears '+claim.clearsAt.toLocaleString([], {weekday:'short', hour:'numeric'});
+    const w=el('span','obw'); w.append(b, el('small',null,o.day)); td.append(w);
+  } else {
+    if(o.cls==='fa' && !(CLOCK && CLOCK.configured)) b.title='Free agent \u2014 set a claim period in League Setup to see waiver status';
+    td.append(b);
   }
-  const claim=CLOCK && CLOCK.configured && !CLOCK.none? CLOCK.byPlayer.get(p.i) : null;
-  if(claim && claim.onWaivers){
-    const box=el('div','mvside');
-    const b=el('span','teambadge wv','W'); b.textContent='Waivers';
-    box.append(b);
-    const hrs=claim.hoursLeft;
-    box.append(Object.assign(el('div','ss'),{textContent: hrs<24? 'clears in '+Math.max(1,Math.round(hrs))+'h'
-      : 'clears '+claim.clearsAt.toLocaleDateString([], {weekday:'short'})+' '+claim.clearsAt.toLocaleTimeString([], {hour:'numeric'})}));
-    td.title='On waivers \u2014 dropped '+claim.droppedAt.toLocaleString()+(claim.droppedBy? ' by '+claim.droppedBy : '')+'; claims process before he reaches free agency.';
-    td.append(box); return td;
-  }
-  const b=el('span','teambadge fa','FA');
-  b.title = CLOCK && CLOCK.configured? 'Free agent \u2014 not on a roster in this league' : 'Free agent \u2014 set a claim period in League Setup to see waiver status';
-  w.append(b); td.append(w);
+  td.dataset.v=o.cls==='you'? '0' : (o.cls==='team'? '1'+o.text : (o.cls==='wv'? '2' : '3'));
   return td;
 }
 
@@ -4533,9 +4647,10 @@ function onPlayerSort(key){
  */
 function playerColumns(){
   return [
-    {w:34,  band:'', cell:p=>{ const td=el('td','watch'); td.append(starBtn(p)); return td; }},
-    {w:264, band:'', key:'name',   label:'Player', cell:playerCell2},
+    {w:44,  band:'', label:'#', r:1, rank:true},
+    {w:330, band:'', key:'name',   label:'Player', cell:playerCell2},
     ...columnsFor(hz(), {players:true}),
+    {w:34,  band:'', cell:p=>{ const td=el('td','watch'); td.append(starBtn(p)); return td; }},
   ];
 }
 
@@ -4648,18 +4763,17 @@ function lpList(){
 }
 function leaguePlayerColumns(){
   const cols=[
-    {w:34, band:'', cell:p=>{ const td=el('td','watch'); td.append(starBtn(p)); return td; }},
-    {w:264, band:'', key:'name', label:'Player', cell:playerCell2},
-    {w:118, band:'', key:'roster', label:'Roster', cell:rosterBadgeCell},
+    {w:44, band:'', label:'#', r:1, rank:true},
+    {w:330, band:'', key:'name', label:'Player', cell:playerCell2},
+    {w:64, band:'', key:'roster', label:'Owner', r:1, cell:rosterBadgeCell},
     ...columnsFor(hz(), {players:true}),
+    {w:34, band:'', cell:p=>{ const td=el('td','watch'); td.append(starBtn(p)); return td; }},
   ];
-  const agreed=cols.find(c=>c.key==='cons');
-  if(agreed) agreed.cell=p=>leagueConsPtsCell(p,hz());
   return cols;
 }
 function leaguePlayersTable(list){
   return grid({id:'lplayers', tableClass:'lplayers', cols:leaguePlayerColumns(), rows:list, noun:'players', stick:2, lean:true,
-    rowClass:p=>{ const r=ROSTER.get(p.i); return r && r.mine? 'mine' : null; },
+    rowClass:ownerRowClass,
     sort:{key:lpSort, flip:lpFlip}, onSort:onLpSort,
     empty:['No players match','Loosen a filter, or clear the search.']});
 }
@@ -4790,8 +4904,8 @@ function waiverRows(pool, pos, mineIds){
  */
 function waiverSheetCols(){
   const wk=waiverBy==='wk';
-  const player={key:'name', label:'Player', w:280, band:'', dir:'asc', sort:r=>r.p.n||'', cell:r=> cell('player', r.p)};
-  const roster={label:'Roster', w:118, band:'', cell:r=> rosterBadgeCell(r.p)};
+  const player={key:'name', label:'Player', w:330, band:'', dir:'asc', sort:r=>r.p.n||'', cell:r=> cell('player', r.p)};
+  const roster={label:'Owner', w:64, band:'', r:1, cell:r=> rosterBadgeCell(r.p)};
   const n=(key,label,get,d,o={})=> Object.assign({key, label, r:1, w:58, sort:get, cell:r=> cell('num', get(r), {d, sep:o.sep})}, o);
   if(waiverSheet==='projections'){
     const band=wk? 'Week '+DATA.week : 'Rest of season · '+rosSpan();
@@ -4826,7 +4940,7 @@ function waiverSheetCols(){
   return [
     {key:'ecr', label:'ECR', r:1, w:56, dir:'asc', title:'FantasyPros expert consensus rank', sort:r=> waiverBy==='wk'? r.p.rk : r.p.rosRk, cell:r=> cell('num', null, {text:ecrText(waiverBy==='wk'? r.p.pr : r.p.rosPr)})},
     player, roster,
-    {label:'Opp', w:72, sep:1, cell:r=> cell('text', null, {cls:'num tsep', text:oppLabel(r.p, DATA.week)})},
+    {label:'Opp', w:72, r:1, cell:r=> cell('text', null, {cls:'r num opp', text:oppLabel(r.p, DATA.week)})},
     Object.assign(n('pts', 'Pts', r=>r.pts, wk? 1 : 0, {title:'Agreed points: FantasyPros and Draft Sharks, one vote per site'}), {cell:r=>{
       const td=cell('num', r.pts, {d:wk? 1 : 0}); td.title=consTip(r.p, sheetPeriod(r.p).h); return td;
     }}),
@@ -4899,7 +5013,7 @@ function pageWaivers(){
     any=true;
     const title=POS_TITLE[pos] || pos;
     out.push(panel(title, rows.length+' \u00b7 '+(waiverShowMine? 'yours included' : 'available'),
-      smallTable({id:'waivers|'+waiverSheet+'|'+waiverBy, cols:spec, rows, lean:true, nopos:true, rowClass:r=> r.mine? 'mine' : null})));
+      smallTable({id:'waivers|'+waiverSheet+'|'+waiverBy, cols:spec, rows, lean:true, nopos:true, rowClass:r=> ownerRowClass(r.p)})));
   });
   if(!any) out.push(panel('Waiver Wire', null, emptyState('Nobody available','No player at this position has a FantasyPros projection.')));
 
@@ -5082,7 +5196,7 @@ function sourceTable(site, feed, ctx, rows){
   const cols=feed.cols(ctx, rows);
   const lead = teams
     ? {key:'team', label:'Team', w:72, dir:'asc', sort:r=>r.team, cell:r=>cell('text', r.team)}
-    : {key:'name', label:'Player', w:264, dir:'asc', sort:r=>String(r.n||'').toLowerCase(), cell:r=>cell('player', r)};
+    : {key:'name', label:'Player', w:330, dir:'asc', sort:r=>String(r.n||'').toLowerCase(), cell:r=>cell('player', r)};
   const gcols=[lead, ...cols.map(c=>({key:c.key, label:c.label, title:c.title, r:c.kind==='text'? 0 : 1,
     w: c.wide? 420 : teams? 60 : c.kind==='text'? 104 : 84, dir:feedDir(c),
     sort:r=>{ const v=c.get(r,ctx); return v===''? null : v; },
@@ -5969,7 +6083,7 @@ function pageAnalysis(){
 
     const lineup=me.lineup||[];
     cols.append(panel('Your lineup, slot by slot','FantasyPros’ optimal lineup',
-      lineup.length? smallTable({id:'analysis-lineup', rows:lineup, cols:[
+      lineup.length? smallTable({id:'analysis-lineup', nopos:true, rows:lineup, cols:[
         {label:'Slot', cell:x=> cell('slot', x.slot)},
         {label:'Player', cell:x=>{ const pr=uni.get(Number(x.fpId)); return pr? cell('player', pr) : cell('text', null, {text:x.name||FX_BLANK}); }},
         {key:'rank', label:'League rank', r:1, dir:'asc', sort:x=>x.rank, cell:x=> cell('num', null, {text:fxRank(x.rank)})},
@@ -6291,7 +6405,7 @@ function pagePower(){
     const uni=universe(scoringKey(l));
     const slotOf=x=> x.slot.includes('/')? (x.slot.includes('QB')? 'SF' : 'FLEX') : x.slot;
     const prOf=x=> x.id!=null? uni.get(Number(x.id)) : null;
-    out.push(panel('Your contender lineup', valName(S), smallTable({id:'power-lineup', rows:me.lineup, cols:[
+    out.push(panel('Your contender lineup', valName(S), smallTable({id:'power-lineup', nopos:true, rows:me.lineup, cols:[
       {label:'Slot', cell:x=> cell('slot', slotOf(x))},
       {label:'Player', cell:x=>{ const pr=prOf(x); return pr? cell('player', pr) : cell('text', null, {text:x.id!=null? FX_BLANK : 'Empty'}); }},
       // Unpriced (a kicker, a defense) reads as a dash, not as a value of 0.
@@ -6440,9 +6554,11 @@ function pageValues(){
       return vs.length>1? Math.max(...vs)-Math.min(...vs) : null;
     };
     const band=s=> SRC_GROUPS.find(g=>g.key===srcGroup(s)).label;
+    const mineIds=new Set(myTeams(l).map(t=>String(t.id)));
+    const valOwner=p=>{ const t=owner.get(p.i); return fxOwner(t? {mine:mineIds.has(String(t.id)), abbr:teamAbbrev(l,t), name:teamLabel(l,t)} : null, null); };
     const cols=[
       {key:'name', label:'Player', w:null, dir:'asc', sort:p=>p.n||'', cell:p=>cell('player',p)},
-      {key:'team', label:'Team', dir:'asc', sort:p=> owner.has(p.i)? teamLabel(l,owner.get(p.i)) : '~', cell:p=>{ const t=owner.get(p.i); return el('td',null,t? teamLabel(l,t) : 'Free agent'); }},
+      {key:'team', label:'Owner', r:1, dir:'asc', sort:p=> owner.has(p.i)? teamLabel(l,owner.get(p.i)) : '~', cell:p=>{ const td=el('td','r'); td.append(ownerBadge(valOwner(p))); return td; }},
       ...ss.map(s=>({
         key:s.id, label:srcShort(s), title:srcTitle(s), band:band(s), r:1,
         // Ranks read best-first ascending; points and raw values descending.
@@ -6477,7 +6593,7 @@ function pageValues(){
     Array.from(LIST.children).slice(1).forEach(n=>n.remove());
     LIST.append(grid({
       id:'values|'+valScale, cols, rows, footer, noun:'players',
-      limit: teamView? null : 100, stick:1,
+      limit: teamView? null : 100, stick:1, rowClass:p=> valOwner(p).row || null,
       legend: valScale!=='raw'? heatLegend() : null,
       empty:['Nobody matches','Loosen the position, search or team filter.']
     }));
@@ -6759,7 +6875,7 @@ function pageTrade(){
     else if(tradeSort==='dn') rows=rows.filter(p=>move(p)!=null).sort((a,b)=>move(a)-move(b));
     else rows.sort((a,b)=>b.tm.v-a.tm.v);
     const cols=[
-      {key:'name', label:'Player', w:250, dir:'asc', sort:p=>p.n||'', cell:p=>cell('player',p)},
+      {key:'name', label:'Player', w:330, dir:'asc', sort:p=>p.n||'', cell:p=>cell('player',p)},
       {key:'mkt', label:'Market', r:1, w:104, title:'What managers pay for him in trades, on a ~1000 scale', sort:p=>p.tm.v, cell:tmMarketCell},
       {key:'exp', label:'Experts', r:1, w:104, title:'What FantasyPros’ experts would pay, where published', sort:p=>p.tm.xv, cell:tmExpertCell},
       {key:'gap', label:'Value gap', r:1, w:92, title:'Expert value minus market value', sort:p=>p.tm.x, cell:tmGapCell},
@@ -6958,7 +7074,7 @@ function mdValues(p){
     if(v==null){ tr.append(dashCell(), dashCell(), dashCell(), dashCell()); return tr; }
     const pr=valPosRank(p,s,sf), w=valWorth(p,s,sf);
     tr.append(Object.assign(el('td','r num'),{textContent:pr!=null? (p.p||'')+pr : '—'}));
-    tr.append(Object.assign(el('td','r num'+heatClass(p,s,sf)),{textContent:prFmt(w)}));
+    tr.append(shadeCell(Object.assign(el('td','r num'+heatClass(p,s,sf)),{textContent:prFmt(w)})));
     const d=w!=null && base!=null? w-base : null;
     const dc=el('td','r'); dc.append(el('span','delta '+(d>0?'up':d<0?'dn':'flat'), d==null? '—' : (d>0?'+':'')+prFmt(d))); tr.append(dc);
     tr.append(Object.assign(el('td','r num'),{textContent: s.kind==='rank'? '#'+v : fxNum(v,1)}));
@@ -7806,7 +7922,7 @@ function pageLeagues(){
       {label:'Matchup'},
       {label:'Sync', r:1, title:'Switch a league off to skip it in every sync'},
     ];
-    out.push(panel('Your teams', shown.length+' team'+(shown.length===1?'':'s')+' · best standing first', table2(null, cols, rows)));
+    out.push(panel('Your teams', shown.length+' team'+(shown.length===1?'':'s')+' · best standing first', table2(cols, rows)));
   }
 
   const off=dir.filter(d=>!d.scraped && (lgHost==='all' || d.host===lgHost));

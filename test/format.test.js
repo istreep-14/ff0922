@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { FX_BLANK, fxNum, fxValue, fxCount, fxSignedCount, fxDelta, fxRank, fxPosRank, fxPct, fxHeat, fxHeatClass } from '../src/format.js';
+import { FX_BLANK, fxNum, fxValue, fxCount, fxSignedCount, fxDelta, fxRank, fxPosRank, fxRankText, fxOwner, fxPct, fxHeat, fxHeatClass } from '../src/format.js';
 
 test('a missing number is a dash, never a zero — and a real zero stays a zero', () => {
   for (const f of [fxNum, fxValue, fxCount, fxSignedCount, fxDelta, fxRank, fxPct]) {
@@ -44,7 +44,7 @@ test('a change always carries its sign; ranks and shares read as ranks and share
   assert.equal(fxDelta(0), '0.0');
   assert.equal(fxDelta(22, 0), '+22');
   assert.equal(fxRank(12), '#12');
-  assert.equal(fxPosRank('WR', 12), 'WR12');
+  assert.equal(fxPosRank('WR', 12), 'WR 12');
   assert.equal(fxPct(99.7), '100%');
 });
 
@@ -71,4 +71,34 @@ test('the page formats through this module, and has no private formatter left', 
   const src = readFileSync(new URL('../src/format.js', import.meta.url), 'utf8');
   const names = [...src.matchAll(/^(?:export )?(?:const|function) (\w+)/gm)].map((m) => m[1]);
   for (const n of names) assert.ok(!new RegExp(`(?:const|let|function) ${n}\\b`).test(tpl), `${n} is declared in the template too`);
+});
+
+test('a position rank reads "RB 6" everywhere, including one a source already wrote as RB6', () => {
+  // The tables showed RB6 beside the points while the design (and the player
+  // card) read RB 6; the source strings came through untouched.
+  assert.equal(fxRankText('RB6'), 'RB 6');
+  assert.equal(fxRankText('wr 12'), 'WR 12');
+  assert.equal(fxRankText('DST1'), 'DST 1');
+  assert.equal(fxPosRank('', 3), '3', 'no position, no stray space');
+  // Anything that is not a position rank passes through untouched.
+  assert.equal(fxRankText('#12'), '#12');
+  assert.equal(fxRankText('17.2'), '17.2');
+  assert.equal(fxRankText('Week 7'), 'Week 7');
+  assert.equal(fxRankText(''), '');
+  assert.equal(fxRankText(null), FX_BLANK);
+});
+
+test('the owner badge: YOU for yours, the abbreviation for anyone else, FA, or W with the day he clears', () => {
+  assert.deepEqual(
+    [fxOwner({ mine: true, abbr: 'IAN', name: 'Ian' }).text, fxOwner({ mine: true, abbr: 'IAN' }).cls, fxOwner({ mine: true }).row],
+    ['YOU', 'you', 'you']);
+  const other = fxOwner({ mine: false, abbr: 'NAS', name: 'Naseem Abdel' });
+  assert.equal(other.text, 'NAS');
+  assert.equal(other.row, '', 'someone else\u2019s player is not tinted');
+  assert.match(other.title, /Naseem Abdel/, 'the full name is on hover');
+  const w = fxOwner(null, { clearsDay: 'Thu' });
+  assert.deepEqual([w.text, w.cls, w.row, w.day], ['W', 'wv', 'wv', 'Thu']);
+  // A rostered player is never "on waivers", whatever the clock says.
+  assert.equal(fxOwner({ mine: false, abbr: 'ZK' }, { clearsDay: 'Thu' }).text, 'ZK');
+  assert.deepEqual([fxOwner(null).text, fxOwner(null).row], ['FA', 'fa']);
 });

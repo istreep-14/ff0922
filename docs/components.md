@@ -3,7 +3,9 @@
 Status: **phases 1–4 done** — formatting module, `cell()` kinds, one player
 identity, `grid()` on every large table, `smallTable()` on every small table,
 and shared List / Compare / KeyValue components; phase 5 remains. The
-migration order is at the end.
+migration order is at the end. **The table system (§3.9, 2026-10-21)** is the
+approved look every table now draws with: tokens, one header row, the
+one-line player identity, owner badges, densities and row states.
 
 The dashboard (`src/dashboard.template.html`) grew one page at a time, and its
 tables show it. This document fixes ONE vocabulary of components — which one a
@@ -57,8 +59,8 @@ Pick by the data's shape. When two fit, take the one higher in this list.
 
 | Component | Use when | Row height | Examples here |
 |---|---|---|---|
-| **DataGrid** | > ~25 rows, or > 8 columns, or the reader scans/sorts/filters | 36px (compact) | Players, League Players, Values, Trade Market, Sources |
-| **Table** | ≤ ~25 rows, rows are teams/weeks, a bar or tier is the point | 48px (comfortable) | Standings, Power Rankings, Teams matrix, Analysis, Waiver Wire sheets (top 8–30 per position), game log |
+| **DataGrid** | > ~25 rows, or > 8 columns, or the reader scans/sorts/filters | 38px (default; 32 / 48 by the switch) | Players, League Players, Values, Trade Market, Sources |
+| **Table** | ≤ ~25 rows, rows are teams/weeks, a bar or tier is the point | 38px (default) | Standings, Power Rankings, Teams matrix, Analysis, Waiver Wire sheets (top 8–30 per position), game log |
 | **List** | 1–3 facts per row, read top to bottom, often selectable | 44px; 64px as cards | Lineups, trade sides, watch list, recent players, transactions |
 | **Compare** | two things side by side | — | Matchup, trade result |
 | **KeyValue** | one object's attributes | 28px | player card blocks, league settings |
@@ -67,20 +69,22 @@ Pick by the data's shape. When two fit, take the one higher in this list.
 
 ### 3.1 DataGrid (large)
 
-- Sticky header (and band row); the first column is sticky ALWAYS.
-- Named **bands** over grouped columns: a centred spanner label over a short
-  rule that stops shy of the next group. Every table shares one header —
-  unfilled, muted eyebrow labels, one strong rule under the last header row.
-- A grid narrower than its panel still spans it: the columns keep their
-  widths (`sizeCols(…, fill)` pins a min-width) and an empty trailing cell
-  takes the spare room, so header and row rules run to the panel edge.
-- Compact density; zebra off; row hover on; `tr.mine` highlight kept.
+- Sticky header; the first column is sticky ALWAYS.
+- **One header row** (§3.9). A column group no longer gets a band row; its
+  short name rides in the column's own label (`FP pts`, `DS floor`,
+  `Trade value`) through `headLabel` / `BAND_SHORT`, and `head` sets a
+  label outright.
+- The card **hugs** its columns: a column's `w` is its floor, not a clip
+  (`table.fixed` is auto layout), so a one-row header is never cut; frozen
+  columns pin their width so the next one's offset is known.
+- Default density (38px); zebra off; row hover on; owner tints (§3.9).
 - **Sort is declared, not parsed**: each column gives `sortValue(row)`;
   blanks always last; the sorted column header is highlighted.
 - Rows render 100 at a time with "Show all N" (no virtualisation needed at
   our sizes, ≤ ~800 rows); the panel header shows `N of M` like the props board.
-- A **density toggle** (compact / comfortable) per grid, remembered per grid;
-  Trade Market defaults to comfortable (§6), the rest to compact.
+- A **density switch** (Compact / Default / Comfy — 32 / 38 / 48px) per grid,
+  remembered per grid (`densitySwitch`, which re-classes the table in place);
+  Trade Market adds Roomy (64px) and defaults to it (§6).
 - Optional **heat** columns (see 3.6) and a legend line under the grid.
 - Filter bar above it, in the order from §2.6.
 
@@ -94,12 +98,10 @@ Pick by the data's shape. When two fit, take the one higher in this list.
 - **Lean** (`grid({lean:true})`, `table2(…, {cls:'lean'})`): one line per
   row, like a printed cheat sheet — every player table (My Team, All Rosters,
   Players, League Players, Sources, Waiver Wire, stored weeks, the Overview's
-  side panels). The player reads `Name  RB – BAL`, or `Name (BAL)` with
-  `nopos` where the table is already one position; a number's rank sits to
-  its left (`RB12 178.8`), not under it; the kickoff moves to the opponent's
-  hover. Group labels stay, centred and unfilled; no header fill, no column
-  rules. Pure CSS over the same cells. Team tables (Standings, Power, Analysis)
-  keep the comfortable two-line Table.
+  side panels). The player is the one-line identity (§3.9); a number's rank
+  sits beside it (`178.8  RB 12`) where it is not its own column; the
+  kickoff moves to the opponent's hover. Pure CSS over the same cells. Team
+  tables (Standings, Power, Analysis) keep their two-line team cells.
 
 ### 3.3 List
 
@@ -136,8 +138,8 @@ blank handling and sort value. No page writes a cell by hand.
 | `player` | PlayerIdentity (sm 28px / md 36px) | left | — | name opens the card |
 | `team` | TeamIdentity (logo + name, "you" mark) | left | — | |
 | `text` | string, ellipsis | left | `—` | |
-| `num` | value with unit-aware format | right | `—` + reason tooltip | optional sub-line |
-| `rank` | `#12` or `WR12` | right | `—` | sort ascending |
+| `num` | value with unit-aware format | centre | `—` + reason tooltip | optional sub-line |
+| `rank` | `#12` or `WR 12` | centre | `—` | sort ascending |
 | `delta` | signed number, green/red; arrow icon past `threshold` | right | `—` | `+0` shown as `0` |
 | `heat` | `num` + background from a scale | right | uncoloured | full-bleed in DataGrid, pill in Table |
 | `spark` | line/area series | right | `—` | `data-v` = net change |
@@ -146,9 +148,10 @@ blank handling and sort value. No page writes a cell by hand.
 | `chip` | tier / need / status chips | left | — | |
 | `action` | link or outlined button | right | — | last column only |
 
-**PlayerIdentity** (one renderer, three sizes): headshot → name → `POS chip ·
-TEAM logo · TEAM` (+ `bye N`, injury badge). Replaces `playerCell2`,
-`rosterCell` and `.prow`.
+**PlayerIdentity** (one renderer, two layouts — §3.9): one line, position
+badge → 28px headshot with the NFL logo on its corner → name → NFL team →
+status tag. A lineup leads with its slot badge and keeps `POS - TEAM` under
+the name. `playerCell2` and `rosterCell` are its two layouts.
 
 ### 3.7 Formatting rules (one module, tested)
 
@@ -159,7 +162,7 @@ TEAM logo · TEAM` (+ `bye N`, injury badge). Replaces `playerCell2`,
 | trade value < 100 | 1 decimal | `97.4` |
 | league points (League Value) | integer ≥ 100, else 1 decimal | `168`, `48.1` |
 | overall rank | `#n` | `#12` |
-| position rank | `POSn` | `WR12` |
+| position rank | `POS n` (`fxPosRank`; `fxRankText` tidies a source's `WR12`) | `WR 12` |
 | percent | integer + `%` | `99%` |
 | change | sign always, same decimals as the value | `+22`, `-1.5` |
 | missing | `—`, never `0`, with a tooltip saying why | |
@@ -175,6 +178,99 @@ TEAM logo · TEAM` (+ `bye N`, injury badge). Replaces `playerCell2`,
   class from `fxHeatClass`.
 - Every scale works in both themes (built with `color-mix` on tokens, as
   today) and every heated column has a one-line legend.
+
+### 3.9 The table system (approved boards, 2026-10-21)
+
+The Design canvas's "Page choices" boards — Team view and Player table, dark
+and light — are the reference. Everything below is in
+`src/dashboard.template.html`, shared by `grid()`, `smallTable()`, `table2()`
+and `table()`; no page styles its own table.
+
+**Tokens.** Dark is the default theme (`:root`); light is the same names
+re-valued under `:root[data-theme="light"]`, chosen by the Theme button only.
+
+| Token | Dark | Light | Used for |
+|---|---|---|---|
+| `--ground` | `#12161F` | `#DFE4EC` | page |
+| `--surface` | `#29304A` | `#FFFFFF` | card and rows |
+| `--th-bg` / `--surface-2` | `#222A3E` | `#F3F5F9` | header bar |
+| `--line-strong` | `#424B69` | `#D6DCE5` | card edge, rule under the header |
+| `--line` | `#3A4360` | `#E2E7EE` | row lines |
+| `--row-hover` | `#353E5A` | `#F3F5F9` | hover |
+| `--ink` / `--ink-name` | `#E6E9EF` / `#EEF1F6` | `#262B33` / `#1F242C` | numbers / names |
+| `--ink-3` / `--th-ink` | `#A9B1BF` / `#B9C0CC` | `#868B95` / `#525A67` | secondary line / headers |
+| `--gold` on `--gold-ink` | `#FACD39` on `#16191D` | same | the accent: active chip, YOU, sort arrow (dark) |
+| `--p-qb … --p-ir` | QB `#C8A1FF` RB `#83DCEF` WR `#85DE9E` TE `#FF8AA2` K `#FDB97C` DST `#BDC3CD` BN `#EBEEF4` IR `#FD9891`; FLX `#7FD1D8` | FLX `#A9E6EE` | position and slot badges, ink `#13284A` |
+| `--heat-u2 … --heat-d2` | `#1F5A50 #1C3F43 · #3E2B38 #5E3239` | soft green / soft red | shaded value cells |
+
+**Type.** Poppins (Arial, Helvetica fallback), antialiased, weights 400 /
+500 / 600 only. Names 14px/500 (`--fs-name`); numbers and ranks 12px/500
+tabular, centred (`--fs-num`); headers 12px/500 in sentence case on the
+header bar (`--fs-th`). No vertical column lines, no zebra.
+
+**Rows.** 38px by default, cells padded `0 8px`, columns sized to content;
+the player column is ~330px. The card hugs its table.
+
+**Player identity** (`playerIdentity`): one line —
+
+| Piece | Spec |
+|---|---|
+| position badge | `.pos`, min-width 24px, 18px tall, radius 5px, 10px/600, `#13284A` on the position colour |
+| headshot | `.av` 28px round; the NFL logo `.lg` 13px at its bottom-left with a drop shadow; a defense is its logo |
+| name | `.plink` 14px/500; turns link-blue with its row on hover; opens the player card |
+| NFL team | `.tm` 11px/500 secondary |
+| status | `statusTag`: `.st` 16px tall, 10px/600 — BYE yellow, OUT/IR coral, Q/D amber |
+
+A lineup (`layout:'roster'`) leads with the slot badge (`.pos.slot`: min-width
+28px, 23px tall, radius 6px, 11px/600; flex reads FLX) and keeps a
+`POS - TEAM` line under the name; a starter who cannot play is dimmed. The
+all-players grids lead with a muted overall rank column (`{rank:true}`: the
+row's place under the current sort). A table of one position (`nopos`) drops
+the badge.
+
+**Ranks** read `RB 6`: position, a space, the number (`fxPosRank`,
+`fxRankText`). The agreed number and its rank are two columns named for the
+window — `Week` / `Wk rank`, `ROS` / `ROS rank` — with an (i) on the points
+header explaining "Agreed". The opponent column is centred and muted.
+
+**Owner badge** (`fxOwner` → `ownerBadge`, league-wide tables: League
+Players, Values, Waiver Wire): a 20px badge with the team's abbreviation,
+`YOU` in yellow for yours, `FA` green, `W` amber plus the day he clears
+(`Thu`); the full name is on hover. The whole row is tinted by the same
+answer: `tr.you` (warm), `tr.fa` (green), `tr.wv` (amber).
+
+**Toolbar** (`.dg-bar`, above a grid or a lineup): filter chips (`.fchip`,
+28px pills; the active one yellow), a muted count with the sort ("Showing
+100 of 539 players · sorted by Week"), and the density switch.
+
+**Density** (`densitySwitch`): Compact 32px / Default 38px / Comfy 48px
+(Roomy 64px on Trade Market), set as a class on the table, remembered per
+table id under `gd.dg.<id>` (the old `comfortable` reads as Default).
+
+**Headers** (`headCell`): sortable columns show dim up/down arrows; the
+sorted column's live arrow is the accent (`--sort-on`: yellow dark, blue
+light).
+
+**Row states**, strongest last — each is a `--cell-bg` the cells paint, so a
+frozen cell layers it over the card instead of hiding it:
+
+| State | Look |
+|---|---|
+| hover | `--row-hover` tint; the name turns link blue |
+| yours / FA / waivers | warm / green / amber tint |
+| selected | `--row-sel` tint with a 3px blue left edge |
+| expanded | `--row-exp` tint; a detail tray (`playerTray`) opens under it: this week, rest of season, rostered, weekly bars |
+
+Clicking a player row anywhere but the name (which opens the card) selects
+it and opens the tray; a second click closes it; one open row per table.
+
+**Section dividers** (`tr.sec`, `tr.grouphdr`, `tr.cutrow`): Bench, Injured
+reserve, a playoff cut — a 10px muted uppercase label over a thin top rule,
+never a filled band. The totals row is unfilled, under a strong rule.
+
+**Shaded value cells** (`fxHeatClass` + `shadeCell`): the shade is a rounded
+cell (`.hc`) inside the column, never a full-bleed fill — League Value vs
+each source, team totals vs League Value, Yahoo net adds.
 
 ## 4. How it is built
 

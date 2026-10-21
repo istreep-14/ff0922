@@ -57,8 +57,30 @@ export function fxDelta(v, d = 1) {
 /** An overall rank: `#12`. */
 export const fxRank = (n) => (fxMissing(n) ? FX_BLANK : '#' + n);
 
-/** A position rank: `WR12`. */
-export const fxPosRank = (pos, n) => (fxMissing(n) ? FX_BLANK : String(pos || '') + n);
+/** A position rank: `WR 12` — position, a space, the number. */
+export const fxPosRank = (pos, n) => (fxMissing(n) ? FX_BLANK : (pos ? String(pos) + ' ' : '') + n);
+
+/**
+ * A position rank a source already wrote (`RB6`, `rb 6`) in the tables'
+ * form, `RB 6`. Anything that is not a position rank is left as it is.
+ */
+export function fxRankText(s) {
+  if (s == null) return FX_BLANK;
+  const m = String(s).trim().match(/^(QB|RB|WR|TE|K|DST|DEF|FLEX|SF)\s*(\d+)$/i);
+  return m ? m[1].toUpperCase() + ' ' + m[2] : String(s);
+}
+
+/**
+ * Who has a player, as the owner badge writes it: the team's abbreviation
+ * (YOU for yours), FA, or W for a player on waivers with the day he clears.
+ * `own` is null for nobody, or { mine, abbr, name }; `claim` is a waiver
+ * claim { clearsDay } when he is on waivers.
+ */
+export function fxOwner(own, claim) {
+  if (own) return { text: own.mine ? 'YOU' : String(own.abbr || '?'), cls: own.mine ? 'you' : 'team', row: own.mine ? 'you' : '', title: (own.name || '') + (own.mine ? ' — your team' : '') };
+  if (claim) return { text: 'W', cls: 'wv', row: 'wv', day: claim.clearsDay || '', title: 'On waivers' + (claim.clearsDay ? ', clears ' + claim.clearsDay : '') };
+  return { text: 'FA', cls: 'fa', row: 'fa', title: 'Free agent' };
+}
 
 /** A share: `99%`. */
 export const fxPct = (v) => (fxMissing(v) ? FX_BLANK : Math.round(Number(v)) + '%');
